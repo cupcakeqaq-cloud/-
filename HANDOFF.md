@@ -588,6 +588,14 @@ window.CONTENT = {
 - **本仓库单独配了 git 代理**：`git config http.proxy http://127.0.0.1:7897`（站主本机的代理端口）。原因：不配代理时 `git push` 直连 `github.com:443` 会 `Failed to connect ... after 21s`，而 PowerShell 走系统代理能通 —— git 不读 Windows 系统代理，只读自己的配置和 `HTTP(S)_PROXY` 环境变量。后台 `/api/git` 调的是同一个 git，所以这条配置同时也让后台的「提交并推送」能用。**站主如果关掉/换掉代理**：要么 `git config --unset http.proxy`，要么把端口改成新的，否则推送会连不上。
 - `git push` 会走本机 `credential.helper=manager` 的已存凭据，所以**推送不需要 `.env` 里的 `GITHUB_TOKEN`**；那个 token 只用于 `/api/release` 传大文件到 Releases。
 
+**站主实测反馈修掉的 bug（登录不进后台）**
+
+- 现象：站主打开 `http://127.0.0.1:3000/admin/` 和局域网地址，输入密码毫无反应，**连「密码不对」都不弹**。
+- 根因：带斜杠的 `/admin/` 是把 `admin.html` 的内容直接发出去，但**浏览器地址栏停在 `/admin/`**，于是页面里那两个相对路径的 `<script src="js/…">` 被解析成 `/admin/js/i18n.js`、`/admin/js/admin.js` → 两个都 404（实测 `/admin/js/i18n.js -> 404`）→ 脚本一行都没执行 → 表单变成死的：点「登录」没反应、回车没反应、也没有任何报错。
+- 修法：`server.js` 把 `/admin` 和 `/admin/` **302 到 `/admin.html`**，地址栏变成 `/admin.html` 后相对路径就对了（admin.html 里保持相对路径，这样它扔到 Pages 上也不会烂）。
+- 修完实测（无头 Edge 真点）：错密码 → `#loginMsg` 显示「密码不对」；对密码 → 登录框隐藏、后台显示、`#hint` 显示「已读取（N 个文件还没提交）」。
+- 顺带：启动时把登录密码打印到控制台（之前只有「首次自动生成」那一次打印，站主根本没看到过）。
+
 **站主下一步就两件事**
 
 1. `.env` 里的 `ADMIN_PASSWORD` 是首次启动自动生成的随机串（只打印在控制台）。想换成好记的就改那一行，然后重启 `npm start`。

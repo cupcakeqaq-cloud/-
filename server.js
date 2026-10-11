@@ -108,9 +108,11 @@ const server = http.createServer((req, res) => {
   // 后台接口优先（/api/*）
   if (admin && admin.handle(req, res, url)) return;
 
-  // 后台页面
+  // 后台页面（必须重定向到 /admin.html：admin.html 里的 js 用的是相对路径，
+  //  如果浏览器地址停在 /admin/，相对路径会变成 /admin/js/*.js 直接 404，页面就成了死表单）
   if (pathname === '/admin' || pathname === '/admin/') {
-    serveStatic(req, res, '/admin.html');
+    res.writeHead(302, { Location: '/admin.html' });
+    res.end();
     return;
   }
 
@@ -138,6 +140,11 @@ server.listen(PORT, HOST, () => {
   if (admin) {
     console.log('★ 网站编辑器后台： http://127.0.0.1:' + PORT + '/admin/');
     lanURLs().forEach((u) => console.log('   同一局域网也能开： ' + u));
-    if (!admin.CFG.ADMIN_PASSWORD) console.log('★ 注意：.env 里 ADMIN_PASSWORD 是空的，登录不了。');
+    if (admin.CFG.ADMIN_PASSWORD) {
+      console.log('★ 后台登录密码： ' + admin.CFG.ADMIN_PASSWORD);
+      console.log('   想换密码就改项目根目录 .env 里的 ADMIN_PASSWORD，然后重启。');
+    } else {
+      console.log('★ 注意：.env 里 ADMIN_PASSWORD 是空的，登录不了。');
+    }
   }
 });
