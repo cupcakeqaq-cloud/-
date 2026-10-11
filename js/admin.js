@@ -545,11 +545,13 @@
 
   function paintCrop() {
     if (!cr) return;
-    var f = $('#cropFrame'), im = $('#cropImg'), z = cr.zoom;
+    var f = $('#cropFrame'), im = $('#cropImg');
+    /* 按存盘时的精度（3 位小数）画，预览才和保存后的前台一模一样 */
+    var z = c3(cr.zoom), cx = c3(clampPan(cr.cx, z)), cy = c3(clampPan(cr.cy, z));
     im.style.width = (z * 100) + '%';
     im.style.height = (z * 100) + '%';
-    im.style.left = ((0.5 - cr.cx * z) * 100) + '%';
-    im.style.top = ((0.5 - cr.cy * z) * 100) + '%';
+    im.style.left = ((0.5 - cx * z) * 100) + '%';
+    im.style.top = ((0.5 - cy * z) * 100) + '%';
     f.style.aspectRatio = cropRatio();
     $('#cropZoom').value = String(Math.round(z * 100));
     $('#cropVal').textContent = z.toFixed(2) + '×';
