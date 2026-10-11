@@ -5,8 +5,7 @@
   "private": true,
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "refresh:gallery": "node refresh-gallery.cjs"
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=18"

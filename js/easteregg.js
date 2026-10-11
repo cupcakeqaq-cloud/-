@@ -6,6 +6,7 @@
   var NORMAL = 'Easter%20egg/1.png';
   var PRESSED = 'Easter%20egg/2.png';
   var SOUND = 'Easter%20egg/%E9%9F%B3%E6%95%88.wav';
+  var ERR_SOUND = 'assets/winxp/sounds/error.wav';   /* 报错弹窗音效（原版 ErrorBox 用的那个） */
 
   var audio = null;
   var clickCount = 0;
@@ -147,7 +148,28 @@
     return { x: x, y: y };
   }
 
+  /* ---- 报错音效（站主 m01947 第 3 条）：每弹一个错误窗口响一声 ----
+     winXP 原版在 src/WinXP/apps/ErrorBox 里用 new Audio(errorSound) 播 src/assets/sounds/error.wav，
+     已拷到 assets/winxp/sounds/error.wav。原版每次 new Audio 会叠成一片噪音，
+     这里复用一个 Audio + 每 260ms 最多响一次（报错窗口本身 170ms 一个，全响就炸了）。 */
+  var errAudio = null, lastErrSound = 0;
+  function playErrorSound() {
+    var now = Date.now();
+    if (now - lastErrSound < 260) return;
+    lastErrSound = now;
+    if (!errAudio) {
+      try { errAudio = new Audio(ERR_SOUND); errAudio.preload = 'auto'; } catch (e) { errAudio = null; }
+    }
+    if (!errAudio) return;
+    try {
+      errAudio.currentTime = 0;
+      var p = errAudio.play();
+      if (p && p.catch) p.catch(function () {});
+    } catch (e) {}
+  }
+
   function spawnError() {
+    playErrorSound();
     var pos = nextCascadePos();
     var dlg = document.createElement('div');
     dlg.className = 'xp-dialog err-dialog';
@@ -170,7 +192,16 @@
     errorTimer = setInterval(spawnError, 170);
   }
 
-  /* ---- 重点弹窗「你在期待什么」 ---- */
+  /* ---- 重点弹窗「你在期待什么」（文案跟随当前语言） ---- */
+  function TT(key, fallback) {
+    return window.t ? t(key) : fallback;
+  }
+  /* 乱码里含 < > & " 这类字符，塞进 innerHTML 前必须转义 */
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
   var featuredShown = false;
   function showFeaturedDialog() {
     if (featuredShown) return;
@@ -178,9 +209,9 @@
     var dlg = document.createElement('div');
     dlg.className = 'xp-dialog featured-dialog';
     dlg.innerHTML =
-      '<div class="titlebar"><span class="tb-title">信息</span><span class="tb-btns"><i class="tb-close">×</i></span></div>' +
-      '<div class="dlg-body"><span class="dlg-ico">⚠</span><span>你在期待什么？</span></div>' +
-      '<div class="dlg-btns"><button class="dlg-btn">确定</button></div>';
+      '<div class="titlebar"><span class="tb-title">' + TT('ceInfoTitle', '信息') + '</span><span class="tb-btns"><i class="tb-close">×</i></span></div>' +
+      '<div class="dlg-body"><span class="dlg-ico">⚠</span><span>' + TT('ceFeatured', '你在期待什么？') + '</span></div>' +
+      '<div class="dlg-btns"><button class="dlg-btn">' + TT('ceOk', '确定') + '</button></div>';
     document.body.appendChild(dlg);
     var done = false;
     function proceed() {
@@ -194,27 +225,65 @@
     setTimeout(proceed, 3800);
   }
 
-  /* ---- 蓝屏（慢速） ---- */
+  /* ---- 故障原因 / 模块名 / STOP 码：每次随机生成一串乱码 ---- */
+  var HEX = '0123456789ABCDEF';
+  function rndHex(n) {
+    var s = '';
+    for (var i = 0; i < n; i++) s += HEX[(Math.random() * 16) | 0];
+    return s;
+  }
+  function rndGarble(n) {
+    var s = '';
+    for (var i = 0; i < n; i++) s += GARBLE[(Math.random() * GARBLE.length) | 0];
+    return s;
+  }
+  /* 驱动文件名用纯 ASCII 乱码，汉字乱码在日/英界面里会显得像排版事故 */
+  var ASCII = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+  function rndAscii(n) {
+    var s = '';
+    for (var i = 0; i < n; i++) s += ASCII[(Math.random() * ASCII.length) | 0];
+    return s;
+  }
+
+  /* ---- 蓝屏（慢速；**站主要求纯英文，不翻译**，故障信息每次随机乱码） ---- */
   function showBSOD() {
     if (garbleTimer) clearInterval(garbleTimer);
     if (errorTimer) clearInterval(errorTimer);
     document.querySelectorAll('.err-dialog').forEach(function (d) { d.remove(); });
 
+    var mod = 'CUPCAKE_' + rndAscii(4) + '.sys';
+    var mod2 = 'cupcake' + rndHex(2).toLowerCase() + '.sys';
+    var vars = {
+      mod: mod,
+      stop: '0x' + rndHex(8) + ' (' + '0x' + rndHex(8) + ', 0x' + rndHex(8) + ', 0x' + rndHex(8) + ', 0x' + rndHex(8) + ')',
+      mod2: mod2,
+      addr: '0x' + rndHex(8),
+      base: '0x' + rndHex(8),
+      stamp: rndHex(8).toLowerCase()
+    };
+    function fill(s) {
+      return s.replace(/\{(\w+)\}/g, function (m, k) { return vars[k] != null ? vars[k] : m; });
+    }
+
     var bsod = document.createElement('div');
     bsod.className = 'bsod';
     bsod.innerHTML =
       '<div class="bsod-title">Windows</div>' +
-      'A problem has been detected and Windows has been shut down to prevent damage\n' +
-      'to your computer.\n\n' +
-      'CUPCAKE_GLITCH.sys\n\n' +
-      'If this is the first time you\'ve seen this Stop error screen,\n' +
-      'restart your computer. If this screen appears again, follow these steps:\n\n' +
-      'Check to make sure any new hardware or software is properly installed.\n' +
-      'If this is a new installation, ask your hardware or software manufacturer\n' +
-      'for any Windows updates you might need.\n\n' +
-      'Technical information:\n\n' +
-      '*** STOP: 0x0000007E (0xC0000005, 0xE1A2F000, 0xF7A2A000, 0xF7A29FF0)\n\n' +
-      '    cupcake.sys - Address E1A2F000 base at E1A2A000, DateStamp 3d6dd67c';
+      esc(fill('A problem has been detected and Windows has been shut down to prevent damage\nto your computer.\n\n' +
+        '{mod}\n\n' +
+        'If this is the first time you\'ve seen this Stop error screen, restart your computer.\n' +
+        'If this screen appears again, follow these steps:\n\n' +
+        'Check to make sure any new hardware or software is properly installed.\n' +
+        'If this is a new installation, ask your hardware or software manufacturer for any\n' +
+        'Windows updates you might need.\n\n' +
+        'If problems continue, disable or remove any newly installed hardware or software.\n' +
+        'Disable BIOS memory options such as caching or shadowing.\n' +
+        'If you need to use Safe Mode to remove or disable components, restart your computer,\n' +
+        'press F8 to select Advanced Startup Options, and then select Safe Mode.\n\n' +
+        'Technical information:\n\n' +
+        '*** STOP: {stop}')) +
+      '\n\n' +
+      esc(fill('    {mod2} - Address {addr} base at {base}, DateStamp {stamp}'));
     var mem = document.createElement('div');
     mem.className = 'bsod-mem';
     mem.innerHTML = 'Beginning dump of physical memory' +
@@ -223,7 +292,7 @@
     bsod.appendChild(mem);
     document.body.appendChild(bsod);
 
-    var fill = mem.querySelector('.bsod-fill');
+    var fillEl = mem.querySelector('.bsod-fill');
     var label = mem.querySelector('div[style]');
     var pct = 0;
     var iv = setInterval(function () {
@@ -233,7 +302,7 @@
         clearInterval(iv);
         setTimeout(function () { location.reload(); }, 1600);
       }
-      fill.style.width = pct + '%';
+      fillEl.style.width = pct + '%';
       label.textContent = 'Physical memory dump ... ' + Math.floor(pct) + '%';
     }, 190);
   }

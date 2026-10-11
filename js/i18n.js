@@ -6,63 +6,138 @@
       ja: '12あKa@被告人杯糕_ ★ ホームページ',
       en: '12あKa@被告人杯糕_ ★ Homepage'
     },
-
-    headHello: {
-      zh: '(｡･ω･｡)ﾉ♡ 欢迎光临',
-      ja: '(｡･ω･｡)ﾉ♡ いらっしゃいませ',
-      en: '(｡･ω･｡)ﾉ♡ Welcome'
+    commissionPageTitle: {
+      zh: '委托相关事宜 ★ 12あKa@被告人杯糕_',
+      ja: '依頼受付 ★ 12あKa@被告人杯糕_',
+      en: 'Commission ★ 12あKa@被告人杯糕_'
     },
+    resourcesPageTitle: {
+      zh: '资源配布 ★ 12あKa@被告人杯糕_',
+      ja: '素材配布 ★ 12あKa@被告人杯糕_',
+      en: 'Resources ★ 12あKa@被告人杯糕_'
+    },
+    backHome: { zh: '← 返回主页', ja: '← ホームへ戻る', en: '← Back to home' },
 
+    /* ---------- 页面窗口标题 ---------- */
     titleProfile: { zh: '自我介绍', ja: '自己紹介', en: 'About' },
-    titleDanmaku: { zh: '弹幕留言板', ja: '弾幕掲示板', en: 'Danmaku Board' },
-    titleGallery: { zh: '画廊', ja: 'ギャラリー', en: 'Gallery' },
-    titleCommission: { zh: '委托流程', ja: '依頼の流れ', en: 'Commission' },
-    titleVoice: { zh: '音源配布', ja: '音源配布', en: 'Voice DL' },
+    titleGuestbook: { zh: '留言板', ja: '掲示板', en: 'Guestbook' },
+    titleCommission: { zh: '委托相关事宜', ja: '依頼受付', en: 'Commission' },
+    titleResources: { zh: '资源配布', ja: '素材配布', en: 'Resources' },
 
+    /* ---------- 自我介绍 ---------- */
     aboutTitle: { zh: '简介', ja: '紹介', en: 'About' },
     bio: {
-      zh: '18↑一般通过十八线低精力画手，此网页用于自我介绍／配布音源／委托流程介绍。',
-      ja: '18↑ 一般通過の低浮上絵描き。このページでは自己紹介・音源配布・依頼の流れをまとめています。',
-      en: '18+ freelance illustrator, generally low-energy. This page is for my self-intro, voicebank releases, and commission info.'
+      zh: '18↑一般通过十八线低精力画手，此网页暂时为半成品，大部分文本为ai自动填写的占位符，请无视。',
+      ja: '18↑ 一般通過の低浮上絵描き。このページはまだ半完成品で、テキストの大半はAIが自動で入れたプレースホルダーです。スルーしてください。',
+      en: '18+ generally low-energy illustrator. This page is still a work in progress — most of the text is AI-filled placeholder, please ignore it.'
     },
     linksTitle: { zh: '找到我', ja: '見つけてね', en: 'Find me' },
     email: { zh: '邮箱', ja: 'メール', en: 'Email' },
 
-    counterLabel: { zh: '访问计数', ja: 'アクセスカウンター', en: 'Hits' },
+    /* ---------- 开始菜单 ---------- */
+    menuHome: { zh: '返回主页', ja: 'ホームに戻る', en: 'Home' },
+    menuCommission: { zh: '委托相关事宜', ja: '依頼受付', en: 'Commission' },
+    menuResources: { zh: '资源配布', ja: '素材配布', en: 'Resources' },
+    menuFriend: { zh: 'Survivor', ja: 'Survivor', en: 'Survivor' },
+    menuArrange: { zh: '整理所有窗口', ja: 'ウィンドウを整列', en: 'Arrange windows' },
 
-    updatesTitle: { zh: '更新日志', ja: '更新履歴', en: 'Updates' },
-    update1: { zh: '网页建成 ✿', ja: 'サイト開設 ✿', en: 'Site opened ✿' },
-    update2: { zh: 'UTAU 音源配布中', ja: 'UTAU 音源配布中', en: 'UTAU voicebanks available' },
+    /* ---------- 桌面快捷方式 ---------- */
+    deskComputer: { zh: '我的电脑', ja: 'マイ コンピュータ', en: 'My Computer' },
+    deskMines: { zh: '扫雷', ja: 'マインスイーパ', en: 'Minesweeper' },
+    deskPaint: { zh: '画图', ja: 'ペイント', en: 'Paint' },
 
-    danmakuPlaceholder: { zh: '发条弹幕吧', ja: 'コメントをどうぞ', en: 'Leave a comment' },
-    danmakuSend: { zh: '发送', ja: '送信', en: 'Send' },
-    danmakuColorTitle: { zh: '选择弹幕颜色', ja: 'コメントの色を選ぶ', en: 'Pick a color' },
-    danmakuHint: { zh: '点「发送」即可留言', ja: '「送信」でコメントできます', en: 'Hit Send to leave a comment' },
-    danmakuStatusWait: { zh: '● 连接中…', ja: '● 接続中…', en: '● Connecting…' },
-    danmakuStatusOn: { zh: '● 已连接', ja: '● 接続済み', en: '● Connected' },
-    danmakuStatusOff: { zh: '○ 未连接', ja: '○ 未接続', en: '○ Offline' },
-
-    galleryHint: { zh: '单击图片可放大', ja: 'クリックで拡大', en: 'Click to enlarge' },
-    galleryEmpty: {
-      zh: '暂无作品，往 picture 文件夹放图后刷新即可',
-      ja: '作品がありません。picture フォルダに画像を入れて更新してください',
-      en: 'No artworks yet — drop images into the picture folder and refresh'
+    /* ---------- 留言板（本地存储） ---------- */
+    gbPlaceholder: { zh: '写点什么吧…', ja: 'なにか書いてね…', en: 'Say something…' },
+    gbSend: { zh: '发送', ja: '送信', en: 'Send' },
+    gbEmpty: { zh: '暂无评论', ja: 'まだコメントがありません', en: 'No comments yet' },
+    gbHint: {
+      zh: '留言仅保存在你自己的浏览器里（localStorage），刷新不会丢，换设备不会同步。',
+      ja: 'コメントは自分のブラウザ内（localStorage）にのみ保存されます。更新しても消えませんが、別の端末とは同期しません。',
+      en: 'Comments are stored only in your own browser (localStorage). They survive a refresh but do not sync across devices.'
     },
+    gbName: { zh: '名字（可留空）', ja: '名前（空欄可）', en: 'Name (optional)' },
+    gbDelete: { zh: '删除', ja: '削除', en: 'Delete' },
+    gbTimeNow: { zh: '刚刚', ja: 'たった今', en: 'just now' },
 
-    step1b: { zh: '① 咨询沟通', ja: '① ご相談', en: '① Inquiry' },
-    step1d: { zh: '私信说明用途／预算／工期，附上参考图与设定。', ja: 'DMで用途・予算・納期をお知らせください。参考画像と設定も添えて。', en: 'DM me the use, budget, and deadline, plus references and character info.' },
-    step2b: { zh: '② 确认报价', ja: '② お見積もり', en: '② Quote' },
-    step2d: { zh: '确认价格、排期与修改次数，约好交稿时间。', ja: '料金・スケジュール・修正回数を確認し、納期を決めます。', en: 'Confirm price, schedule, and revisions, and set the deadline.' },
-    step3b: { zh: '③ 草稿确认', ja: '③ ラフ確認', en: '③ Sketch' },
-    step3d: { zh: '先出草稿／线稿，构图 OK 再进入下一步。', ja: '先にラフ・線画をお見せし、構図OKで次へ進みます。', en: 'I send a sketch/lineart first; we proceed once the composition is approved.' },
-    step4b: { zh: '④ 上色细化', ja: '④ 着色・仕上げ', en: '④ Coloring' },
-    step4d: { zh: '上色、细化并交付预览，按约定修改。', ja: '着色・仕上げをしてプレビューをお渡しし、約束の範囲で修正します。', en: 'Color and polish, send a preview, and revise as agreed.' },
-    step5b: { zh: '⑤ 完稿交付', ja: '⑤ 納品', en: '⑤ Delivery' },
-    step5d: { zh: '结算尾款，发送高清成稿 ✿ 感谢委托！', ja: '残金を清算後、高解像度データをお送りします ✿ ご依頼ありがとうございます！', en: 'After the final payment, I send the hi-res files ✿ Thanks for commissioning me!' },
-    commissionNote: { zh: '※ 具体流程以实际沟通为准，欢迎先来问价 ♡', ja: '※ 実際の流れは相談次第です。お気軽にお見積もりください ♡', en: '※ Actual process may vary — feel free to ask for a quote first ♡' },
+    /* ---------- 主页上的两个入口 ---------- */
+    ceText: {
+      zh: '委托流程、价目表、申请方式与例图都搬到独立页面了，点击下面的按钮进入。',
+      ja: '依頼の流れ・料金表・申し込み方法・サンプルは専用ページに移動しました。',
+      en: 'Process, price list, how to apply and samples all live on a separate page now.'
+    },
+    ceGo: { zh: '进入委托相关事宜页 →', ja: '依頼受付ページへ →', en: 'Open commission page →' },
+    reText: {
+      zh: '音源等资源的下载与使用说明搬到独立页面了，点击下面的按钮进入。',
+      ja: '音源などのダウンロードと使い方は専用ページに移動しました。',
+      en: 'Downloads and usage notes moved to a separate page.'
+    },
+    reGo: { zh: '进入资源配布页 →', ja: '素材配布ページへ →', en: 'Open resources page →' },
 
-    voiceSizeGhost: { zh: '约 65.3 MB · zip', ja: '約 65.3 MB · zip', en: '~65.3 MB · zip' },
-    voiceSizeLin: { zh: '约 55.9 MB · zip', ja: '約 55.9 MB · zip', en: '~55.9 MB · zip' },
+    /* ---------- 委托页 ---------- */
+    cmStatusTitle: { zh: '目前是否接受委托', ja: '依頼受付状況', en: 'Commission status' },
+    cmStatusOpen: { zh: '接受中', ja: '受付中', en: 'OPEN' },
+    cmStatusNote: {
+      zh: '档期随时变动，来问价之前建议先私信确认一下当前排期 ♡',
+      ja: 'スケジュールは変動します。お問い合わせ前にDMでご確認ください ♡',
+      en: 'Slots change often — please DM me to confirm the current schedule first ♡'
+    },
+    cmPriceTitle: { zh: '委托价目表', ja: '料金表', en: 'Price list' },
+    cmPriceTalk: { zh: '私信议价', ja: 'DMで相談', en: 'DM to discuss' },
+    cmPriceNote: {
+      zh: '※ 上表价格与工期为占位内容（工期单位为工作日），正式价目待站长补充；商用／加急另计。',
+      ja: '※ 上記の料金と納期は仮の内容です（納期は営業日）。正式な料金表は追って更新します。商用・特急は別途。',
+      en: '※ Prices and lead times above are placeholders (lead time in business days) to be filled in by the owner. Commercial use and rush orders cost extra.'
+    },
+    cmApplyTitle: { zh: '委托申请方式', ja: '申し込み方法', en: 'How to apply' },
+    cmApply1b: { zh: '① 私信联系', ja: '① DMで連絡', en: '① Get in touch' },
+    cmApply1d: {
+      zh: '通过米画师 / X / マシュマロ 任意一个渠道私信我，附上用途与参考图。',
+      ja: 'ミファシ・X・マシュマロのいずれかからDMしてください。用途と参考画像を添えて。',
+      en: 'DM me on MiHuashi / X / Marshmallow with the intended use and references.'
+    },
+    cmApply2b: { zh: '② 说明需求', ja: '② 内容を伝える', en: '② Brief me' },
+    cmApply2d: {
+      zh: '说明用途、预算、期望工期，以及角色设定／构图要求。',
+      ja: '用途・予算・希望納期、キャラ設定や構図の希望を教えてください。',
+      en: 'Tell me the use, budget, deadline, plus character settings and composition wishes.'
+    },
+    cmApply3b: { zh: '③ 确认后开工', ja: '③ 確認して着手', en: '③ Confirm and start' },
+    cmApply3d: {
+      zh: '确认报价与排期后支付定金，草稿 → 上色 → 完稿逐步交付。',
+      ja: '料金とスケジュールを確認し、着手金をお支払いいただいてからラフ→着色→完成へ進みます。',
+      en: 'After confirming the quote and schedule, pay the deposit; then sketch → color → final delivery.'
+    },
+    cmShotsHint: { zh: '点击例图可在新标签查看原图', ja: '画像をクリックすると原寸で開きます', en: 'Click a sample to open the full image' },
+
+    /* ---------- 委托页卡片（01 白底头像用的是站长米画师实价，02-04 为占位）
+       价位按语言换算当地货币，汇率基准写在这里，改汇率就改这三对数字：
+       1 CNY = 21 JPY = 0.14 USD（日元取 500 整、美元取 5 整） ---------- */
+    cmCard1Title: { zh: '白底头像', ja: '白背景アイコン', en: 'Flat-color icon' },
+    cmCard1Price: { zh: '¥320-520', ja: '6,500〜11,000円', en: '$45-75' },
+    cmCard1Desc1: { zh: '塑造成仅做如例图所示简单二分', ja: '塗りは例のようにシンプルな二分まで', en: 'Shading kept to the simple two-tone shown' },
+    cmCard1Desc2: { zh: '需要小物添加／抱娃之类的ok', ja: '小物追加・抱っこなどはOK', en: 'Props, plushies and the like are fine' },
+    cmCard2Title: { zh: '半身插画', ja: '半身イラスト', en: 'Half-body illustration' },
+    cmCard2Price: { zh: '¥600-900', ja: '12,500〜19,000円', en: '$85-125' },
+    cmCard2Desc1: { zh: '膝上／腰上半身构图', ja: '腰上〜膝上の半身構図', en: 'Waist-up to knee-up composition' },
+    cmCard2Desc2: { zh: '可按需求加背景与光效', ja: 'ご希望に応じて背景やライティングも', en: 'Backgrounds and lighting available on request' },
+    cmCard3Title: { zh: '全身插画', ja: '全身イラスト', en: 'Full-body illustration' },
+    cmCard3Price: { zh: '¥1000-1500', ja: '21,000〜31,500円', en: '$140-210' },
+    cmCard3Desc1: { zh: '全身构图，含简单背景', ja: '全身構図、簡単な背景付き', en: 'Full body with a simple background' },
+    cmCard3Desc2: { zh: '复杂设定／多套服装另议', ja: '複雑な設定・衣装違いは別途お見積り', en: 'Complex designs or extra outfits quoted separately' },
+    cmCard4Title: { zh: '场景／多人', ja: 'シチュエーション・複数人', en: 'Scene / multiple characters' },
+    cmCard4Desc1: { zh: '横构图场景、双人以上互动', ja: '横長の構図、二人以上の絡み', en: 'Wide compositions, two or more characters' },
+    cmCard4Desc2: { zh: '按复杂度报价，先私信沟通', ja: '複雑さでお見積り、まずはDMで', en: 'Quoted by complexity — DM me first' },
+    cmLinksTitle: { zh: '联系方式', ja: '連絡先', en: 'Contact' },
+
+    /* ---------- 资源页 ---------- */
+    rsIntroTitle: { zh: '资源简介', ja: '素材について', en: 'About these resources' },
+    rsIntro: {
+      zh: '这里什么都有可能放 —— 会不定时上传本人制作的东西，看到更新就下载吧。',
+      ja: 'ここに置くものは何でもありです —— 本人が作ったものを不定期にアップします。更新があったらダウンロードしていってください。',
+      en: 'Anything goes here — I upload things I make now and then. Grab whatever you see when it updates.'
+    },
+    rsDownloadTitle: { zh: '下载', ja: 'ダウンロード', en: 'Download' },
+    voiceSizeFlan: { zh: '约 33.2 MB · zip', ja: '約 33.2 MB · zip', en: '~33.2 MB · zip' },
     voiceDownload: { zh: '↓ 下载', ja: '↓ ダウンロード', en: '↓ Download' },
     voiceNoteTitle: { zh: '使用说明：', ja: '使い方：', en: 'How to use:' },
     voiceNote: {
@@ -71,9 +146,64 @@
       en: 'Unzip and place the voicebank folder into UTAU\'s voice folder, then select it in the editor. No redistribution or resale; please credit the author when using or sharing. Contact me for commercial use ♡'
     },
 
-    footStart: { zh: '开始', ja: 'スタート', en: 'Start' },
+    /* ---------- 电源流程 ---------- */
+    pwLogoffTitle: { zh: '注销 Windows', ja: 'Windows のログオフ', en: 'Log Off Windows' },
+    pwTurnTitle: { zh: '注销 Windows', ja: 'Windows のログオフ', en: 'Log Off Windows' },
+    pwStandby: { zh: '待机', ja: 'スタンバイ', en: 'Stand By' },
+    pwTurnOff: { zh: '关闭计算机', ja: '電源を切る', en: 'Turn Off' },
+    pwRestart: { zh: '重新启动', ja: '再起動', en: 'Restart' },
+    pwSwitch: { zh: '切换用户', ja: 'ユーザーの切り替え', en: 'Switch User' },
+    pwLogOff: { zh: '注销', ja: 'ログオフ', en: 'Log Off' },
+    pwCancel: { zh: '取消', ja: 'キャンセル', en: 'Cancel' },
+    pwTurnOffShort: { zh: '关闭计算机', ja: '電源を切る', en: 'Turn Off Computer' },
+    pwShuttingDown: { zh: 'Windows 正在关机', ja: 'Windows を終了しています', en: 'Windows is shutting down' },
+    pwRestarting: { zh: 'Windows 正在重新启动', ja: 'Windows を再起動しています', en: 'Windows is restarting' },
+    pwSafeToTurnOff: {
+      zh: '你现在可以安全地关闭计算机了。',
+      ja: 'コンピュータの電源を切っても安全です。',
+      en: 'It is now safe to turn off your computer.'
+    },
+    pwRestartNow: { zh: '重新开机', ja: '再起動', en: 'Restart' },
 
-    duckAria: { zh: '玩具鸭彩蛋', ja: 'おもちゃのアヒルのお楽しみ', en: 'Toy duck surprise' }
+    /* ---------- 欢迎界面 ---------- */
+    wlTip: { zh: '要开始，请单击您的用户名', ja: '開始するにはユーザー名をクリックしてください', en: 'To begin, click your user name' },
+    wlRunning: { zh: '{n} 程序正在运行', ja: '{n} 個のプログラムが実行中', en: '{n} programs running' },
+    wlShutdown: { zh: '关闭计算机', ja: '電源を切る', en: 'Turn off computer' },
+    wlHint: { zh: '单击用户名登录', ja: 'ユーザー名をクリックしてログオン', en: 'Click the user name to log on' },
+
+    /* ---------- 假 404（外链兜底） ---------- */
+    nfTitle: { zh: '无法显示网页', ja: 'ページを表示できません', en: 'The page cannot be displayed' },
+    nfLede: {
+      zh: '您要访问的网页目前无法显示。该站点不允许被嵌入到其他页面中。',
+      ja: 'アクセスしようとしたページは表示できません。このサイトは他のページへの埋め込みを許可していません。',
+      en: 'The page you are looking for is currently unavailable. This site does not allow itself to be embedded in other pages.'
+    },
+    nfWhy: { zh: '这可能是因为：', ja: '原因として考えられること：', en: 'This might be because:' },
+    nfLi1: { zh: '该站点发送了禁止嵌入的响应头（X-Frame-Options / CSP）', ja: '埋め込みを禁止するヘッダー（X-Frame-Options / CSP）が送信されている', en: 'The site sends headers that forbid embedding (X-Frame-Options / CSP)' },
+    nfLi2: { zh: 'Web 地址输入有误，或该站点已下线', ja: 'アドレスが間違っている、またはサイトが閉鎖されている', en: 'The address is misspelled, or the site is offline' },
+    nfLi3: { zh: '网络连接被中断（本地网络或站点被墙）', ja: '接続が遮断されている（ローカル回線・ブロックなど）', en: 'The connection was interrupted (local network or blocked)' },
+    nfTech: { zh: 'HTTP 404 - 找不到文件', ja: 'HTTP 404 - ファイルが見つかりません', en: 'HTTP 404 - File not found' },
+    nfRetry: { zh: '重试', ja: '再試行', en: 'Retry' },
+    nfNewTab: { zh: '在新标签打开', ja: '新しいタブで開く', en: 'Open in a new tab' },
+
+    /* ---------- 我的电脑 ---------- */
+    compNotReady: {
+      zh: '无法访问 {drive}。设备未就绪，或该位置没有可用的磁盘。',
+      ja: '{drive} にアクセスできません。デバイスの準備ができていないか、ディスクがありません。',
+      en: 'Cannot access {drive}. The device is not ready or there is no disk at this location.'
+    },
+    compNoSearch: {
+      zh: '搜索引擎尚未安装。（笑）',
+      ja: '検索エンジンはまだインストールされていません。（笑）',
+      en: 'No search engine is installed yet. (lol)'
+    },
+
+    /* ---------- 彩蛋 ---------- */
+    duckAria: { zh: '玩具鸭彩蛋', ja: 'おもちゃのアヒルのお楽しみ', en: 'Toy duck surprise' },
+    ceInfoTitle: { zh: '信息', ja: '情報', en: 'Information' },
+    ceFeatured: { zh: '你在期待什么？', ja: '何を期待してるの？', en: 'What were you expecting?' },
+    ceOk: { zh: '确定', ja: 'OK', en: 'OK' }
+    /* 蓝屏文案**不做多语言**（站主要求纯英文保证还原度），已硬编码在 js/easteregg.js */
   };
 
   var STORE_KEY = 'cupcake-lang-v2';
@@ -160,6 +290,10 @@
   }
 
   function bind() {
+    /* 语言下拉挪进任务栏托盘（XP 语言栏），避免盖住最大化窗口的标题栏按钮 */
+    var drop0 = document.getElementById('langDrop');
+    var tray = document.querySelector('.task-tray');
+    if (drop0 && tray) tray.insertBefore(drop0, tray.firstChild);
     var toggle = document.getElementById('langToggle');
     var menu = document.getElementById('langMenu');
     if (toggle && menu) {
@@ -180,7 +314,8 @@
       })(opts[i]);
     }
     document.addEventListener('click', function (e) {
-      if (!document.getElementById('langDrop').contains(e.target)) closeMenu();
+      var drop = document.getElementById('langDrop');
+      if (drop && !drop.contains(e.target)) closeMenu();
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeMenu();

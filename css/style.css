@@ -1,9 +1,13 @@
 /* ══════════════════════════════════════════════════════════
-   12あKa@被告人杯糕_ · 自介页样式
-   千禧年个人博客 / Windows XP / 废萌
+   12あKa@被告人杯糕_ · 自介页样式（博客层）
+   窗口 / 任务栏 / 开始菜单等 XP 外壳见 css/winxp.css
    ══════════════════════════════════════════════════════════ */
 
-/* ---------- 像素字体（Fusion Pixel Font，OFL 授权） ---------- */
+/* ---------- 像素字体（Fusion Pixel Font，OFL 授权） ----------
+   ⚠️ 站主 m02125 第 2 条要求全站换成思源黑体那一路的无衬线，
+   所以下面三份 woff2 **现在没有任何地方引用**（:root 的 --font-body / --font-ui）。
+   留着是为了以后想给某个局部（比如站头印章字）加回像素味时直接写 font-family:'Pixel' 即可，
+   不会被浏览器下载，不影响体积。 */
 @font-face {
   font-family: 'Pixel';
   src: url('../assets/fonts/fusion-12px-zh_hans.woff2') format('woff2');
@@ -23,20 +27,26 @@
   unicode-range: U+0020-007F, U+00A0-024F, U+2000-206F, U+2070-209F, U+20A0-20CF, U+2100-214F, U+2190-21FF, U+2500-25FF, U+2600-26FF, U+2700-27BF;
 }
 
-/* ---------- 变量 ---------- */
+/* ---------- 变量 ----------
+   配色**照抄开源工程 winXP-master**（Luna 默认主题那套）：
+   米色面 #ece9d8 / 任务窗格标题蓝 #1c68ff / 窗格文字深海军蓝 #0c327d /
+   浅蓝渐变 #a8bcff / 控件边框灰 #b9b9b9 / 选中蓝 #316ac5 / 内容区白 #fff。
+   （来源：src/WinXP/apps/MyComputer/index.js 的样式块。）
+   2024 改版前的粉色调已全部退役，不要再往这里加 --hotpink。 */
 :root {
-  --hotpink: #ff4fa0;
-  --pink: #ff8fc8;
-  --pink-bg: #ffe3f1;
-  --cream: #fff6ea;
-  --lav: #c9a7ff;
-  --sky: #7ed0ff;
-  --mint: #b4f0d8;
-  --lemon: #ffe08a;
-  --win: #ece9d8;
-  --winline: #b8b09a;
-  --ink: #6b4056;
-  --dark: #3b2240;
+  --ink: #000;               /* 正文 */
+  --dark: #0c327d;           /* 强调文字（XP 任务窗格文字色） */
+  --accent: #0c327d;         /* 标题 / 主按钮文字 */
+  --accent2: #2f6ac4;        /* 链接 / 次级强调（XP 窗格标题蓝 #1c68ff 降了一档饱和，站主嫌太艳） */
+  --accent-soft: #a8bcff;    /* 浅蓝：编号、气泡、选中 */
+  --accent-bg: #ece9d8;      /* XP 米色面 */
+  --line: #b9b9b9;           /* XP 控件边框灰 */
+  --sel: #316ac5;            /* XP 选中蓝 */
+  /* 字体（站主 m02125 第 2 条：英文/数字不要像素体，全站换成思源黑体那一路的无衬线）
+     --font-body 给页面正文（中文优先思源黑体，Windows 上通常落到微软雅黑）；
+     --font-ui 给 XP 外壳（拉丁字符优先 Tahoma —— 原版 XP 就是 Tahoma，最还原）。 */
+  --font-body: 'Noto Sans SC', 'Source Han Sans SC', 'Source Han Sans CN', 'Microsoft YaHei', 'PingFang SC', Tahoma, system-ui, sans-serif;
+  --font-ui: Tahoma, 'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', 'PingFang SC', system-ui, sans-serif;
 }
 
 /* ---------- 基础 ---------- */
@@ -45,12 +55,12 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: 'Pixel', 'MS PGothic', 'MS Gothic', 'PMingLiU', 'SimSun', 'Microsoft YaHei', monospace;
+  font-family: var(--font-body);
   color: var(--ink);
   line-height: 1.6;
   min-height: 100vh;
   overflow-x: hidden;
-  background: url('../assets/background/windows.jpg') center / cover fixed no-repeat, #ffdff0;
+  background: url('../assets/background/windows.jpg') center / cover fixed no-repeat, #ece9d8;
 }
 
 /* 轻纱提亮，保证内容可读 */
@@ -73,6 +83,8 @@ a { color: inherit; text-decoration: none; }
 }
 .star-art {
   position: absolute; margin: 0;
+  /* 星星是 ASCII 字符画，必须等宽字体，别跟着 --font-body 变 */
+  font-family: 'Consolas', 'Courier New', monospace;
   color: #ffffff;
   text-shadow:
     0 0 6px rgba(255, 255, 255, .95),
@@ -90,91 +102,50 @@ a { color: inherit; text-decoration: none; }
   100% { opacity: 0; transform: scale(1.08); }
 }
 
-/* ---------- 语言切换（下拉） ---------- */
-.lang-drop { position: fixed; top: 12px; right: 14px; z-index: 95; }
+/* ---------- 语言切换（由 i18n.js 挪进任务栏托盘，做成 XP 语言栏） ---------- */
+.lang-drop { position: relative; z-index: 95; display: inline-flex; align-items: center; }
 .lang-toggle {
-  font-family: inherit; font-size: 14px; font-weight: bold;
-  color: var(--ink); background: rgba(255, 255, 255, .92);
-  border: 2px solid; border-color: #fff #c9a3c1 #c9a3c1 #fff;
-  border-radius: 6px; padding: 4px 12px; cursor: pointer;
-  box-shadow: 2px 2px 0 rgba(160, 60, 130, .25);
+  font-family: inherit; font-size: 11px; font-weight: bold; line-height: 1;
+  color: #fff; background: transparent;
+  border: 1px solid transparent; border-radius: 2px;
+  padding: 3px 5px; cursor: pointer;
 }
-.lang-toggle:hover { background: #fff3f9; }
+.lang-toggle:hover { background: rgba(255, 255, 255, .28); border-color: rgba(255, 255, 255, .55); }
 .lang-menu {
-  position: absolute; top: calc(100% + 5px); right: 0;
+  position: absolute; bottom: calc(100% + 6px); right: 0;
   background: #fff; min-width: 112px;
-  border: 2px solid; border-color: #fff #c9a3c1 #c9a3c1 #fff;
+  border: 2px solid; border-color: #fff var(--line) var(--line) #fff;
   border-radius: 6px;
-  box-shadow: 3px 3px 0 rgba(160, 60, 130, .2);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, .16);
   overflow: hidden;
 }
 .lang-menu[hidden] { display: none; }
 .lang-opt {
   display: block; width: 100%; padding: 8px 14px; text-align: left;
   font-family: inherit; font-size: 14px; color: var(--ink);
-  background: #fff; border: none; border-bottom: 1px dashed #f0c9e0; cursor: pointer;
+  background: #fff; border: none; border-bottom: 1px dashed #b9b9b9; cursor: pointer;
 }
 .lang-opt:last-child { border-bottom: none; }
-.lang-opt:hover { background: #ffe3f1; }
-.lang-opt.active { background: #ffd3ea; color: var(--hotpink); font-weight: bold; }
+.lang-opt:hover { background: var(--accent-bg); }
+.lang-opt.active { background: #a8bcff; color: var(--accent); font-weight: bold; }
 
-/* ---------- 窗口角落贴纸 ---------- */
-.profile-corner-gif {
-  position: absolute; left: -20px; bottom: -16px; z-index: 6;
-  width: 100px;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .22));
-}
-.gif-gl-bottom {
-  position: absolute; bottom: -16px; left: -18px; z-index: 6;
-  width: 124px;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .22));
-}
-.gif-comm-br {
-  position: absolute; bottom: -12px; right: -10px; z-index: 6;
-  width: 88px;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .22));
-}
-.gif-dan-bl {
-  position: absolute; bottom: -14px; left: -18px; z-index: 6;
-  width: 84px;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .22));
-}
-
-/* ---------- 页面骨架 ---------- */
+/* ---------- 页面骨架 ----------
+   z-index 层级（改之前先读这段）：
+   star-field 1 → desktop 6 → duck 85（桌面玩具，压在任务栏下面、盖在所有窗口上面）
+   → .page 76（页面与页面内窗口）→ #winLayer 80（浮动窗口）
+   → taskbar 90 → startmenu 92 → lang-drop 95（任务栏托盘内）
+   → power-mask 119 → welcome 120 → xp-msg 125 → powerdlg 130 → bsod 140
+   任务栏永远盖住玩具鸭，玩具鸭永远盖住窗口。 */
 .page {
-  position: relative; z-index: 2;
+  position: relative; z-index: 76;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 16px 10px 92px;
+  padding: 10px 10px 40px;
+  height: calc(100vh - 30px);   /* 任务栏 30px */
+  overflow: hidden;             /* 主页面整页不滚动，窗口内部自己滚 */
+  display: flex;
+  flex-direction: column;
 }
-
-/* ---------- 站头横幅（毛玻璃） ---------- */
-.site-head {
-  text-align: center;
-  padding: 12px 16px 14px;
-  background: rgba(255, 255, 255, .5);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, .75);
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(90, 50, 90, .15);
-}
-.head-dotart {
-  color: #d86fa8; font-size: 14px; letter-spacing: 1px;
-  text-shadow: 0 0 6px rgba(255, 255, 255, .9);
-}
-.head-title {
-  font-size: 32px; line-height: 1.3; font-weight: bold;
-  color: #ffffff;
-  text-shadow: 2px 2px 0 #2b3d5f, 0 0 14px rgba(30, 40, 70, .45);
-  margin: 4px 0 2px;
-  word-break: break-all;
-}
-.head-hello { font-size: 14px; color: #b0558d; text-shadow: 1px 1px 0 #fff; }
 
 /* ---------- 分隔线 ---------- */
 .divider {
@@ -186,154 +157,116 @@ a { color: inherit; text-decoration: none; }
 }
 .divider > span { flex: none; }
 
-/* ---------- Windows XP 窗口 ---------- */
-.window {
-  position: relative;
-  display: flex; flex-direction: column;
-  background: var(--win);
-  border-radius: 8px;
-  overflow: visible;
-  box-shadow: 0 0 0 1px #0831d9, 0 9px 22px rgba(70, 30, 70, .28);
-}
-.titlebar {
-  display: flex; align-items: center; gap: 7px;
-  padding: 6px 8px;
-  border-radius: 7px 7px 0 0;
-  background: linear-gradient(180deg, #0058ee 0%, #2f8fff 6%, #2f8fff 90%, #0058ee 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45);
-  border-bottom: 1px solid #0831d9;
-  color: #fff; font-size: 14px; font-weight: bold;
-  text-shadow: 1px 1px 0 rgba(0, 0, 60, .55);
-}
-.tb-title { letter-spacing: .5px; }
-.tb-new {
-  font-size: 12px; color: var(--lemon); font-weight: bold; letter-spacing: 1px;
-  animation: blink 1.1s steps(1) infinite;
-}
-@keyframes blink { 50% { opacity: 0; } }
-.tb-btns { margin-left: auto; display: flex; gap: 2px; }
-.tb-btns i {
-  position: relative;
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 24px; height: 21px;
-  font-style: normal; font-size: 0; color: transparent;
-  background: linear-gradient(180deg, #fff 0%, #ece9d8 45%, #d6d3ce 55%, #f0efe8 100%);
-  border: 1px solid #6d6d6d; border-radius: 3px;
-  box-shadow: inset 1px 1px 0 #fff;
-  cursor: default;
-}
-.tb-btns i:hover {
-  background: linear-gradient(180deg, #ffffff 0%, #d6e8ff 50%, #bcd8f8 100%);
-}
-.tb-min::after { content: ''; width: 9px; height: 2px; background: #333; }
-.tb-max::after { content: ''; width: 8px; height: 7px; border: 1.6px solid #333; }
-.tb-close::before, .tb-close::after {
-  content: ''; position: absolute; left: 50%; top: 50%;
-  width: 12px; height: 2px; background: #fff;
-}
-.tb-close::before { transform: translate(-50%, -50%) rotate(45deg); }
-.tb-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
-.tb-btns .tb-close {
-  background: linear-gradient(180deg, #ffb3b3 0%, #e5484d 50%, #c23333 100%);
-  border-color: #9e2828;
-}
-.tb-btns .tb-close:hover {
-  background: linear-gradient(180deg, #ffc9c9 0%, #f06a6f 50%, #d54343 100%);
-}
-
-.win-body {
-  padding: 14px;
-  border: 3px solid;
-  border-color: #fff #7a7a7a #7a7a7a #fff;
-  border-top-width: 0;
-  border-radius: 0 0 7px 7px;
-}
-
-/* ---------- 双栏布局（主栏 + 侧栏） ---------- */
+/* ---------- 双栏布局 ----------
+   主区：第一行「委托相关事宜 + 资源配布」并排，第二行「留言板」整行
+   侧栏：自介（撑满一屏高度） */
 .blog-cols {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 14px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) 380px;   /* 站主 m02125 第 3 条：自介窗宽一点，名字才不被挤压 */
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
   margin-top: 2px;
 }
-.main-col { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; gap: 14px; }
-.side-col { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; gap: 14px; position: sticky; top: 10px; }
+.main-col {
+  grid-column: 1;   /* 主栏在左（宽），与 HTML 里 aside 的先后顺序无关 */
+  grid-row: 1;      /* 必须显式指定行，否则自动排布会把主栏挤到第二行 */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
+  min-height: 0;
+}
+.main-col > #commissionEntry { grid-column: 1; grid-row: 1; }
+.main-col > #resourcesEntry  { grid-column: 2; grid-row: 1; }
+.main-col > #guestbook       { grid-column: 1 / -1; grid-row: 2; min-height: 0; }
+.side-col {
+  grid-column: 2;   /* 侧栏在右（328px） */
+  grid-row: 1;
+  display: flex; flex-direction: column; gap: 12px; min-height: 0;
+}
+.side-col > #profile { flex: 1; min-height: 0; }
+/* 窗口撑满各自的格子，内容区自己出滚动条 */
+.main-col > .win, .side-col > .win { height: 100%; min-height: 0; }
 
 /* ---------- 通用小元素 ---------- */
 .bio-title {
-  font-size: 15px; font-weight: bold; color: var(--hotpink);
+  font-size: 15px; font-weight: bold; color: var(--accent);
   margin-bottom: 6px;
 }
-.mini { font-size: 12px; color: #a58ba0; font-weight: normal; }
+.mini { font-size: 12px; color: #767676; font-weight: normal; }
 
+/* 统一按钮样式（站主要求：所有按钮都长成留言板发送按钮那样） */
 .btn {
   font-family: inherit;
-  border: 2px solid;
-  border-color: #fff #8f6f86 #8f6f86 #fff;
-  background: linear-gradient(180deg, #ff9dcb, #ff6fb1);
-  color: #fff; font-weight: bold; font-size: 14px;
-  padding: 6px 14px; border-radius: 6px; cursor: pointer;
-  text-shadow: 1px 1px 0 rgba(150, 30, 90, .5);
-  box-shadow: 2px 2px 0 rgba(120, 40, 90, .25);
-  transition: transform .08s;
+  font-size: 12px;
+  padding: 5px 18px;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #143a7a;
+  background: linear-gradient(180deg, #fdfdfd, #dfe4ee);
+  border: 1px solid #9aa7c0;
 }
-.btn:hover { filter: brightness(1.05); }
-.btn:active { transform: translateY(1px); box-shadow: 1px 1px 0 rgba(120, 40, 90, .25); }
+.btn:hover { filter: brightness(1.04); }
+.btn:active { filter: brightness(.94); }
+.btn-go { display: inline-block; }
 
 .note-box {
   margin-top: 12px; padding: 10px 12px;
-  background: #fff9e6;
-  border: 1px dashed #e0b14f;
+  background: #fff;
+  border: 1px dashed #b9b9b9;
   border-radius: 6px;
-  font-size: 13px; color: #7a5a30;
+  font-size: 13px; color: #000;
 }
-.note-box b { color: #c8862a; }
+.note-box b { color: #0c327d; }
 
 code {
   font-family: inherit;
-  background: #ffe9f4; color: #d23f87;
+  background: var(--accent-bg); color: #0c327d;
   padding: 0 4px; border-radius: 3px; font-size: .9em;
 }
 
-/* ---------- 自我介绍（侧栏，小头图） ---------- */
-.profile-body { display: flex; flex-direction: column; gap: 13px; }
+/* ---------- 自我介绍（侧栏；一屏内塞下，头图从底端裁） ---------- */
+.profile-body { display: flex; flex-direction: column; gap: 11px; }
 
 .profile-banner {
   position: relative;
-  height: 200px;
-  margin: -14px -14px 0;
-  border-radius: 6px 6px 0 0;
+  height: 118px;
+  margin: -12px -12px 0;
+  border-radius: 4px 4px 0 0;
   background-image: url('../assets/background/cute.jpg');
-  background-size: cover;
-  background-position: center 25%;
+  background-size: 100% auto;
+  background-position: center top;
+  background-repeat: no-repeat;
   margin-bottom: 2px;
 }
 
 .profile-top { display: flex; flex-direction: row; align-items: center; text-align: left; gap: 13px; }
 .avatar-frame {
   position: relative; flex: none;
-  width: 92px; height: 92px;
-  margin-top: -40px; margin-left: 6px;
+  width: 80px; height: 80px;
+  margin-top: -34px; margin-left: 6px;
   padding: 5px; background: #fff;
-  border: 3px solid; border-color: #fff #b0a88d #b0a88d #fff;
+  border: 3px solid; border-color: #fff var(--line) var(--line) #fff;
   border-radius: 50%;
-  box-shadow: 3px 3px 0 rgba(0, 0, 0, .15), inset 0 0 0 2px var(--pink-bg);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, .15), inset 0 0 0 2px var(--accent-bg);
 }
 .avatar { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
 
-.profile-id { min-width: 0; }
+.profile-id { min-width: 0; flex: 1; }
 .cn {
-  font-size: 18px; line-height: 1.3; font-weight: bold;
-  color: var(--hotpink);
-  text-shadow: 2px 2px 0 #ffd9ec;
-  word-break: break-all;
+  font-size: 16px; line-height: 1.3; font-weight: bold;
+  color: var(--accent);
+  /* 站主 m02125 第 3 条：名字不要被挤成两行 —— 原来 18px + word-break:break-all
+     会把结尾的「_」甩到第二行，看着像被挤压。现在缩到 16px 且不换行。 */
+  white-space: nowrap;
 }
 
 .bio-card, .links-card {
-  background: rgba(255, 255, 255, .6);
-  border: 2px solid; border-color: #fff #d9c6d0 #d9c6d0 #fff;
-  border-radius: 8px; padding: 10px 12px;
+  background: #fff;
+  border: 2px solid; border-color: #fff var(--line) var(--line) #fff;
+  border-radius: 6px; padding: 10px 12px;
 }
 .bio { font-size: 14px; color: var(--dark); }
 
@@ -342,261 +275,51 @@ code {
 .social {
   position: relative;
   display: flex; align-items: center; gap: 10px;
-  padding: 7px 10px; border-radius: 8px;
-  border: 2px solid; border-color: #fff #b3a0aa #b3a0aa #fff;
-  background: rgba(255, 255, 255, .8);
+  padding: 6px 10px; border-radius: 6px;
+  border: 2px solid; border-color: #fff var(--line) var(--line) #fff;
+  background: #fff;
   transition: transform .12s, box-shadow .12s;
   cursor: pointer;
 }
-.social:hover { transform: translateX(3px); box-shadow: 2px 2px 0 rgba(255, 79, 160, .2); }
+.social:hover { transform: translateX(3px); box-shadow: 2px 2px 0 rgba(0, 0, 0, .16); }
 .social-ico { width: 24px; height: 24px; flex: none; display: flex; align-items: center; justify-content: center; }
 .social-ico img { width: 22px; height: 22px; object-fit: contain; }
 .social-label { font-size: 13px; color: var(--dark); font-weight: bold; }
 .social-tip {
   position: absolute; bottom: calc(100% + 6px); left: 50%;
   transform: translateX(-50%);
-  background: #fff; color: var(--hotpink);
+  background: #fff; color: var(--accent);
   font-size: 12px; padding: 3px 10px; border-radius: 6px;
-  border: 1.5px solid var(--pink);
-  box-shadow: 2px 2px 0 rgba(160, 60, 130, .2);
+  border: 1.5px solid var(--accent-soft);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, .16);
   white-space: nowrap; opacity: 0; pointer-events: none;
   transition: opacity .15s;
   z-index: 10;
 }
 .social-mail:hover .social-tip, .social-mail:focus .social-tip { opacity: 1; }
 
-/* 访问计数器（LED） */
-.counter-box {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: rgba(255, 255, 255, .6);
-  border: 2px solid; border-color: #fff #d9c6d0 #d9c6d0 #fff;
-  border-radius: 8px; padding: 8px 10px;
-}
-.counter-label { font-size: 13px; color: var(--ink); }
-.counter-led {
-  font-family: inherit; font-size: 15px; letter-spacing: 2px;
-  background: #141414; color: #7cfc9a;
-  padding: 3px 9px; border-radius: 4px;
-  border: 1px solid #3a3a3a;
-  box-shadow: inset 0 0 8px rgba(0, 0, 0, .8), 0 0 10px rgba(124, 252, 154, .28);
-}
+/* ---------- 主页上的跳转入口 ---------- */
+.entry-text { font-size: 13px; color: var(--dark); margin-bottom: 9px; line-height: 1.5; }
 
-/* 更新日志 */
-.update-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
-.update-list li {
-  display: flex; gap: 10px; align-items: baseline;
-  font-size: 13px; color: var(--dark);
-  background: rgba(255, 255, 255, .6);
-  border: 2px solid; border-color: #fff #d9c6d0 #d9c6d0 #fff;
-  border-radius: 6px; padding: 5px 9px;
-}
-.up-date { flex: none; font-size: 11.5px; color: #a58ba0; }
+/* ---------- 留言板（主区第二行）；版式细节见 css/winxp.css 的评论区一节 ---------- */
+.gb-send { align-self: flex-end; }
+.gb-hint { line-height: 1.5; }
 
-/* ---------- 画廊（白色半透明磨砂玻璃） ---------- */
-.gallery-panel {
-  position: relative;
-  background: rgba(255, 255, 255, .68);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, .85);
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(90, 50, 90, .18);
-  padding: 14px;
-}
-.gallery-head {
-  display: flex; align-items: baseline; gap: 10px;
-  margin-bottom: 12px;
-}
-.gallery-title {
-  font-size: 19px; font-weight: bold; color: var(--hotpink);
-  text-shadow: 1px 1px 0 rgba(255, 255, 255, .9);
-}
-.gallery-head .mini { margin-left: auto; }
+/* ---------- 委托页：状态 / 流程 / 联系方式 ---------- */
+.cm-open { font-size: 17px; font-weight: bold; color: #4c7a34; letter-spacing: .5px; }
+.cm-status-note { font-size: 13px; color: var(--dark); }
 
-.gallery-grid { column-count: 3; column-gap: 12px; }
-.gallery-item {
-  break-inside: avoid;
-  margin-bottom: 12px;
-  border-radius: 8px; overflow: hidden;
-  background: #fff; cursor: zoom-in;
-  box-shadow: 2px 3px 0 rgba(0, 0, 0, .12);
-}
-.gallery-item img {
-  width: 100%; height: auto; display: block;
-  transition: transform .18s ease;
-}
-.gallery-item:hover img { transform: scale(1.03); }
-.gallery-empty { text-align: center; color: #a58ba0; padding: 30px 0; }
+/* 委托流程：站主 m02125 第 4 条 —— 不要「一个步骤一个盒子」的模块化排版，就是四行普通文字 */
+.cm-steps { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.cm-steps li { font-size: 13px; line-height: 1.7; }
+.cm-steps b { color: var(--accent); margin-right: 4px; }
+.cm-steps span { color: var(--dark); }
 
-/* ---------- 委托流程 ---------- */
-.commission-steps { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.commission-steps li {
-  display: flex; gap: 9px; align-items: flex-start;
-  background: rgba(255, 255, 255, .6);
-  border: 2px solid; border-color: #fff #d9c6d0 #d9c6d0 #fff;
-  border-radius: 7px; padding: 8px 10px;
-  font-size: 13.5px;
-}
-.commission-steps b { color: var(--hotpink); flex: none; }
-.commission-steps span { color: var(--dark); }
+.cm-contact { display: grid; grid-template-columns: 1fr; gap: 6px; }
 
-/* ---------- 音源配布 ---------- */
-.voice-list { display: flex; flex-direction: column; gap: 9px; }
-.voice-item {
-  display: flex; align-items: center; gap: 11px;
-  padding: 9px 11px; border-radius: 8px;
-  border: 2px solid; border-color: #fff #b3a0aa #b3a0aa #fff;
-  background: linear-gradient(180deg, #fff, #eef6ff);
-  transition: transform .12s;
-}
-.voice-item:hover { transform: translateX(3px); }
-.voice-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-.voice-name { font-weight: bold; color: var(--dark); font-size: 14.5px; }
-.voice-size { font-size: 11.5px; color: #a58ba0; }
-.voice-dl {
-  flex: none; font-size: 13px; font-weight: bold; color: #fff;
-  background: linear-gradient(180deg, #8ecbff, #4aa3e8);
-  border: 1px solid #2f7bc0; border-radius: 6px;
-  padding: 5px 11px;
-  box-shadow: 2px 2px 0 rgba(40, 90, 140, .3);
-}
-.voice-item:hover .voice-dl { filter: brightness(1.06); }
-
-/* ---------- 弹幕留言板（主栏底部） ---------- */
-.danmaku-body { display: flex; flex-direction: column; gap: 9px; }
-.danmaku-screen {
-  position: relative; height: 170px; overflow: hidden;
-  border-radius: 6px;
-  background: #302a3a;
-  border: 2px solid #1d1030;
-  box-shadow: inset 2px 2px 6px rgba(0, 0, 0, .35);
-}
-.danmaku-item {
-  position: absolute; left: 100%; top: 0;
-  white-space: nowrap; font-size: 15px; font-weight: bold;
-  text-shadow: 1px 1px 0 rgba(0, 0, 0, .75);
-  will-change: transform;
-  animation-name: danmakuFly;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
-  animation-duration: var(--dur, 8s);
-}
-@keyframes danmakuFly {
-  from { transform: translateX(0); }
-  to { transform: translateX(var(--fly, -1600px)); }
-}
-
-.danmaku-bar { display: flex; gap: 7px; align-items: center; }
-.color-dots { display: flex; gap: 4px; align-items: center; }
-.color-dot {
-  width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid #fff; cursor: pointer;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .35);
-  transition: transform .1s;
-}
-.color-dot:hover { transform: scale(1.15); }
-.color-dot.active { outline: 2px solid var(--hotpink); outline-offset: 1px; }
-
-#danmakuInput {
-  flex: 1; min-width: 0;
-  font-family: inherit; font-size: 14px; color: var(--dark);
-  padding: 6px 9px; border-radius: 6px;
-  border: 2px solid; border-color: #9c947c #fff #fff #9c947c;
-  background: #fff;
-  outline: none;
-}
-#danmakuInput:focus { border-color: var(--hotpink); }
-
-.danmaku-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #9a8292; }
-.dot-status.on { color: #2aa86a; }
-.dot-status.wait { color: #d78a2a; }
-.dot-status.off { color: #c06070; }
-
-/* ---------- 底部任务栏（Windows XP，固定） ---------- */
-.footbar {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
-  display: flex; align-items: center; gap: 12px;
-  padding: 0 320px 0 0;
-  background: linear-gradient(180deg, #2f5fd0 0%, #1a47a0 100%);
-  box-shadow: 0 -1px 6px rgba(0, 0, 0, .28);
-  color: #fff; font-size: 13px;
-}
-.footbar::before {
-  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0));
-  pointer-events: none;
-}
-.foot-btn {
-  display: flex; align-items: center;
-  background: linear-gradient(180deg, #7fd15f 0%, #3f9c46 100%);
-  border: none;
-  border-radius: 0;
-  padding: 3px 24px 3px 18px;
-  font-size: 16px; font-weight: bold; font-style: italic;
-  color: #fff; cursor: pointer;
-  text-shadow: 1px 1px 0 rgba(0, 60, 0, .5);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
-}
-.foot-sep { width: 1px; align-self: stretch; background: rgba(255, 255, 255, .35); }
-.foot-txt { opacity: .95; }
-.footbar .spacer { flex: 1; }
-.foot-tray {
-  display: flex; align-items: center; gap: 10px;
-  padding: 0;
-  border: none; background: none;
-}
-.foot-tray svg { width: 14px; height: 14px; fill: #bcd7fb; color: #bcd7fb; }
-.foot-clock { font-size: 13px; }
-
-/* ---------- 开始菜单 ---------- */
-.start-menu {
-  position: fixed; left: 8px; bottom: 48px; z-index: 71;
-  width: 250px;
-  background: #fff;
-  border-radius: 8px 8px 0 0;
-  box-shadow: 0 0 0 1px #0831d9, 0 6px 24px rgba(0, 0, 0, .35);
-  overflow: hidden;
-}
-.start-menu[hidden] { display: none; }
-.start-head {
-  display: flex; align-items: center; gap: 9px;
-  padding: 9px 12px;
-  background: linear-gradient(180deg, #2f8fff 0%, #0a53d8 100%);
-  color: #fff; font-weight: bold; font-size: 15px;
-}
-.start-head .avatar-mini { width: 32px; height: 32px; border-radius: 5px; border: 1px solid #fff; object-fit: cover; }
-.start-programs { padding: 5px 0; }
-.start-item {
-  display: flex; align-items: center; gap: 11px;
-  padding: 7px 14px; font-size: 14px; color: #333; cursor: pointer;
-}
-.start-item:hover { background: #2f8fff; color: #fff; }
-.start-item.disabled { color: #b0b0b0; cursor: default; }
-.start-item.disabled:hover { background: transparent; color: #b0b0b0; }
-.start-item.disabled svg { opacity: .45; }
-.start-item svg { width: 28px; height: 28px; flex: none; }
-.start-divider { height: 1px; background: #d6d6d6; margin: 5px 8px; }
-.start-side {
-  padding: 6px 10px;
-  background: linear-gradient(180deg, #cfe3ff 0%, #9cc2f7 100%);
-  border-top: 1px solid #a5b9d8;
-  font-size: 13px; color: #1a3a6a;
-}
-.start-side .ss-item { padding: 5px 6px; }
-.start-footer {
-  display: flex; justify-content: flex-end; gap: 4px;
-  background: linear-gradient(180deg, #5a8fe0, #2f57b0);
-  padding: 6px 8px;
-}
-.start-footer button {
-  font-family: inherit; font-size: 12px; color: #fff;
-  background: transparent; border: none; cursor: pointer; padding: 5px 9px; border-radius: 4px;
-}
-.start-footer button:hover { background: rgba(255, 255, 255, .2); }
-
-/* ---------- 彩蛋·玩具鸭（固定右下角，紧贴底端） ---------- */
+/* ---------- 彩蛋·玩具鸭（固定右下角，站在任务栏上沿；层级低于窗口 ----------） */
 .duck {
-  position: fixed; right: 6px; bottom: 0; z-index: 75;
+  position: fixed; right: 6px; bottom: 18px; z-index: 85;
   background: transparent; border: none; cursor: pointer; padding: 0;
 }
 .duck-img {
@@ -612,100 +335,77 @@ code {
   100% { transform: scale(1, 1); }
 }
 
-/* ---------- 灯箱 ---------- */
-.lightbox {
-  position: fixed; inset: 0; z-index: 100;
-  background: rgba(22, 10, 30, .86);
-  display: flex; align-items: center; justify-content: center; flex-direction: column;
-  padding: 40px;
-  animation: fadeIn .18s ease;
+/* ---------- 崩坏故障（彩蛋）：RGB 分离 + 撕裂扫描线 + 快速频闪 + 逐元素闪烁 ----------
+   站主 m02125 第 1 条：**窗口不要扭来扭去** → 去掉了整页的 skew/位移抖动（原 glitchShake），
+   故障感靠扫描线、频闪、RGB 鬼影和逐元素反相来撑。 */
+body.glitching .page *,
+body.glitching .taskbar * {
+  text-shadow: 3px 0 rgba(214, 60, 92, .42), -3px 0 rgba(90, 190, 220, .42) !important;
+  animation: glitchHue .26s steps(3) infinite;
 }
-.lightbox[hidden] { display: none; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.lb-close {
-  position: absolute; top: 16px; right: 22px;
-  width: 42px; height: 42px; font-size: 26px; line-height: 1;
-  color: #fff; background: rgba(255, 255, 255, .12);
-  border: 2px solid #fff; border-radius: 8px; cursor: pointer;
+body.glitching .page img, body.glitching .taskbar img {
+  filter: saturate(2.1) contrast(1.5) hue-rotate(24deg);
 }
-.lb-close:hover { background: rgba(255, 79, 160, .55); }
-.lb-img {
-  max-width: 92vw; max-height: 78vh;
-  border: 5px solid #fff; border-radius: 8px;
-  box-shadow: 0 0 46px rgba(255, 120, 200, .55);
-  background: #fff;
-}
-.lb-caption { margin-top: 10px; color: #ffd7ec; font-size: 13px; }
-
-/* ---------- 故障 / 蓝屏 / 弹窗（彩蛋） ---------- */
-body.glitching .page,
-body.glitching .footbar { animation: glitchShake .16s steps(2) infinite; }
-body.glitching .page *, body.glitching .footbar * {
-  text-shadow: 1.5px 0 rgba(255, 0, 90, .6), -1.5px 0 rgba(0, 220, 255, .6) !important;
-}
-body.glitching .page img, body.glitching .footbar img {
-  filter: saturate(2.4) contrast(1.35) hue-rotate(14deg);
-}
-@keyframes glitchShake {
-  0% { transform: translate(0, 0); }
-  25% { transform: translate(-3px, 1px); }
-  50% { transform: translate(3px, -2px); }
-  75% { transform: translate(-2px, -1px); }
-  100% { transform: translate(2px, 2px); }
+@keyframes glitchHue {
+  0%   { filter: none; }
+  50%  { filter: invert(1) hue-rotate(90deg); }
+  100% { filter: none; }
 }
 .glitch-overlay {
-  position: fixed; inset: 0; z-index: 90; pointer-events: none;
+  position: fixed; inset: -14%; z-index: 96; pointer-events: none;
   mix-blend-mode: screen;
   background:
-    repeating-linear-gradient(0deg, rgba(255, 0, 90, .14) 0 2px, rgba(0, 220, 255, .14) 2px 4px, transparent 4px 7px),
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, .06) 0 3px, transparent 3px 6px);
-  animation: glitchShake .22s steps(2) infinite;
+    repeating-linear-gradient(0deg, rgba(255, 0, 90, .28) 0 3px, rgba(0, 220, 255, .28) 3px 6px, transparent 6px 9px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .12) 0 2px, transparent 2px 5px),
+    repeating-linear-gradient(0deg, transparent 0 18px, rgba(255, 255, 255, .5) 18px 25px, transparent 25px 60px);
+  animation: glitchShift .07s steps(3) infinite, glitchStrobe .34s steps(2) infinite;
 }
+@keyframes glitchShift {
+  0%   { background-position: 0 0, 0 0, 0 0; }
+  100% { background-position: 14px 0, -11px 0, 0 46px; }
+}
+@keyframes glitchStrobe { 0%, 100% { opacity: .9; } 50% { opacity: .3; } }
 .glitch-flash {
-  position: fixed; inset: 0; z-index: 89; pointer-events: none;
+  position: fixed; inset: 0; z-index: 97; pointer-events: none;
   background: #fff; opacity: 0;
-  animation: flash .6s steps(3) 1;
+  animation: flash .14s steps(2) infinite;
 }
-@keyframes flash {
-  0% { opacity: 0; } 30% { opacity: .85; } 60% { opacity: 0; } 80% { opacity: .5; } 100% { opacity: 0; }
-}
+@keyframes flash { 0%, 49% { opacity: 0; } 50%, 100% { opacity: .34; } }
 
-/* XP 弹窗 */
+/* XP 弹窗（彩蛋错误框 / XP.msg 提示框） */
 .xp-dialog {
   position: fixed; top: 50%; left: 50%; z-index: 130;
   transform: translate(-50%, -50%);
   width: 300px;
   background: #ece9d8;
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   box-shadow: 0 0 0 1px #0831d9, 0 12px 30px rgba(0, 0, 0, .4);
   overflow: hidden;
+  font-family: var(--font-ui);
 }
-.xp-dialog .titlebar { padding: 5px 8px; font-size: 13px; }
 .xp-dialog .dlg-body {
   padding: 18px 16px;
   display: flex; align-items: center; gap: 14px;
-  border: 3px solid; border-color: #fff #7a7a7a #7a7a7a #fff; border-top-width: 0;
   font-size: 14px; color: #333;
 }
 .xp-dialog .dlg-ico { flex: none; font-size: 30px; line-height: 1; }
 .xp-dialog .dlg-btns {
   display: flex; justify-content: center; gap: 8px;
-  padding: 10px 16px 18px;
-  border: 3px solid; border-color: #fff #7a7a7a #7a7a7a #fff; border-top: none;
+  padding: 0 16px 16px;
 }
 .xp-dialog.err-dialog { transform: none; width: 320px; }
 .xp-dialog.featured-dialog { width: 360px; z-index: 135; }
 .xp-dialog.featured-dialog .dlg-body { font-size: 17px; font-weight: bold; }
 .xp-dialog.featured-dialog .dlg-ico { font-size: 34px; }
 .xp-dialog .dlg-btn {
-  font-family: inherit; font-size: 13px;
+  font-family: inherit; font-size: 12px;
   min-width: 78px; padding: 5px 14px;
-  border: 1px solid #7a7a7a; border-radius: 4px;
-  background: linear-gradient(#fff, #d6d3ce);
-  color: #000; cursor: pointer;
-  box-shadow: inset 1px 1px 0 #fff;
+  border: 1px solid #9aa7c0; border-radius: 3px;
+  background: linear-gradient(180deg, #fdfdfd, #dfe4ee);
+  color: #143a7a; cursor: pointer;
 }
-.xp-dialog .dlg-btn:active { background: linear-gradient(#d6d3ce, #fff); }
+.xp-dialog .dlg-btn:hover { filter: brightness(1.04); }
+.xp-dialog .dlg-btn:active { filter: brightness(.94); }
 
 /* XP 蓝屏 */
 .bsod {
@@ -723,69 +423,19 @@ body.glitching .page img, body.glitching .footbar img {
 .bsod .bsod-bar { height: 14px; background: #00007a; border: 1px solid #fff; margin-top: 6px; }
 .bsod .bsod-fill { height: 100%; width: 0; background: #00a; }
 
-/* ---------- XP 小应用窗口 ---------- */
-.app-window {
-  position: fixed; z-index: 80;
-  background: #ece9d8;
-  border-radius: 8px;
-  box-shadow: 0 0 0 1px #0831d9, 0 12px 30px rgba(0, 0, 0, .35);
-  overflow: hidden;
-}
-.app-window .titlebar { cursor: move; user-select: none; }
-.app-window .app-body {
-  border: 3px solid; border-color: #fff #7a7a7a #7a7a7a #fff; border-top-width: 0;
-  background: #fff; overflow: hidden;
-}
-.app-window .app-toolbar {
-  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-  padding: 4px 6px; background: #ece9d8; border-bottom: 1px solid #b8b09a;
-}
-.app-toolbar button, .app-toolbar .tb {
-  font-family: inherit; font-size: 12px; padding: 2px 8px;
-  border: 1px solid #7a7a7a; border-radius: 3px; background: linear-gradient(#fff, #d6d3ce);
-  cursor: pointer;
-}
-.app-window textarea {
-  width: 100%; height: 220px; border: none; resize: none; outline: none;
-  font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; padding: 8px;
-  display: block;
-}
-.app-window canvas { display: block; cursor: crosshair; }
-.app-color { width: 16px; height: 16px; border: 1px solid #7a7a7a; border-radius: 50%; cursor: pointer; }
-.app-window .mine-grid { display: grid; gap: 1px; background: #b8b09a; padding: 1px; }
-.app-window .mine-cell {
-  width: 26px; height: 26px; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: bold; cursor: pointer; background: #d6d3ce;
-  border: 1px solid; border-color: #fff #7a7a7a #7a7a7a #fff;
-}
-.app-window .mine-cell.revealed { background: #fff; border: 1px solid #c0c0c0; cursor: default; }
-.app-window .mine-cell.mine { background: #f0a0a0; }
-.app-window .comp-list { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; padding: 12px; }
-.app-window .comp-list li { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 12px; width: 76px; text-align: center; }
-.app-window .comp-ico {
-  width: 34px; height: 34px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  color: #fff; font-weight: bold; font-size: 13px;
-}
-
 /* ---------- 响应式 ---------- */
+/* 窄屏放弃「一屏不滚」：页面允许纵向滚动，两栏自动堆叠 */
 @media (max-width: 900px) {
+  body { overflow-y: auto; }
+  .page { height: auto; min-height: calc(100vh - 30px); overflow: visible; }
   .blog-cols { grid-template-columns: 1fr; }
-  .main-col, .side-col { grid-column: auto; grid-row: auto; position: static; }
-  .gallery-grid { column-count: 2; }
+  .main-col, .side-col { display: flex; flex-direction: column; gap: 12px; }
+  .main-col > .win, .side-col > .win { height: auto; }
   .side-col .profile-top { flex-direction: row; text-align: left; align-items: center; }
-  .side-col .avatar-frame { margin-top: -40px; width: 92px; height: 92px; }
+  .side-col .avatar-frame { margin-top: -34px; width: 84px; height: 84px; }
   .side-col .cn { font-size: 17px; }
 }
-@media (max-width: 760px) {
-  .sticker-corner { display: none; }
-}
 @media (max-width: 560px) {
-  .gallery-grid { column-count: 1; }
-  .head-title { font-size: 24px; }
   .duck-img { width: 190px; }
-  .footbar { padding-right: 200px; }
-  .danmaku-screen { height: 150px; }
-  .profile-banner { height: 150px; }
-  .banner-sticker { width: 56px; }
+  .profile-banner { height: 140px; }
 }

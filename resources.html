@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="resourcesPageTitle">资源配布 ★ 12あKa@被告人杯糕_</title>
+<meta name="description" content="12あKa@被告人杯糕_ 的资源配布：不定时上传本人制作的音源与素材。">
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/winxp.css">
+</head>
+<body data-page="resources">
+
+<div class="star-field" id="starField" aria-hidden="true"></div>
+
+<div class="lang-drop" id="langDrop">
+  <button class="lang-toggle" id="langToggle" type="button" aria-expanded="false" aria-haspopup="true">中文 ▾</button>
+  <div class="lang-menu" id="langMenu" hidden>
+    <button class="lang-opt" type="button" data-lang="zh">中文</button>
+    <button class="lang-opt" type="button" data-lang="ja">日本語</button>
+    <button class="lang-opt" type="button" data-lang="en">English</button>
+  </div>
+</div>
+
+<!-- ══════ 固定式浏览器窗口：整页可滚动，不可拖动/关闭 ══════ -->
+<section class="win" id="rsWin" data-win data-fixed>
+  <div class="titlebar">
+    <img class="tb-icon" src="assets/winxp/windowsIcons/ie.png" alt="">
+    <span class="tb-title" data-i18n="titleResources">资源配布</span>
+    <span class="tb-btns"><i class="tb-min" title="Minimize">—</i><i class="tb-max" title="Maximize">□</i><i class="tb-close" title="Close">×</i></span>
+  </div>
+  <div class="win-body flush">
+
+    <div class="ie-home">
+      <button class="ie-back" id="ieBack" type="button" title="Back">
+        <img src="assets/winxp/windowsIcons/back.png" alt="Back">
+      </button>
+      <button class="ie-back-txt" id="ieHome" type="button" data-i18n="backHome">← 返回主页</button>
+      <div class="ie-addr">
+        <span>Address</span>
+        <input id="ieAddr" type="text" readonly>
+      </div>
+    </div>
+
+    <div class="ie-page">
+      <div class="ie-wrap">
+
+        <section class="cm-sec">
+          <h2 data-i18n="rsIntroTitle">资源简介</h2>
+          <p class="cm-card-desc" data-i18n="rsIntro">这里什么都有可能放 —— 会不定时上传本人制作的东西，看到更新就下载吧。</p>
+        </section>
+
+        <section class="cm-sec">
+          <h2 data-i18n="rsDownloadTitle">下载</h2>
+          <div class="rs-item">
+            <img src="assets/winxp/windowsIcons/846(32x32).png" alt="">
+            <div class="rs-info">
+              <div class="rs-name">芙兰朵露 v1.0.0-beta</div>
+              <div class="rs-size" data-i18n="voiceSizeFlan">约 33.2 MB · zip</div>
+            </div>
+            <a class="rs-dl" href="voice%20dl/%E8%8A%99%E5%85%B0%E6%9C%B5%E9%9C%B2v1.0.0-beta.zip" download data-i18n="voiceDownload">↓ 下载</a>
+          </div>
+        </section>
+
+        <section class="cm-sec">
+          <h2 data-i18n="voiceNoteTitle">使用说明：</h2>
+          <p class="cm-card-desc" data-i18n="voiceNote">下载并解压 zip，将音源文件夹放入 UTAU 的 voice 目录，编辑器内选择该音源即可使用。请勿二次配布或倒卖；转载／使用请标注音源作者。商用请先联系确认♡</p>
+        </section>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════ winXP 任务栏 ══════ -->
+<footer class="taskbar">
+  <button class="task-start" id="startBtn" type="button" aria-label="Start">
+    <img src="assets/winxp/windowsIcons/start.png" alt="Start">
+  </button>
+  <div class="task-tasks" id="taskTasks"></div>
+  <div class="task-tray">
+    <img src="assets/winxp/windowsIcons/690(16x16).png" alt="">
+    <img src="assets/winxp/windowsIcons/394(16x16).png" alt="">
+    <img src="assets/winxp/windowsIcons/229(16x16).png" alt="">
+    <span class="task-clock" id="taskClock">--:--</span>
+  </div>
+</footer>
+<div class="startmenu" id="startMenu" hidden></div>
+
+<div id="winLayer"></div>
+
+<script src="js/i18n.js"></script>
+<script src="js/config.js"></script>
+<script src="js/winxp.js"></script>
+<script src="js/starfield.js"></script>
+</body>
+</html>
