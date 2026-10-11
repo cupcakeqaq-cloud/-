@@ -941,6 +941,9 @@ body.grayed #winLayer { pointer-events: none; }
 }
 .cm-lead { display: flex; flex-direction: column; gap: 5px; }
 .cm-lead .cm-open { font-size: 19px; font-weight: 700; color: #4c7a34; letter-spacing: .5px; }
+/* 受理状态另外两档的配色（由 js/content-render.js 按 js/content.js 的 status 加 class） */
+.cm-lead .cm-open.cm-paused { color: #a06a1f; }
+.cm-lead .cm-open.cm-closed { color: #8a4b4b; }
 .cm-lead .cm-status-note { font-size: 12px; color: #6b5f4e; line-height: 1.6; }
 .cm-panel > h2 {
   font-size: 13px; color: #8a5a22; font-weight: 700; letter-spacing: 1px;

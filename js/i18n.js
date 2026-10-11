@@ -76,6 +76,9 @@
     /* ---------- 委托页 ---------- */
     cmStatusTitle: { zh: '目前是否接受委托', ja: '依頼受付状況', en: 'Commission status' },
     cmStatusOpen: { zh: '接受中', ja: '受付中', en: 'OPEN' },
+    /* 另外两个状态：由 js/content.js 的 commission.status 决定用哪个，改文案改这里 */
+    cmStatusPaused: { zh: '暂停接单', ja: '一時受付停止', en: 'PAUSED' },
+    cmStatusClosed: { zh: '已停止接单', ja: '受付終了', en: 'CLOSED' },
     cmStatusNote: {
       zh: '档期随时变动，来问价之前建议先私信确认一下当前排期 ♡',
       ja: 'スケジュールは変動します。お問い合わせ前にDMでご確認ください ♡',
@@ -282,6 +285,7 @@
 
   window.I18N = DICT;
   window.t = t;
+  window.getLang = currentLang;
   window.setLang = setLang;
 
   function closeMenu() {

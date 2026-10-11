@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>网站编辑器 · 后台</title>
+<style>
+:root { --line:#d8d8d8; --dim:#777; --hl:#1257a8; }
+* { box-sizing:border-box; }
+body { margin:0; font:13px/1.55 "Segoe UI",system-ui,"Microsoft YaHei",sans-serif; background:#f2f2f2; color:#1c1c1c; }
+a { color:var(--hl); }
+code { font:11px/1.4 Consolas,monospace; color:var(--dim); }
+input,textarea,select,button { font-family:inherit; font-size:12px; }
+input,textarea,select { padding:2px 5px; border:1px solid #c4c4c4; background:#fff; width:100%; border-radius:2px; }
+textarea { font-family:Consolas,monospace; resize:vertical; }
+button { padding:3px 9px; border:1px solid #b5b5b5; background:#fbfbfb; border-radius:2px; cursor:pointer; }
+button:hover:not(:disabled) { background:#eef4fd; border-color:var(--hl); }
+button:disabled { opacity:.45; cursor:default; }
+button.pri { background:var(--hl); border-color:var(--hl); color:#fff; font-weight:700; }
+button.pri:hover { background:#0d4c96; }
+button.del { color:#a33; }
+
+/* 登录 */
+#login { max-width:340px; margin:14vh auto; background:#fff; border:1px solid var(--line); padding:16px; }
+#login h1 { margin:0 0 4px; font-size:16px; }
+#login p { margin:0 0 12px; color:var(--dim); font-size:12px; }
+
+/* 主界面 */
+#top { position:sticky; top:0; z-index:9; display:flex; align-items:center; gap:8px; padding:6px 10px; background:#2b2b2b; color:#fff; }
+#top b { font-size:14px; }
+#top .sp { flex:1; }
+#top a { color:#9ecbff; font-size:12px; }
+#tabs { position:sticky; top:33px; z-index:8; display:flex; gap:3px; padding:5px 10px 0; background:#e4e4e4; border-bottom:1px solid var(--line); }
+#tabs button { border-radius:2px 2px 0 0; border-bottom-color:transparent; }
+#tabs button.on { background:#fff; border-color:var(--line); border-bottom-color:#fff; font-weight:700; margin-bottom:-1px; }
+main { padding:10px; max-width:1180px; }
+#hint { font-size:12px; color:#ffe08a; }
+#hint.err { color:#ff9c9c; }
+
+/* 字段块 */
+.grp { margin:0 0 10px; background:#fff; border:1px solid var(--line); }
+.grp > h3 { margin:0; padding:5px 9px; font-size:12px; background:#ebebeb; border-bottom:1px solid var(--line); }
+.bd { padding:8px 9px; }
+.mini { padding:0 5px; font-size:11px; }
+.f { display:grid; grid-template-columns:200px 1fr; gap:8px; padding:6px 9px; border-bottom:1px dotted #e0e0e0; }
+.f:last-child { border-bottom:0; }
+.f > .fl { display:flex; flex-direction:column; gap:1px; padding-top:2px; }
+.f > .fl b { font-weight:600; font-size:12px; }
+.f > .fi { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
+.f > .fi .row { display:flex; gap:4px; align-items:center; }
+.tip { color:var(--dim); font-size:11px; padding:5px 9px; background:#fafafa; border-bottom:1px solid #eee; }
+
+/* 卡片 / 例图 */
+.card { margin:0 0 8px; border:1px solid var(--line); background:#fff; }
+.card > h4 { margin:0; padding:4px 9px; font-size:12px; background:#f0f0f0; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:8px; }
+.card > .bd { padding:8px 9px; }
+.shots { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; }
+.shot { border:1px solid var(--line); background:#fafafa; padding:4px; }
+.shot img { display:block; width:100%; height:96px; object-fit:cover; object-position:top center; background:#eee; }
+.shot .u { display:flex; gap:3px; margin-top:4px; flex-wrap:wrap; }
+.shot .u button { padding:1px 6px; }
+.shot .p { font:10px/1.3 Consolas,monospace; color:var(--dim); word-break:break-all; margin-top:3px; }
+.row2 { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px; }
+.row2 select { max-width:320px; }
+.item { border:1px solid var(--line); background:#fff; padding:8px 9px; margin:0 0 8px; }
+.item > .hd { display:flex; align-items:center; gap:6px; margin-bottom:5px; }
+.item > .hd b { flex:1; font-size:12px; }
+.tri { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; margin:3px 0; }
+.lab { font-size:11px; color:var(--dim); margin-top:5px; }
+#gitout { background:#1e1e1e; color:#d6d6d6; padding:8px; font:11px/1.5 Consolas,monospace; white-space:pre-wrap; max-height:420px; overflow:auto; border:1px solid #444; margin-top:8px; }
+.pill { font-size:11px; padding:0 5px; border-radius:9px; background:#e8e8e8; color:#444; }
+.pill.warn { background:#ffe6c9; color:#8a4b1f; }
+.pill.off { background:#f0d0d0; color:#8a2f2f; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <h1>网站编辑器</h1>
+  <p>密码在项目根目录的 <code>.env</code> 里（<code>ADMIN_PASSWORD</code>）。</p>
+  <input id="pw" type="password" placeholder="密码" autocomplete="current-password">
+  <div class="row2"><button class="pri" id="doLogin">登录</button><span id="loginMsg"></span></div>
+</div>
+
+<div id="app" hidden>
+  <div id="top">
+    <b>网站编辑器</b>
+    <span id="hint"></span>
+    <span class="sp"></span>
+    <a href="/" target="_blank">看前台 ↗</a>
+    <a href="/commission.html" target="_blank">委托页 ↗</a>
+    <a href="/resources.html" target="_blank">资源页 ↗</a>
+    <button id="reload">重新读取</button>
+    <button class="pri" id="save">保存改动</button>
+    <button id="logout">退出</button>
+  </div>
+  <div id="tabs"></div>
+  <main id="view"></main>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

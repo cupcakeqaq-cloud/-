@@ -421,14 +421,170 @@ $git = 'C:\Users\CupCakeQAQ_\AppData\Local\GitHubDesktop\app-3.6.6\resources\app
 ## 十、未完成 / 可继续做的
 
 - **委托页的卡片文案与价位**：标题与两行说明在 `js/i18n.js` 的 `cmCard1~4Title/Desc1/Desc2`；**价位也在 i18n 里**（`cmCard1Price~cmCard3Price`，三语各一份：zh `¥320-520` / ja `6,500〜11,000円` / en `$45-75`）。换算基准（1 CNY = 21 JPY = 0.14 USD，日元取 500 整、美元取 5 整）写在 `js/i18n.js` 委托卡片那段的注释里，**改汇率就改那三对数字**。第 4 档「私信议价」走 `cmPriceTalk`。**01 白底头像 ¥320-520 是站主米画师的真实价，02~04（¥600-900 / ¥1000-1500 / 私信议价）是我编的占位**，等站主给正式内容 —— 改价时三语都要改。
-- 委托状态写「接受中」（`cmStatusOpen`），换状态只改这个词。
-- 例图是手工挑选硬编码在 `commission.html` 里的（4 档 × 3 张），加图要手动补 `<img>`；比例由 JS 自动判定（3:4 / 1:1 / 4:3 三套预设）。
-- **站主打算以后写一个后端网站编辑器**（本轮明确了，但暂不实现）→ 所以不要把例图比例、卡片内容写死成不可替换的结构，能数据化就数据化。
-- 留言板暂无后端（见六.2）。
+- 委托状态写「接受中」（`cmStatusOpen`），换状态只改这个词 —— **后台做好后改状态在后台点，见十二**。
+- 例图是手工挑选硬编码在 `commission.html` 里的（现为 4 档 × 3 张），加图要手动补 `<img>`；比例由 JS 自动判定（3:4 / 1:1 / 4:3 三套预设）。**后台做好后例图数据化到 `js/content.js`，见十二**（`content-render.js` 重建 `.cm-card-shots`，比例判定逻辑不变）。
+- **站主的后端网站编辑器就是第十二节**：本地 Node 后台，不要写死结构、能数据化就数据化。
+- 留言板前端由另一个对话负责、后端存储定成仓库里的 `gb/comments.json`，契约见 12.3；本后台只做管理（删/隐藏/置顶/回复），不负责访客写入。
 - 扫雷没做中键 chording。
 - `assets/stickers/anime/` 里 5 张 GIF 现在都没用到（站主要求去掉页面所有 GIF），留着备用。
 - 移动端只做了基础响应式（1180px 隐藏桌面图标、900px 放弃一屏不滚改单列、700px 各面板收窄），没有针对触摸拖拽做优化。
 - `diag/icon_sheet.py`（生成图标接触表）、`diag/make_minecraft_icon.py`（生成草方块图标）留着备用；`diag/sheet.png`、`diag/pic_sheet.png` 是挑图标/挑例图用的接触表。`diag/` 其余是站主自己的 X 账号诊断资料。
+
+---
+
+## 十二、本地后台（网站编辑器）
+
+**状态：已实现，并在本机跑通验证（见 12.11）。** 站主需求（m00001）：能改介绍等文案、委托页例图/文本/委托开放状态、上传文件资源；后续追加：留言评论区管理也合并进来。
+
+### 12.1 目标与硬约束
+
+- 不碰代码就能改：三页全部文案（三语）、委托页四档卡片（标题/价格/两行说明/例图 1~6 张）、委托开放状态、资源页下载项、留言区（删/隐藏/置顶/回复）、上传图片与文件、大文件走 GitHub Releases、一键提交并推送。
+- 保持**纯静态零构建零依赖**；后台也只用 node 内置模块，**不装任何 npm 包**。
+- 后台跑在站主自己电脑（局域网可访问、要密码）；内容进 git 仓库走 Pages 分发；**不重写成 React、不引数据库**。
+- 唯一一把钥匙：GitHub 细粒度 token（只勾 `Contents: Read and write`、只授权本仓库），存 `E:\自介网页\.env`，**绝不进仓库、绝不进浏览器**。泄露 = 别人能改这个仓库，碰不到账号其它东西。
+
+### 12.2 文件清单
+
+| 文件 | 动作 | 作用 |
+|---|---|---|
+| `server.js` | 改 | 静态托管不变；`require('./server/admin.js')` 挂后台路由。缺 `admin.js` 时照旧只跑静态 |
+| `server/admin.js` | 新增 | 后台服务端：登录、内容读写、上传、git、Releases（纯 node 内置） |
+| `admin.html` | 新增 | 后台界面：朴素紧凑表单 + 少量内联 CSS（站主选的，**不做 XP 皮肤**） |
+| `js/admin.js` | 新增 | 后台前端逻辑（原生 JS） |
+| `js/content.js` | **生成** | 唯一内容数据文件（后台写、前台读） |
+| `js/content-render.js` | 新增 | 把 `CONTENT` 渲染进 DOM（约 60 行，手写） |
+| `gb/comments.json` | 新增 | 留言数据。**不能放 `data/`**，那个目录被 `.gitignore` 忽略 |
+| `uploads/` | 新增目录 | 后台传的新图 / 小文件；文件名自动 ASCII 化 |
+| `.env.example` | 新增 | `ADMIN_PASSWORD` / `GITHUB_TOKEN` / `SESSION_SECRET` / `GIT_PATH` 模板 |
+| `.env` | 新增 | 真密码与 token，**gitignore 掉** |
+| `.gitignore` | 改 | 补 `.env` |
+| 三个 `*.html` | 改 | 各加两行 `<script>`（`js/content.js`、`js/content-render.js`，紧跟 `js/i18n.js` 之后） |
+
+### 12.3 数据契约
+
+`js/content.js`（后台生成、机器写、diff 友好）：
+
+```js
+window.CONTENT = {
+  "i18n": { "cmCard1Title": { "zh": "…", "ja": "…", "en": "…" } },   // 只放改过的 key
+  "commission": {
+    "status": "open",                                                 // open | paused | closed
+    "cards": [ { "shots": ["uploads/20260101-a3f9.png"] } ]           // 固定 4 项，每项 1~6 张
+  },
+  "resources": {
+    "items": [ { "icon": "assets/winxp/windowsIcons/846(32x32).png",
+                 "name": { "zh": "", "ja": "", "en": "" },
+                 "size": { "zh": "", "ja": "", "en": "" },
+                 "href": "voice dl/芙兰朵露v1.0.0-beta.zip" } ]
+  }
+};
+```
+
+- **文案覆盖**：`content.js` 里只存改过的 key，解析期 `Object.assign` 进 `js/i18n.js` 的 `DICT`（i18n.js 的 `apply()` 在 `DOMContentLoaded` 才跑，时序天然安全）。`js/i18n.js` 只加了两处（`cmStatusPaused`/`cmStatusClosed` 两个状态 key + 导出 `window.getLang`），其余一字未动，删掉 `content.js` 就完全回到加后台之前的样子 —— 就是参考工程那个「DB 优先、静态兜底」的路子。
+- **卡片文案**仍走 DICT key（`cmCard1Title/Price/Desc1/Desc2` 等），不另立字段，少一个数据源。04 档无价格、走 `cmPriceTalk`，与现状一致。
+- **例图**：`content-render.js` 按数据重建 `.cm-card-shots` 的 `<img>`（1~6 张，超出自动换行），脚本在 `js/winxp.js` 的 `boot()` 之前解析，所以现有的 `naturalWidth/Height` 自动判比例、`ratio-sq/ratio-land` 那套**不用改**。
+- **URL 编码**：`href` 允许写非 ASCII 文件名，`content-render.js` 里自动 `encodeURI()` —— 根治「手工百分号编码，编错就 404」那个坑。
+
+`gb/comments.json`：
+
+```json
+{ "v": 1,
+  "comments": [
+    { "id": "c-1735689600000-a3f9", "name": "访客", "text": "留言正文",
+      "time": 1735689600000, "pinned": false, "hidden": false,
+      "reply": { "zh": "", "ja": "", "en": "" } }
+  ] }
+```
+
+- 排序：`pinned` 优先，其余按 `time` 倒序（前后台同一套规则）。
+- `hidden: true` = 前台不显示、后台留着可恢复；删除 = 从数组移除并提交。
+- **写入方是另一个对话**：它需要一个能 commit 这个文件（或提供写接口）的免费服务，本后台不管写入，只读 + 管（增删/隐藏/置顶/回复），每次改之前重新读文件。两边同时写则最后写的赢 —— 量小，不引锁（`ponytail:` 注释）。
+
+### 12.4 接口（JSON，`/api/*`，除 `login` 外都要会话 Cookie）
+
+| 方法 | 路径 | 作用 |
+|---|---|---|
+| POST | `/api/login` | 校验密码，下发 HttpOnly 会话 Cookie |
+| POST | `/api/logout` | 清 Cookie |
+| GET | `/api/state` | 返回 `content` + `comments` + git 改动摘要 |
+| POST | `/api/save` | 校验并写 `js/content.js` |
+| POST | `/api/gb` | 整文件写 `gb/comments.json` |
+| POST | `/api/upload?name=&kind=` | 原始字节直传（不走 multipart，免解析），存 `uploads/`，回 `{path}` |
+| POST | `/api/release?name=` | 传大文件到 Releases，回公开下载链接 |
+| POST | `/api/git` | `git add -A` → `commit` → `push`，原样回显 git 输出 |
+
+### 12.5 后台界面（朴素表单，五个页签）
+
+1. **文案** — 每个字段三语并排（zh / ja / en）。分组标签表写在 `js/admin.js` 的 `LABELS` 里：主页 / 委托页 / 资源页 / 桌面·菜单·杂项 / 其他；**不在表里的 key 自动落「其他」**，所以 i18n.js 以后加 key 后台不会漏。
+2. **委托页** — 开放状态三选一（接受中 / 暂满 / 已关闭，新增 2 个 DICT key）；四档卡片：标题 / 价格 / 两行说明 / 例图（上传新图、从 `picture/` 老图里挑、拖动排序、删，1~6 张）。
+3. **资源页** — 下载项列表：显示名（三语）、大小（三语）、文件（小文件直传 `uploads/`，大文件走 Releases 并自动回填链接）。
+4. **留言** — 列表 + 隐藏 / 置顶 / 删除 / 三语回复；默认只显示未隐藏的。
+5. **提交** — 列出改动文件名与增删行摘要，一个「提交并推送」按钮；git 报错原样显示，不吞。
+
+### 12.6 鉴权与安全
+
+- 密码在 `.env`（`ADMIN_PASSWORD`），服务端用 `node:crypto` 的 `scrypt` 比对；会话 = HttpOnly + HMAC 签名的 Cookie，**不引第三方库**。
+- 同一 IP 密码错 5 次锁 15 分钟（内存 Map）。
+- 绑定 `0.0.0.0`，启动时控制台打印 `http://127.0.0.1:3000/admin/` 与局域网地址（手机同一 WiFi 直接开）。
+- 上传白名单类型 + 单文件大小上限；后台不暴露公网。
+- `admin.html` 会随 Pages 一起发布（GitHub Pages 发的是整个仓库）—— 它只是个空表单、接口指向本机 `/api`，不含任何秘密；密码和 token 只在 `.env` 里。
+- 首次启动缺 `.env` 时自动生成一份（随机会话密钥 + 随机密码）并打印到控制台，站主照着改。
+
+### 12.7 大文件 → GitHub Releases
+
+- 用同一个 token：首次自动创建 tag `assets` 的 release，之后复用。
+- 上传：`POST https://uploads.github.com/repos/cupcakeqaq-cloud/CupCakeQAQ-site/releases/{id}/assets?name=<ascii>`。
+- 同名 asset 已存在 → 先 `DELETE` 再传；单文件 ≤2GB；拿回的 `https://github.com/.../releases/download/assets/<file>` 自动回填资源页 `href`。
+- 不用 Git LFS：Pages 上 LFS 文件不能直接下载。
+
+### 12.8 这轮明确不做
+
+数据库 / React / 多用户 / 图片压缩（超 2MB 后台只提示自己压）/ 留言板前端（另一个对话的地盘）/ 把后台暴露到公网。
+
+### 12.9 站主首次使用
+
+1. 复制 `.env.example` 为 `.env`，填 `ADMIN_PASSWORD` 和 `GITHUB_TOKEN`（建 token 的步骤写在 `.env.example` 注释里）。
+2. `npm start`，按控制台打印的地址打开后台。
+3. 改完点「保存」，再点「提交并推送」，等 1~2 分钟 Pages 更新。
+
+### 12.10 验证方式
+
+- `node --check` 覆盖 `server/admin.js`、`js/admin.js`、`js/content-render.js`。
+- 无头 Edge 打开 `/admin/` 自己看渲染，**不给站主导图**（见第七节）。
+- 改一条文案 → 保存 → 前台刷新核对；上传一张图 → 确认 `uploads/` 落地且前台显示；留言隐藏/置顶 → 前台核对。
+- 推送是真的推 GitHub，用一次真实文案改动来测（这本身就是功能验收）。
+- 收尾删掉一切临时文件与 `diag/shots/`（Pages 会一起发布）。
+
+### 12.11 实现记录 + 验证证据（本批）
+
+与 12.1~12.10 设计稿的**差异，以本节为准**：
+
+- 文案分组表在 `js/admin.js` 里叫 `FIELDS`（`[key, 分组, 中文标签]`），分组为：主页 / 委托页 / 资源页 / 桌面·菜单 / 留言板·彩蛋 / 电源·开机·404 / 其他；DICT 里有、`FIELDS` 里没列的 key 自动落「其他」，以后加 key 后台不会漏。
+- 状态三选一实际文案：`open` → `cmStatusOpen`「接受中」/ `paused` → `cmStatusPaused`「暂停接单」/ `closed` → `cmStatusClosed`「已停止接单」。`.cm-open` 上加 `.cm-paused`（棕 `#a06a1f`）/ `.cm-closed`（暗红 `#8a4b4b`），配色加在 `css/winxp.css:945-946`。
+- 会话不用 HMAC：`crypto.randomBytes(24)` 的随机 token 存服务端内存 Map，12 小时过期。重启后台 = 全部退出登录（单管理员、本机跑，够用）。
+- 12.4 之外还加了 `GET /api/whoami`（决定显示登录框还是后台）与 `GET /api/files`（图库列表）。
+- 「提交」页**只列改动文件名**，没有增删行摘要；按钮是「保存 + 提交并推送」，先存后推，防止忘了保存。
+- 上传实测限制：图片 `png/jpg/jpeg/gif/webp` ≤30MB，其他 `zip/7z/rar/tar/gz/pdf/txt/mp3/wav/ogg` ≤100MB，超 100MB 走 Releases；存进 `uploads/`，文件名强制 ASCII 化 `YYYYMMDD-原名-6位hex.ext`（非 ASCII 会被剥掉，`芙兰朵露v1.0.0-beta.zip` → `20261012-v1.0.0-beta-0cc6de.zip`）。
+- 「留空 = 用默认值」：后台**没法把一句文案改空**（故意的，怕误删）。
+- `resources.items` 初始就是现有那一条（href 保持中文名 `voice dl/芙兰朵露v1.0.0-beta.zip`）；列表被清空时前台回落 `resources.html` 里写死的那条。
+
+**顺手修掉的两个真问题**
+
+- `server.js` 的 `serveStatic` 以前会把 `.env`、`.git/config` 也照发出去 —— 后台允许局域网访问，等于把 GitHub token 送给整个局域网。现在**任何以 `.` 开头的路径段一律 403**（实测 `/.env`、`/.gitignore`、`/.git/config` 全部 403）。
+- `server/admin.js` 里 `git()` 用的 `execFile` 在 spawn 失败时是**同步抛异常**（不走回调），会把整个 `/api/state` 打挂、后台开不了。已包 try/catch：git 不可用时后台照常打开，「提交」页只显示红字提示。
+
+**验证证据（本机实测）**
+
+- `node --check` 全过：`server.js`、`server/admin.js`、`js/admin.js`、`js/content-render.js`、`js/content.js`、`js/i18n.js`。
+- 接口：`/api/whoami` 未登录回 `{authed:false}`；未登录 `/api/state` 401「没登录」；错密码 401「密码不对」；对密码下发 Cookie；`/api/upload` 传 png 回 `uploads/20261012-t31-655e8a.png`，传 `.exe` 回 400「不允许的文件类型：.exe」；`/api/gb` 把非法 id 重写成 `c-<time>-<hex>`、丢掉空正文项、`time:0` 填成当前时间。
+- 前台渲染（无头 Edge `--dump-dom` 实测）：改 `bio` 后 `index.html` 的 `<p class="bio">` 显示新文案；`status=paused` 后 `commission.html` 的徽章变成 `<span class="cm-open cm-paused" data-i18n="cmStatusPaused">暂停接单</span>`；01 档例图被重建成 2 张，其中新上传的 png 被 `js/winxp.js` 的 `boot()` 打上 `class="ratio-land"` —— **比例自动判定对重建出来的图依然有效**；`resources.html` 长出第二条 `.rs-item` 且链接正确。
+- 后台界面：临时 `_probe.html`（真接口 + 真密码登录，验完已删）dump 了五个页签 —— 文案页 100 个字段三语齐全、委托页状态/例图/图库下拉正常、资源页三语输入与「上传大文件」按钮（无 token 时禁用）正常、留言页的日期/置顶/隐藏/三语回复正常、提交页正常。
+- 临时文件全部删除：`_probe.html`、`_tmp-body.json`、`_tmp-gb.json`、`uploads/`（测试上传）、`diag/dom-*.html`、`diag/shots/`。
+
+**站主下一步就两件事**
+
+1. `.env` 里的 `ADMIN_PASSWORD` 是首次启动自动生成的随机串（只打印在控制台）。想换成好记的就改那一行，然后重启 `npm start`。
+2. `.env` 里的 `GITHUB_TOKEN` 目前是空的 → 「上传大文件到 Releases」按钮是**禁用**的。按 `.env.example` 注释建一个细粒度 token（只授权本仓库、权限 `Contents: Read and write`）填进去再重启。不填也能用：改文案、换例图、传小文件、管留言、提交推送都正常。
 
 ---
 
