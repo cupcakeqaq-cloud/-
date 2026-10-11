@@ -234,15 +234,27 @@ function clampPan(v, zoom) {
   return Math.min(hi, Math.max(lo, clampNum(v, 0, 1, 0.5)));
 }
 
-/** 例图一项：老写法是 "路径"；裁剪过就存 {src, zoom, cx, cy}（zoom=1 时仍旧存字符串，老数据不用动） */
+/** 例图能选的三种槽位比例（'' = 自动，按原图判定） */
+const RATIOS = ['1:1', '3:4', '4:3'];
+
+/** 例图一项：老写法是 "路径"；裁剪过或指定过比例才存对象
+ *  （zoom=1 又没指定比例时仍旧存字符串，老数据不用动） */
 function normShot(s) {
   if (typeof s === 'string') return s.trim() || null;
   if (!s || typeof s !== 'object') return null;
   const src = str(s.src, 600);
   if (!src) return null;
   const zoom = clampNum(s.zoom, 1, 4, 1);
-  if (zoom <= 1.001) return src;
-  return { src, zoom: round3(zoom), cx: round3(clampPan(s.cx, zoom)), cy: round3(clampPan(s.cy, zoom)) };
+  const r = RATIOS.indexOf(s.r) >= 0 ? s.r : '';
+  if (!r && zoom <= 1.001) return src;
+  const out = { src };
+  if (r) out.r = r;
+  if (zoom > 1.001) {
+    out.zoom = round3(zoom);
+    out.cx = round3(clampPan(s.cx, zoom));
+    out.cy = round3(clampPan(s.cy, zoom));
+  }
+  return out;
 }
 
 function normContent(c) {

@@ -141,13 +141,26 @@
   function num(v, d) { var n = Number(v); return isFinite(n) ? n : d; }
   function c3(n) { return Math.round(n * 1000) / 1000; }
 
-  /* ── 例图裁剪：内存里例图统一是对象 {src,zoom,cx,cy}，存回去时再按 toWire 还原 ──
+  /* ── 例图：内存里统一是对象 {src,r,zoom,cx,cy}，存回去时再按 toWire 还原 ──
+     r = 槽位比例 '1:1' | '3:4' | '4:3'，'' = 自动（按原图判定）
      zoom=放大倍数（1~4）；cx/cy = 看到的那一块的中心，在「放大后的图框」里的比例（0~1，默认 0.5） */
+  var RATIOS = [['', '自动'], ['1:1', '1:1 方'], ['3:4', '3:4 竖'], ['4:3', '4:3 横']];
+  /* 写死的比例才认，其余一律当自动 */
+  function ratioCss(r) { return (r === '1:1' || r === '3:4' || r === '4:3') ? r.replace(':', ' / ') : ''; }
+  function ratioName(r) {
+    for (var n = 0; n < RATIOS.length; n++) if (RATIOS[n][0] === (r || '')) return RATIOS[n][1];
+    return RATIOS[0][1];
+  }
+  function ratioOptions(cur) {
+    return RATIOS.map(function (r) {
+      return '<option value="' + r[0] + '"' + (r[0] === (cur || '') ? ' selected' : '') + '>比例：' + r[1] + '</option>';
+    }).join('');
+  }
   function sh(s) {
-    if (typeof s === 'string') return { src: s, zoom: 1, cx: 0.5, cy: 0.5 };
+    if (typeof s === 'string') return { src: s, r: '', zoom: 1, cx: 0.5, cy: 0.5 };
     s = s || {};
     var z = Math.min(4, Math.max(1, num(s.zoom, 1)));
-    return { src: String(s.src || ''), zoom: z, cx: clampPan(s.cx, z), cy: clampPan(s.cy, z) };
+    return { src: String(s.src || ''), r: ratioCss(s.r) ? s.r : '', zoom: z, cx: clampPan(s.cx, z), cy: clampPan(s.cy, z) };
   }
   /* 裁剪窗口不能跑出图外：cx ∈ [0.5/z, 1-0.5/z]（z=1 时只能取 0.5，也就是没法平移） */
   function clampPan(v, z) {
@@ -159,12 +172,15 @@
       return { shots: (((c || {}).shots) || []).map(sh).filter(function (o) { return o.src; }) };
     });
   }
-  /* 没放大就是纯字符串（老写法，文件里不会多出参数）；放大过才写对象 */
+  /* 没放大、也没指定比例就是纯字符串（老写法，文件里不会多出参数）；否则写对象 */
   function toWire(o) {
     if (!o || !o.src) return null;
-    var z = o.zoom;
-    if (!(z > 1.001)) return o.src;
-    return { src: o.src, zoom: c3(z), cx: c3(clampPan(o.cx, z)), cy: c3(clampPan(o.cy, z)) };
+    var z = o.zoom, r = ratioCss(o.r) ? o.r : '';
+    if (!r && !(z > 1.001)) return o.src;
+    var out = { src: o.src };
+    if (r) out.r = r;
+    if (z > 1.001) { out.zoom = c3(z); out.cx = c3(clampPan(o.cx, z)); out.cy = c3(clampPan(o.cy, z)); }
+    return out;
   }
   function clone(o) { return JSON.parse(JSON.stringify(o || {})); }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
@@ -290,6 +306,7 @@
   // ───────── 委托页 ─────────
   function shotBox(o, i, j) {
     var z = num(o.zoom, 1);
+    var rc = ratioCss(o.r);
     var tag = z > 1.001 ? ' <span class="pill warn">裁剪 ' + String(c3(z)) + '×</span>' : '';
     return '<div class="shot"><img src="' + esc(enc(o.src)) + '" alt="" loading="lazy">' +
       '<div class="u">' +
@@ -297,7 +314,10 @@
       '<button data-act="up" data-i="' + i + '" data-j="' + j + '">↑</button>' +
       '<button data-act="down" data-i="' + i + '" data-j="' + j + '">↓</button>' +
       '<button class="del" data-act="rm" data-i="' + i + '" data-j="' + j + '">删除</button>' +
-      '</div><div class="p">' + esc(o.src) + tag + '</div></div>';
+      '</div>' +
+      '<select class="ratio" data-act="ratio" data-i="' + i + '" data-j="' + j + '"' +
+      (rc ? ' title="' + esc(rc) + '"' : '') + '>' + ratioOptions(o.r) + '</select>' +
+      '<div class="p">' + esc(o.src) + tag + '</div></div>';
   }
 
   function galleryOptions() {
@@ -532,8 +552,9 @@
   /* 预览框和前台 .cm-card-shots a.crop 用同一套算法：a 当裁剪框，img 放大 z 倍再按 cx/cy 偏移 */
   var cr = null;   // 正在裁的 {i, j, src, zoom, cx, cy}
 
-  /* 槽位比例和前台一致（js/content-render.js 的 shotRatio / js/winxp.js 的判定） */
+  /* 槽位比例：选了就按选的；没选和前台一致（js/content-render.js 的 shotRatio / js/winxp.js 的判定） */
   function cropRatio() {
+    if (cr && ratioCss(cr.r)) return ratioCss(cr.r);
     var im = $('#cropImg');
     var w = im.naturalWidth, h = im.naturalHeight;
     if (!w || !h) return '3 / 4';
@@ -562,8 +583,10 @@
     var o = card && card.shots && card.shots[j];
     if (!o) return;
     var z = Math.min(4, Math.max(1, num(o.zoom, 1)));
-    cr = { i: i, j: j, src: o.src, zoom: z, cx: clampPan(o.cx, z), cy: clampPan(o.cy, z) };
+    cr = { i: i, j: j, src: o.src, r: o.r, zoom: z, cx: clampPan(o.cx, z), cy: clampPan(o.cy, z) };
     $('#cropSrc').textContent = o.src;
+    var rs = $('#cropRatio');
+    if (rs) rs.value = o.r || '';
     var im = $('#cropImg');
     im.onload = paintCrop;
     im.src = enc(o.src);
@@ -581,12 +604,13 @@
     if (!cr) return;
     var o = S.cmCards[cr.i] && S.cmCards[cr.i].shots[cr.j];
     if (!o) { closeCrop(); return; }
-    o.zoom = cr.zoom; o.cx = cr.cx; o.cy = cr.cy;
-    var cropped = o.zoom > 1.001;
+    o.zoom = cr.zoom; o.cx = cr.cx; o.cy = cr.cy; o.r = cr.r;
+    var set = o.zoom > 1.001 || !!ratioCss(o.r);
     closeCrop();
     if (S.tab !== 'cm') S.tab = 'cm';
     render();
-    hint(cropped ? '裁剪已设置（记得点「保存改动」）' : '已恢复成整张显示（记得点「保存改动」）');
+    hint(set ? '已设成「' + ratioName(o.r) + '」' + (o.zoom > 1.001 ? ' + 裁剪 ' + c3(o.zoom) + '×' : '') + '（记得点「保存改动」）'
+      : '已恢复成整张 + 自动比例（记得点「保存改动」）');
   }
 
   function bindCrop() {
@@ -595,6 +619,12 @@
     $('#cropReset').onclick = function () {
       if (!cr) return;
       cr.zoom = 1; cr.cx = 0.5; cr.cy = 0.5;
+      paintCrop();
+    };
+    var rs = $('#cropRatio');
+    if (rs) rs.onchange = function () {
+      if (!cr) return;
+      cr.r = ratioCss(rs.value) ? rs.value : '';
       paintCrop();
     };
     var zl = $('#cropZoom');
@@ -722,6 +752,15 @@
 
   function onChange(e) {
     if (e.target.name === 'cmst') S.status = e.target.value;
+    var d = e.target.dataset || {};
+    if (d.act === 'ratio') {
+      var s = findShot(Number(d.i), Number(d.j));
+      if (!s) return;
+      var o = s.card.shots[s.j];
+      o.r = ratioCss(e.target.value) ? e.target.value : '';
+      render();
+      hint('已设成「' + ratioName(o.r) + '」（记得点「保存改动」）');
+    }
   }
 
   function onKey(e) {

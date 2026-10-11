@@ -36,13 +36,19 @@
   }
 
   /* ── 3. 例图：按数据重建（空数组 = 保留 HTML 里写死的图）
-        一项可以是 "路径"，也可以是 {src, zoom, cx, cy}（只记「看哪一块」，原图像素不动） ── */
+        一项可以是 "路径"，也可以是 {src, r, zoom, cx, cy}
+        r = 槽位比例 '1:1' | '3:4' | '4:3'（不写 = 按原图自动判定）
+        zoom/cx/cy = 只记「看哪一块」，原图像素不动 ── */
   /* 槽位比例：和 js/winxp.js 的判定必须一致 */
   function shotRatio(w, h) {
     var r = w / h;
     if (r > 0.9 && r < 1.15) return '1 / 1';
     if (r >= 1.15) return '4 / 3';
     return '3 / 4';
+  }
+  /* content.js 允许手改，所以写死的比例也过滤一遍 */
+  function fixedRatio(r) {
+    return (r === '1:1' || r === '3:4' || r === '4:3') ? r.replace(':', ' / ') : '';
   }
   function num(v, d) { var n = Number(v); return isFinite(n) ? n : d; }
   /* content.js 允许手改，所以这里也夹一遍：裁剪窗口不能跑出图外（cx ∈ [0.5/z, 1-0.5/z]） */
@@ -60,6 +66,7 @@
       var o = (typeof it === 'string') ? { src: it } : (it || {});
       if (!o.src) return;
       var z = num(o.zoom, 1);
+      var fx = fixedRatio(o.r);
       var a = document.createElement('a');
       a.href = enc(o.src);
       a.target = '_blank';
@@ -68,16 +75,16 @@
       im.src = enc(o.src);
       im.loading = 'lazy';
       im.alt = '';
-      if (z > 1.001) {
-        /* 裁剪过：a 当裁剪框（overflow:hidden），img 放到 z 倍大再偏移，多出来的被裁掉 */
+      if (fx || z > 1.001) {
+        /* 指定了比例或裁剪过：a 当裁剪框（overflow:hidden），img 放大 z 倍再偏移，多出来的被裁掉 */
         a.className = 'crop';
         im.style.width = (z * 100) + '%';
         im.style.height = (z * 100) + '%';
         im.style.left = ((0.5 - pan(o.cx, z) * z) * 100) + '%';
         im.style.top = ((0.5 - pan(o.cy, z) * z) * 100) + '%';
-        /* 槽位比例跟没裁剪时一样，但得等图片载入才知道宽高，先按默认竖版占位 */
-        a.style.aspectRatio = '3 / 4';
-        im.addEventListener('load', function () {
+        /* 选定的比例优先；没选就得等图片载入才知道宽高，先按默认竖版占位 */
+        a.style.aspectRatio = fx || '3 / 4';
+        if (!fx) im.addEventListener('load', function () {
           if (im.naturalWidth && im.naturalHeight) a.style.aspectRatio = shotRatio(im.naturalWidth, im.naturalHeight);
         });
       }

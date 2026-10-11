@@ -59,6 +59,7 @@ main { padding:10px; max-width:1180px; }
 .shot img { display:block; width:100%; height:96px; object-fit:cover; object-position:top center; background:#eee; }
 .shot .u { display:flex; gap:3px; margin-top:4px; flex-wrap:wrap; }
 .shot .u button { padding:1px 6px; }
+.shot select.ratio { width:100%; margin-top:4px; padding:1px 2px; font-size:11px; }
 .shot .p { font:10px/1.3 Consolas,monospace; color:var(--dim); word-break:break-all; margin-top:3px; }
 .row2 { display:flex; gap:6px; align-items:center; flex-wrap:wrap; margin-top:6px; }
 .row2 select { max-width:320px; }
@@ -119,10 +120,16 @@ main { padding:10px; max-width:1180px; }
       <div id="cropFrame"><img id="cropImg" alt=""></div>
     </div>
     <div class="crow">
+      <label>比例 <select id="cropRatio">
+        <option value="">自动（按原图）</option>
+        <option value="1:1">1:1 方</option>
+        <option value="3:4">3:4 竖</option>
+        <option value="4:3">4:3 横</option>
+      </select></label>
       <label>缩放 <input id="cropZoom" type="range" min="100" max="400" step="5" value="100"></label>
       <span id="cropVal" class="dim">1.00×</span>
     </div>
-    <p class="ctip">在图上拖动 = 挪动要看的那一块，滑块 = 放大。这里看到什么样，卡片上就是什么样（原图不动，只记参数）。</p>
+    <p class="ctip">在图上拖动 = 挪动要看的那一块，滑块 = 放大。选了比例，框子就按那个比例裁（多余的部分被切掉）。这里看到什么样，卡片上就是什么样（原图不动，只记参数）。</p>
     <div class="crow">
       <button class="pri" id="cropOk">确定</button>
       <button id="cropCancel">取消</button>
