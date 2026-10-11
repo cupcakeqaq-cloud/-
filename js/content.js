@@ -11,9 +11,15 @@
      resources.items   资源页下载项；href 可以写中文文件名，前台自动 URL 编码
    ───────────────────────────────────────────────────────────── */
 window.CONTENT = {
-  "i18n": {},
+  "i18n": {
+    "reText": {
+      "zh": "资源的下载与使用说明在独立页面，点击下面的按钮进入。",
+      "ja": "リソースのダウンロードと使用説明は専用ページにあります。\n下のボタンをクリックして進んでください。",
+      "en": "Download and usage instructions for the resources are on a dedicated page.\nPlease click the button below to continue."
+    }
+  },
   "commission": {
-    "status": "open",
+    "status": "paused",
     "cards": [
       {
         "shots": [
