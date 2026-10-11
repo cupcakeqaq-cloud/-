@@ -581,6 +581,13 @@ window.CONTENT = {
 - 后台界面：临时 `_probe.html`（真接口 + 真密码登录，验完已删）dump 了五个页签 —— 文案页 100 个字段三语齐全、委托页状态/例图/图库下拉正常、资源页三语输入与「上传大文件」按钮（无 token 时禁用）正常、留言页的日期/置顶/隐藏/三语回复正常、提交页正常。
 - 临时文件全部删除：`_probe.html`、`_tmp-body.json`、`_tmp-gb.json`、`uploads/`（测试上传）、`diag/dom-*.html`、`diag/shots/`。
 
+**提交推送与网络（本批实测，重要）**
+
+- 本批两个提交都推上去了：`85de086`（后台全套 16 个文件）和 `74c7883`（删掉误提交的 `_tmp-git.json`）。远端 `main` 现在就是 `74c7883`，GitHub Pages 已更新（线上实测：`commission.html` 4 块例图共 12 张、状态是默认的 `cmStatusOpen`；`resources.html` 只有 1 条 `.rs-item`；`_tmp-git.json` 在 raw 和 Pages 上都是 404）。
+- **踩的坑：`/api/git` 会 `git add -A` 整个仓库**，我用临时文件传提交信息时把 `_tmp-git.json` 一起提交了（已在下一个提交里删掉）。以后给 `/api/git` 传 body 的临时 JSON 一律放仓库外（`$env:TEMP\dsh-gitmsg.json`）。同理：后台点「提交并推送」之前，工作区里不能有任何不想公开的临时文件。
+- **本仓库单独配了 git 代理**：`git config http.proxy http://127.0.0.1:7897`（站主本机的代理端口）。原因：不配代理时 `git push` 直连 `github.com:443` 会 `Failed to connect ... after 21s`，而 PowerShell 走系统代理能通 —— git 不读 Windows 系统代理，只读自己的配置和 `HTTP(S)_PROXY` 环境变量。后台 `/api/git` 调的是同一个 git，所以这条配置同时也让后台的「提交并推送」能用。**站主如果关掉/换掉代理**：要么 `git config --unset http.proxy`，要么把端口改成新的，否则推送会连不上。
+- `git push` 会走本机 `credential.helper=manager` 的已存凭据，所以**推送不需要 `.env` 里的 `GITHUB_TOKEN`**；那个 token 只用于 `/api/release` 传大文件到 Releases。
+
 **站主下一步就两件事**
 
 1. `.env` 里的 `ADMIN_PASSWORD` 是首次启动自动生成的随机串（只打印在控制台）。想换成好记的就改那一行，然后重启 `npm start`。
