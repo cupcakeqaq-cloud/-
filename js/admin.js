@@ -138,6 +138,34 @@
     });
   }
   function enc(u) { return encodeURI(String(u == null ? '' : u)); }
+  function num(v, d) { var n = Number(v); return isFinite(n) ? n : d; }
+  function c3(n) { return Math.round(n * 1000) / 1000; }
+
+  /* ── 例图裁剪：内存里例图统一是对象 {src,zoom,cx,cy}，存回去时再按 toWire 还原 ──
+     zoom=放大倍数（1~4）；cx/cy = 看到的那一块的中心，在「放大后的图框」里的比例（0~1，默认 0.5） */
+  function sh(s) {
+    if (typeof s === 'string') return { src: s, zoom: 1, cx: 0.5, cy: 0.5 };
+    s = s || {};
+    var z = Math.min(4, Math.max(1, num(s.zoom, 1)));
+    return { src: String(s.src || ''), zoom: z, cx: clampPan(s.cx, z), cy: clampPan(s.cy, z) };
+  }
+  /* 裁剪窗口不能跑出图外：cx ∈ [0.5/z, 1-0.5/z]（z=1 时只能取 0.5，也就是没法平移） */
+  function clampPan(v, z) {
+    var lo = 0.5 / z, hi = 1 - 0.5 / z;
+    return Math.min(hi, Math.max(lo, num(v, 0.5)));
+  }
+  function normCards(cards) {
+    return (cards || []).map(function (c) {
+      return { shots: (((c || {}).shots) || []).map(sh).filter(function (o) { return o.src; }) };
+    });
+  }
+  /* 没放大就是纯字符串（老写法，文件里不会多出参数）；放大过才写对象 */
+  function toWire(o) {
+    if (!o || !o.src) return null;
+    var z = o.zoom;
+    if (!(z > 1.001)) return o.src;
+    return { src: o.src, zoom: c3(z), cx: c3(clampPan(o.cx, z)), cy: c3(clampPan(o.cy, z)) };
+  }
   function clone(o) { return JSON.parse(JSON.stringify(o || {})); }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function hint(msg, err) {
@@ -197,7 +225,7 @@
     S.content = content;
     S.i18n = clone(content.i18n);
     S.status = content.commission.status;
-    S.cmCards = content.commission.cards || [];
+    S.cmCards = normCards(content.commission.cards);
     S.resItems = content.resources.items || [];
     S.commentsList = (comments && comments.comments) || [];
   }
@@ -260,13 +288,16 @@
   }
 
   // ───────── 委托页 ─────────
-  function shotBox(p, i, j) {
-    return '<div class="shot"><img src="' + esc(enc(p)) + '" alt="" loading="lazy">' +
+  function shotBox(o, i, j) {
+    var z = num(o.zoom, 1);
+    var tag = z > 1.001 ? ' <span class="pill warn">裁剪 ' + String(c3(z)) + '×</span>' : '';
+    return '<div class="shot"><img src="' + esc(enc(o.src)) + '" alt="" loading="lazy">' +
       '<div class="u">' +
+      '<button data-act="crop" data-i="' + i + '" data-j="' + j + '">裁剪</button>' +
       '<button data-act="up" data-i="' + i + '" data-j="' + j + '">↑</button>' +
       '<button data-act="down" data-i="' + i + '" data-j="' + j + '">↓</button>' +
       '<button class="del" data-act="rm" data-i="' + i + '" data-j="' + j + '">删除</button>' +
-      '</div><div class="p">' + esc(p) + '</div></div>';
+      '</div><div class="p">' + esc(o.src) + tag + '</div></div>';
   }
 
   function galleryOptions() {
@@ -401,7 +432,7 @@
       i18n: i18n,
       commission: {
         status: S.status,
-        cards: S.cmCards.map(function (c) { return { shots: (c.shots || []).slice(0, 6) }; })
+        cards: S.cmCards.map(function (c) { return { shots: (c.shots || []).map(toWire).filter(Boolean).slice(0, 6) }; })
       },
       resources: {
         items: S.resItems.map(function (it) {
@@ -421,7 +452,7 @@
       if (k.git) S.git = k.git;
       S.i18n = clone(S.content.i18n);
       S.status = S.content.commission.status;
-      S.cmCards = S.content.commission.cards;
+      S.cmCards = normCards(S.content.commission.cards);
       S.resItems = S.content.resources.items;
     });
   }
@@ -442,9 +473,10 @@
       .then(parseRes)
       .then(function (j) {
         S.files.uploads.push(j.path.replace(/^uploads\//, ''));
-        S.cmCards[i].shots.push(j.path);
+        S.cmCards[i].shots.push(sh(j.path));
         render();
         hint('已上传 ' + j.path + '，记得点「保存改动」');
+        openCrop(i, S.cmCards[i].shots.length - 1);   /* 传完直接开裁剪框，让站主挑要露的那一块 */
       })
       .catch(function (e) { hint('上传失败：' + e.message, true); });
   }
@@ -496,6 +528,111 @@
     });
   }
 
+  // ───────── 裁剪弹层 ─────────
+  /* 预览框和前台 .cm-card-shots a.crop 用同一套算法：a 当裁剪框，img 放大 z 倍再按 cx/cy 偏移 */
+  var cr = null;   // 正在裁的 {i, j, src, zoom, cx, cy}
+
+  /* 槽位比例和前台一致（js/content-render.js 的 shotRatio / js/winxp.js 的判定） */
+  function cropRatio() {
+    var im = $('#cropImg');
+    var w = im.naturalWidth, h = im.naturalHeight;
+    if (!w || !h) return '3 / 4';
+    var r = w / h;
+    if (r > 0.9 && r < 1.15) return '1 / 1';
+    if (r >= 1.15) return '4 / 3';
+    return '3 / 4';
+  }
+
+  function paintCrop() {
+    if (!cr) return;
+    var f = $('#cropFrame'), im = $('#cropImg'), z = cr.zoom;
+    im.style.width = (z * 100) + '%';
+    im.style.height = (z * 100) + '%';
+    im.style.left = ((0.5 - cr.cx * z) * 100) + '%';
+    im.style.top = ((0.5 - cr.cy * z) * 100) + '%';
+    f.style.aspectRatio = cropRatio();
+    $('#cropZoom').value = String(Math.round(z * 100));
+    $('#cropVal').textContent = z.toFixed(2) + '×';
+  }
+
+  function openCrop(i, j) {
+    var card = S.cmCards[i];
+    var o = card && card.shots && card.shots[j];
+    if (!o) return;
+    var z = Math.min(4, Math.max(1, num(o.zoom, 1)));
+    cr = { i: i, j: j, src: o.src, zoom: z, cx: clampPan(o.cx, z), cy: clampPan(o.cy, z) };
+    $('#cropSrc').textContent = o.src;
+    var im = $('#cropImg');
+    im.onload = paintCrop;
+    im.src = enc(o.src);
+    paintCrop();
+    $('#crop').hidden = false;
+  }
+
+  function closeCrop() {
+    cr = null;
+    $('#crop').hidden = true;
+    $('#cropImg').src = '';
+  }
+
+  function applyCrop() {
+    if (!cr) return;
+    var o = S.cmCards[cr.i] && S.cmCards[cr.i].shots[cr.j];
+    if (!o) { closeCrop(); return; }
+    o.zoom = cr.zoom; o.cx = cr.cx; o.cy = cr.cy;
+    var cropped = o.zoom > 1.001;
+    closeCrop();
+    if (S.tab !== 'cm') S.tab = 'cm';
+    render();
+    hint(cropped ? '裁剪已设置（记得点「保存改动」）' : '已恢复成整张显示（记得点「保存改动」）');
+  }
+
+  function bindCrop() {
+    $('#cropOk').onclick = applyCrop;
+    $('#cropCancel').onclick = closeCrop;
+    $('#cropReset').onclick = function () {
+      if (!cr) return;
+      cr.zoom = 1; cr.cx = 0.5; cr.cy = 0.5;
+      paintCrop();
+    };
+    var zl = $('#cropZoom');
+    zl.oninput = function () {
+      if (!cr) return;
+      cr.zoom = Math.min(4, Math.max(1, num(zl.value, 100) / 100));
+      /* 换倍数时保持原来的中心点（cx 是相对图框的比例，中心点在图上的位置不变），再夹回合法范围 */
+      cr.cx = clampPan(cr.cx, cr.zoom);
+      cr.cy = clampPan(cr.cy, cr.zoom);
+      paintCrop();
+    };
+
+    /* 拖动：拖 dx 像素 → 窗口在放大 z 倍的图上挪动，除以框宽×倍数 */
+    var f = $('#cropFrame'), down = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    f.addEventListener('pointerdown', function (e) {
+      if (!cr) return;
+      down = true; sx = e.clientX; sy = e.clientY; ox = cr.cx; oy = cr.cy;
+      f.classList.add('drag');
+      if (f.setPointerCapture) f.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+    f.addEventListener('pointermove', function (e) {
+      if (!down || !cr) return;
+      var r = f.getBoundingClientRect();
+      cr.cx = clampPan(ox - (e.clientX - sx) / (r.width * cr.zoom), cr.zoom);
+      cr.cy = clampPan(oy - (e.clientY - sy) / (r.height * cr.zoom), cr.zoom);
+      paintCrop();
+    });
+    function up(e) {
+      if (!down) return;
+      down = false;
+      f.classList.remove('drag');
+      if (f.releasePointerCapture && e.pointerId != null) {
+        try { f.releasePointerCapture(e.pointerId); } catch (err) {}
+      }
+    }
+    f.addEventListener('pointerup', up);
+    f.addEventListener('pointercancel', up);
+  }
+
   // ───────── 事件 ─────────
   function findShot(i, j) {
     var card = S.cmCards[i];
@@ -520,10 +657,11 @@
     if (act === 'reset') { delete S.i18n[t.dataset.k]; render(); hint('已恢复默认：' + t.dataset.k); return; }
 
     if (act === 'add-img') { pickFile('image/*', function (f) { uploadImg(f, i); }); return; }
+    if (act === 'crop') { openCrop(i, j); return; }
     if (act === 'add-pick') {
       var sel = $('select[data-act="sel"][data-i="' + i + '"]');
       if (!sel || !sel.value) { hint('先在下拉里选一张图', true); return; }
-      S.cmCards[i].shots.push(sel.value);
+      S.cmCards[i].shots.push(sh(sel.value));
       render();
       return;
     }
@@ -586,6 +724,7 @@
   }
 
   function onKey(e) {
+    if (e.key === 'Escape' && cr) { closeCrop(); return; }
     if (e.key === 'Enter' && $('#login') && !$('#login').hidden) doLogin();
   }
 
@@ -599,6 +738,7 @@
     $('#save').onclick = doSave;
     $('#reload').onclick = function () { if (confirm('重新读取会丢掉没保存的改动，继续？')) boot(); };
     $('#logout').onclick = function () { post('/api/logout', {}).then(function () { location.reload(); }); };
+    bindCrop();
     api('/api/whoami').then(function (j) {
       if (j.authed) { $('#login').hidden = true; $('#app').hidden = false; boot(); }
       else $('#pw').focus();

@@ -990,7 +990,7 @@ body.grayed #winLayer { pointer-events: none; }
 .cm-card-shots a.crop img {
   position: absolute; inset: auto;
   aspect-ratio: auto; border: 0; border-radius: 0;
-  object-position: center; cursor: zoom-in;
+  object-position: top center; cursor: zoom-in;
 }
 .cm-card-shots img:hover { opacity: .92; }
 .cm-shots-hint { font-size: 12px; color: #767676; text-align: center; margin: -6px 0 18px; }
