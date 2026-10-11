@@ -45,6 +45,11 @@
     return '3 / 4';
   }
   function num(v, d) { var n = Number(v); return isFinite(n) ? n : d; }
+  /* content.js 允许手改，所以这里也夹一遍：裁剪窗口不能跑出图外（cx ∈ [0.5/z, 1-0.5/z]） */
+  function pan(v, z) {
+    var lo = 0.5 / z, hi = 1 - 0.5 / z;
+    return Math.min(hi, Math.max(lo, num(v, 0.5)));
+  }
 
   var cards = document.querySelectorAll('.cm-cards .cm-card');
   (cm.cards || []).forEach(function (card, i) {
@@ -68,8 +73,8 @@
         a.className = 'crop';
         im.style.width = (z * 100) + '%';
         im.style.height = (z * 100) + '%';
-        im.style.left = ((0.5 - num(o.cx, 0.5) * z) * 100) + '%';
-        im.style.top = ((0.5 - num(o.cy, 0.5) * z) * 100) + '%';
+        im.style.left = ((0.5 - pan(o.cx, z) * z) * 100) + '%';
+        im.style.top = ((0.5 - pan(o.cy, z) * z) * 100) + '%';
         /* 槽位比例跟没裁剪时一样，但得等图片载入才知道宽高，先按默认竖版占位 */
         a.style.aspectRatio = '3 / 4';
         im.addEventListener('load', function () {

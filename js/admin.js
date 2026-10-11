@@ -611,7 +611,8 @@
       if (!cr) return;
       down = true; sx = e.clientX; sy = e.clientY; ox = cr.cx; oy = cr.cy;
       f.classList.add('drag');
-      if (f.setPointerCapture) f.setPointerCapture(e.pointerId);
+      /* 指针捕获是锦上添花：某些浏览器对非活动指针会抛错，抛了也不该影响拖动 */
+      try { if (f.setPointerCapture) f.setPointerCapture(e.pointerId); } catch (err) {}
       e.preventDefault();
     });
     f.addEventListener('pointermove', function (e) {
@@ -625,9 +626,7 @@
       if (!down) return;
       down = false;
       f.classList.remove('drag');
-      if (f.releasePointerCapture && e.pointerId != null) {
-        try { f.releasePointerCapture(e.pointerId); } catch (err) {}
-      }
+      try { if (f.releasePointerCapture && e.pointerId != null) f.releasePointerCapture(e.pointerId); } catch (err) {}
     }
     f.addEventListener('pointerup', up);
     f.addEventListener('pointercancel', up);

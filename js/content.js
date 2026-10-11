@@ -28,7 +28,12 @@ window.CONTENT = {
     "cards": [
       {
         "shots": [
-          "picture/插画53.jpg",
+          {
+            "src": "picture/插画53.jpg",
+            "zoom": 4,
+            "cx": 0.875,
+            "cy": 0.125
+          },
           "picture/插画57.jpg",
           "picture/插画54.jpg"
         ]
@@ -49,7 +54,12 @@ window.CONTENT = {
       },
       {
         "shots": [
-          "picture/插画31.png",
+          {
+            "src": "picture/插画31.png",
+            "zoom": 2,
+            "cx": 0.5,
+            "cy": 0.5
+          },
           "picture/插画37.png",
           "picture/插画62.png"
         ]

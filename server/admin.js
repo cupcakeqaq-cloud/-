@@ -227,6 +227,13 @@ function readContent() {
 }
 
 /** 校验 + 收敛成固定形状（多余字段一律丢掉，防手改后写坏前台） */
+/** 裁剪窗口中心不能跑出图外：cx ∈ [0.5/z, 1-0.5/z]（z=1 时只能取 0.5，也就是没法平移） */
+function clampPan(v, zoom) {
+  const lo = 0.5 / zoom;
+  const hi = 1 - 0.5 / zoom;
+  return Math.min(hi, Math.max(lo, clampNum(v, 0, 1, 0.5)));
+}
+
 /** 例图一项：老写法是 "路径"；裁剪过就存 {src, zoom, cx, cy}（zoom=1 时仍旧存字符串，老数据不用动） */
 function normShot(s) {
   if (typeof s === 'string') return s.trim() || null;
@@ -234,10 +241,8 @@ function normShot(s) {
   const src = str(s.src, 600);
   if (!src) return null;
   const zoom = clampNum(s.zoom, 1, 4, 1);
-  const cx = clampNum(s.cx, 0, 1, 0.5);
-  const cy = clampNum(s.cy, 0, 1, 0.5);
   if (zoom <= 1.001) return src;
-  return { src, zoom: round3(zoom), cx: round3(cx), cy: round3(cy) };
+  return { src, zoom: round3(zoom), cx: round3(clampPan(s.cx, zoom)), cy: round3(clampPan(s.cy, zoom)) };
 }
 
 function normContent(c) {
