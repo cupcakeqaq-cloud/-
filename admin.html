@@ -71,6 +71,20 @@ main { padding:10px; max-width:1180px; }
 .pill { font-size:11px; padding:0 5px; border-radius:9px; background:#e8e8e8; color:#444; }
 .pill.warn { background:#ffe6c9; color:#8a4b1f; }
 .pill.off { background:#f0d0d0; color:#8a2f2f; }
+
+/* 裁剪弹层（预览框和前台 .cm-card-shots a.crop 是同一套算法，所见即所得） */
+#crop { position:fixed; inset:0; z-index:30; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; }
+#crop[hidden] { display:none; }
+#crop .cbox { background:#fff; border:1px solid #999; padding:10px; max-width:min(94vw,580px); max-height:94vh; overflow:auto; }
+#crop h4 { margin:0 0 8px; font-size:13px; }
+#crop h4 .dim { color:var(--dim); font:10px/1.3 Consolas,monospace; font-weight:400; word-break:break-all; }
+#cropStage { display:flex; justify-content:center; padding:2px 0 6px; }
+#cropFrame { position:relative; overflow:hidden; width:min(360px,78vw); aspect-ratio:3 / 4; border:1px solid #888; background:#f3ecdd; cursor:grab; touch-action:none; }
+#cropFrame img { position:absolute; width:100%; height:100%; object-fit:cover; object-position:center; pointer-events:none; user-select:none; -webkit-user-drag:none; }
+#cropFrame.drag { cursor:grabbing; }
+#crop .crow { display:flex; align-items:center; gap:8px; margin:6px 0 0; }
+#crop .crow input[type=range] { width:230px; padding:0; }
+#crop .ctip { color:var(--dim); font-size:11px; margin:5px 0 0; }
 </style>
 </head>
 <body>
@@ -96,6 +110,25 @@ main { padding:10px; max-width:1180px; }
   </div>
   <div id="tabs"></div>
   <main id="view"></main>
+</div>
+
+<div id="crop" hidden>
+  <div class="cbox">
+    <h4>裁剪例图 <span id="cropSrc" class="dim"></span></h4>
+    <div id="cropStage">
+      <div id="cropFrame"><img id="cropImg" alt=""></div>
+    </div>
+    <div class="crow">
+      <label>缩放 <input id="cropZoom" type="range" min="100" max="400" step="5" value="100"></label>
+      <span id="cropVal" class="dim">1.00×</span>
+    </div>
+    <p class="ctip">在图上拖动 = 挪动要看的那一块，滑块 = 放大。这里看到什么样，卡片上就是什么样（原图不动，只记参数）。</p>
+    <div class="crow">
+      <button class="pri" id="cropOk">确定</button>
+      <button id="cropCancel">取消</button>
+      <button id="cropReset">恢复默认</button>
+    </div>
+  </div>
 </div>
 
 <script src="js/i18n.js"></script>

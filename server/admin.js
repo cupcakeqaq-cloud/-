@@ -170,6 +170,12 @@ function tri(v, max) {
   }
   return o;
 }
+function clampNum(v, min, max, dflt) {
+  let n = Number(v);
+  if (!isFinite(n)) n = dflt;
+  return Math.min(max, Math.max(min, n));
+}
+function round3(n) { return Math.round(n * 1000) / 1000; }
 function readBody(req, limit) {
   return new Promise(function (resolve, reject) {
     const chunks = [];
@@ -221,6 +227,19 @@ function readContent() {
 }
 
 /** 校验 + 收敛成固定形状（多余字段一律丢掉，防手改后写坏前台） */
+/** 例图一项：老写法是 "路径"；裁剪过就存 {src, zoom, cx, cy}（zoom=1 时仍旧存字符串，老数据不用动） */
+function normShot(s) {
+  if (typeof s === 'string') return s.trim() || null;
+  if (!s || typeof s !== 'object') return null;
+  const src = str(s.src, 600);
+  if (!src) return null;
+  const zoom = clampNum(s.zoom, 1, 4, 1);
+  const cx = clampNum(s.cx, 0, 1, 0.5);
+  const cy = clampNum(s.cy, 0, 1, 0.5);
+  if (zoom <= 1.001) return src;
+  return { src, zoom: round3(zoom), cx: round3(cx), cy: round3(cy) };
+}
+
 function normContent(c) {
   if (!c || typeof c !== 'object') throw new Error('内容格式不对');
   const out = { i18n: {}, commission: { status: 'open', cards: [] }, resources: { items: [] } };
@@ -241,7 +260,7 @@ function normContent(c) {
     const card = cards[i] || {};
     const shots = Array.isArray(card.shots) ? card.shots : [];
     return {
-      shots: shots.filter(function (s) { return typeof s === 'string' && s.trim(); }).slice(0, 6),
+      shots: shots.map(normShot).filter(Boolean).slice(0, 6),
     };
   });
 

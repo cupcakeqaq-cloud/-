@@ -982,6 +982,16 @@ body.grayed #winLayer { pointer-events: none; }
 }
 .cm-card-shots img.ratio-sq { aspect-ratio: 1 / 1; }
 .cm-card-shots img.ratio-land { aspect-ratio: 4 / 3; }
+/* 裁剪过的例图：a 当裁剪框，img 由内联 style 放大/偏移（后台「裁剪」按钮存的 zoom/cx/cy） */
+.cm-card-shots a.crop {
+  position: relative; overflow: hidden;
+  border: 1px solid #d8c9ad; border-radius: 4px; background: #f3ecdd;
+}
+.cm-card-shots a.crop img {
+  position: absolute; inset: auto;
+  aspect-ratio: auto; border: 0; border-radius: 0;
+  object-position: center; cursor: zoom-in;
+}
 .cm-card-shots img:hover { opacity: .92; }
 .cm-shots-hint { font-size: 12px; color: #767676; text-align: center; margin: -6px 0 18px; }
 .cm-sec {

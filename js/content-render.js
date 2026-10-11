@@ -35,21 +35,47 @@
     st.classList.add(cm.status === 'paused' ? 'cm-paused' : 'cm-closed');
   }
 
-  /* ── 3. 例图：按数据重建（空数组 = 保留 HTML 里写死的图） ── */
+  /* ── 3. 例图：按数据重建（空数组 = 保留 HTML 里写死的图）
+        一项可以是 "路径"，也可以是 {src, zoom, cx, cy}（只记「看哪一块」，原图像素不动） ── */
+  /* 槽位比例：和 js/winxp.js 的判定必须一致 */
+  function shotRatio(w, h) {
+    var r = w / h;
+    if (r > 0.9 && r < 1.15) return '1 / 1';
+    if (r >= 1.15) return '4 / 3';
+    return '3 / 4';
+  }
+  function num(v, d) { var n = Number(v); return isFinite(n) ? n : d; }
+
   var cards = document.querySelectorAll('.cm-cards .cm-card');
   (cm.cards || []).forEach(function (card, i) {
     var box = cards[i] && cards[i].querySelector('.cm-card-shots');
     if (!box || !card || !card.shots || !card.shots.length) return;
     box.innerHTML = '';
-    card.shots.forEach(function (src) {
+    card.shots.forEach(function (it) {
+      var o = (typeof it === 'string') ? { src: it } : (it || {});
+      if (!o.src) return;
+      var z = num(o.zoom, 1);
       var a = document.createElement('a');
-      a.href = enc(src);
+      a.href = enc(o.src);
       a.target = '_blank';
       a.rel = 'noopener';
       var im = document.createElement('img');
-      im.src = enc(src);
+      im.src = enc(o.src);
       im.loading = 'lazy';
       im.alt = '';
+      if (z > 1.001) {
+        /* 裁剪过：a 当裁剪框（overflow:hidden），img 放到 z 倍大再偏移，多出来的被裁掉 */
+        a.className = 'crop';
+        im.style.width = (z * 100) + '%';
+        im.style.height = (z * 100) + '%';
+        im.style.left = ((0.5 - num(o.cx, 0.5) * z) * 100) + '%';
+        im.style.top = ((0.5 - num(o.cy, 0.5) * z) * 100) + '%';
+        /* 槽位比例跟没裁剪时一样，但得等图片载入才知道宽高，先按默认竖版占位 */
+        a.style.aspectRatio = '3 / 4';
+        im.addEventListener('load', function () {
+          if (im.naturalWidth && im.naturalHeight) a.style.aspectRatio = shotRatio(im.naturalWidth, im.naturalHeight);
+        });
+      }
       a.appendChild(im);
       box.appendChild(a);
     });

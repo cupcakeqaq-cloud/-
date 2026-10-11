@@ -16,6 +16,11 @@ window.CONTENT = {
       "zh": "资源的下载与使用说明在独立页面，点击下面的按钮进入。",
       "ja": "リソースのダウンロードと使用説明は専用ページにあります。\n下のボタンをクリックして進んでください。",
       "en": "Download and usage instructions for the resources are on a dedicated page.\nPlease click the button below to continue."
+    },
+    "voiceNote": {
+      "zh": "请勿倒卖；转载／使用请标注原作者。",
+      "ja": "転売禁止。転載・使用の際は原作者を明記してください。",
+      "en": "Do not resell. Please credit the original author when reposting or using."
     }
   },
   "commission": {
