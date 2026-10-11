@@ -137,6 +137,8 @@
       en: 'Anything goes here — I upload things I make now and then. Grab whatever you see when it updates.'
     },
     rsDownloadTitle: { zh: '下载', ja: 'ダウンロード', en: 'Download' },
+    /* 显示名跟着语言走；zip 的文件名是中文的，改不了（改了链接就 404） */
+    voiceNameFlan: { zh: '芙兰朵露 v1.0.0-beta', ja: 'フランドール v1.0.0-beta', en: 'Flandre v1.0.0-beta' },
     voiceSizeFlan: { zh: '约 33.2 MB · zip', ja: '約 33.2 MB · zip', en: '~33.2 MB · zip' },
     voiceDownload: { zh: '↓ 下载', ja: '↓ ダウンロード', en: '↓ Download' },
     voiceNoteTitle: { zh: '使用说明：', ja: '使い方：', en: 'How to use:' },

@@ -2,7 +2,8 @@
 
 > 给接手的 AI / 协作者：读完这份就能无缝接手。**整站已改造为 Windows XP 风格**（窗口外壳 / 任务栏 / 开始菜单 / 桌面快捷方式 / 电源流程 / 6 个 XP 应用），仍是**纯静态零构建**，直接推 GitHub Pages 即可。
 >
-> 最新一轮（第 7 批 3 条）：音源撤换成**一个** `voice dl/芙兰朵露v1.0.0-beta.zip`（33.2MB）—— `ゴースト_A.zip`（65.3MB）与 `林屿.zip`（55.9MB）已从仓库删除，资源页 `.rs-item` 从两条减到一条，i18n 的 `voiceSizeGhost`/`voiceSizeLin` 合并成 `voiceSizeFlan`，顺手删掉没人引用的死键 `titleVoice`；资源简介 `rsIntro` 改成「什么都有可能放 —— 不定时上传本人制作的东西」（三语同步）；个人简介 `bio` 改成站主 2026-10-12 自己在 GitHub 网页端提交的那句半成品声明（保留「18↑一般通过十八线低精力画手」前缀 + 「此网页暂时为半成品，大部分文本为ai自动填写的占位符，请无视。」）。
+> 最新一轮（第 8 批 2 条）：**资源页下载项的名字硬编码成中文**，切到日/英后页面上只剩这一个词是中文，和全页语言对不上 → 新增 i18n 键 `voiceNameFlan`（zh `芙兰朵露 v1.0.0-beta` / ja `フランドール v1.0.0-beta` / en `Flandre v1.0.0-beta`），`resources.html` 的 `.rs-name` 挂上 `data-i18n`。**只改显示名，`href` 里的 zip 文件名不动**（文件名是中文的，改了链接就 404）。另按站主要求补了 `README.md`（只写开源归属，见第十一节）并把两份授权原文随素材放进仓库。
+> 上一轮（第 7 批 3 条）：音源撤换成**一个** `voice dl/芙兰朵露v1.0.0-beta.zip`（33.2MB）—— `ゴースト_A.zip`（65.3MB）与 `林屿.zip`（55.9MB）已从仓库删除，资源页 `.rs-item` 从两条减到一条，i18n 的 `voiceSizeGhost`/`voiceSizeLin` 合并成 `voiceSizeFlan`，顺手删掉没人引用的死键 `titleVoice`；资源简介 `rsIntro` 改成「什么都有可能放 —— 不定时上传本人制作的东西」（三语同步）；个人简介 `bio` 改成站主 2026-10-12 自己在 GitHub 网页端提交的那句半成品声明（保留「18↑一般通过十八线低精力画手」前缀 + 「此网页暂时为半成品，大部分文本为ai自动填写的占位符，请无视。」）。
 > 上一轮（第 6 批 3 条）：开始菜单友链显示名改成 **Survivor**（`menuFriend` 三语同值）；中文「委托受理」全站改成 **「委托相关事宜」**（只动中文，日/英仍是 依頼受付 / Commission）；委托价目**按语言换算货币** —— 新增 `cmCard1Price~cmCard3Price` 三个 i18n 键（zh `¥320-520` / ja `6,500〜11,000円` / en `$45-75`），汇率 1 CNY = 21 JPY = 0.14 USD，日元取 500 整、美元取 5 整。
 > 上一轮（站主第 5 批 5 条）已落地：崩坏效果**去掉整页扭动/skew**（只留扫描线+频闪+RGB 鬼影）；**全站字体换成思源黑体那一路的无衬线**（像素字体退役，XP 外壳用 Tahoma）；自介窗侧栏 `328→380px`、名字 16px 不换行，不再被挤压；委托页**去掉价目卡片大编号**、**委托流程改成普通文字行**（不再一步一个盒子）；**浏览器组件的 Back/Forward 做成真历史**（书签首页也进历史，`XP.frame` 超时不再覆盖已导航走的页面）。
 > 上上一批（第 4 批 6 条）：删标题栏两端渐隐、崩坏加强、报错音效、GitHub 外链、开始菜单友链、登录窗照 P3 改成官方商标定式。
@@ -58,8 +59,9 @@ E:\自介网页
 │  │  ├─ sounds/error.wav
 │  │  ├─ empty.png       开始菜单「(Empty)」占位图
 │  │  ├─ xp-flag.png     自制的 XP 旗标（从 windows.png 裁出并抠掉外圈白底）
-│  │  └─ minecraft.png   自制的 32px 草方块图标（diag/make_minecraft_icon.py 生成）
-│  ├─ fonts/             像素字体 3 个 woff2（Fusion Pixel Font，OFL）
+│  │  ├─ minecraft.png   自制的 32px 草方块图标（diag/make_minecraft_icon.py 生成）
+│  │  └─ LICENSE-MIT.txt winXP 工程的 MIT 授权原文（**必须跟素材待在一起，别删**）
+│  ├─ fonts/             像素字体 3 个 woff2（Fusion Pixel Font，OFL）+ LICENSE-OFL.txt（**别删**）
 │  ├─ background/        windows.jpg（大背景=XP 蓝天草地）、cute.jpg
 │  ├─ icon/              5 个外链图标（mihuashi / gmail / bilibili / x / marshmallow）
 │  ├─ stickers/anime/    5 张装饰 GIF（当前页面已不使用，留着备用）
@@ -69,10 +71,13 @@ E:\自介网页
 ├─ voice dl/             芙兰朵露v1.0.0-beta.zip（33.2MB，第 7 批换上的唯一音源）
 ├─ diag/                 站主自己的 X 账号诊断资料 + 两个生成用脚本
 ├─ icon.png              头像（也用作开始菜单头部与欢迎界面头像）
+├─ README.md             开源工程归属 + 授权声明（**只写这个**，开发文档是 HANDOFF.md）
 └─ .nojekyll             禁用 Jekyll（Pages 必需）
 ```
 
-> 已删除：`js/danmaku.js`（弹幕屏）、`js/main.js`（时钟+计数器）、`js/gallery.js` + `gallery.js` + `gallery.json` + `refresh-gallery.cjs`（画廊渲染与清单，委托页改成手工挑图后整套废弃，git 历史里能找回）、`README.md`（站主要求不留）、`server.js` 里的弹幕/SSE 与 `/api/gallery` 接口。
+> 已删除：`js/danmaku.js`（弹幕屏）、`js/main.js`（时钟+计数器）、`js/gallery.js` + `gallery.js` + `gallery.json` + `refresh-gallery.cjs`（画廊渲染与清单，委托页改成手工挑图后整套废弃，git 历史里能找回）、`server.js` 里的弹幕/SSE 与 `/api/gallery` 接口。
+>
+> `README.md` 曾在第 4 批被站主要求删掉（当时理由：本文档已够用），**第 8 批站主又要求加回来，但只写「开源工程归属 + 授权声明」**，不写开发细节——两个文档别互相抄：开发/结构/踩坑看本文档，出处与授权看 `README.md`。
 
 ---
 
@@ -209,6 +214,7 @@ body[data-page=...]
 
 ### resources.html
 同款固定浏览器窗。正文三段：资源简介 / 下载（`.rs-item` 一条：名称 + 体积 + `a.rs-dl`）/ 使用说明。
+**下载项的显示名走 i18n（`voiceNameFlan`），不是硬编码** —— 名字曾经写死在 HTML 里，切日/英后整页只剩这一个词是中文（第 8 批修掉）。加新资源时照这个模式：显示名进 `DICT`，`href` 指向真实文件名。
 zip 的 href 必须保持：`voice%20dl/%E8%8A%99%E5%85%B0%E6%9C%B5%E9%9C%B2v1.0.0-beta.zip`（芙兰朵露 v1.0.0-beta，33.2MB），带 `download`。**文件名是非 ASCII，加文件时必须重新做 URL 编码**（`芙`=%E8%8A%99 `兰`=%E5%85%B0 `朵`=%E6%9C%B5 `露`=%E9%9C%B2），编码错了点下载就是 404。
 
 ---
@@ -429,7 +435,7 @@ $git = 'C:\Users\CupCakeQAQ_\AppData\Local\GitHubDesktop\app-3.6.6\resources\app
 ## 十一、站主的沟通偏好（重要）
 
 - **要严格执行要求，不要自作主张**。改动前不确定就先问清楚再动手。
-- **不要再写 README 文件**（明确要求，本文档是唯一需要维护的说明）。
+- **README 只写开源归属**（第 4 批曾要求删掉，第 8 批又要求加回来）：内容限于「用了哪些开源工程、谁写的、什么授权、用在哪、授权原文在哪」，加上「哪些不是开源」。**开发细节、结构说明、踩坑记录一律留在本文档**，别往 README 里搬 —— 本文档仍是唯一需要维护的开发说明。
 - 反馈直接，会说「××有 bug」「××不对」。**别辩解、别写长道歉**，直接修 + 简短说明。
 - 讨厌：无意义的装饰、莫名其妙的标签词汇、刻意的设计、低级 emoji 装饰、留白过多。
 - 喜欢：紧凑极繁排版、千禧年个人博客味、颜文字分隔线、**XP 界面高还原度**。
