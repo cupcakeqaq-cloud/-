@@ -374,8 +374,25 @@
     seek.addEventListener('pointerup', endSeek);
     seek.addEventListener('pointercancel', endSeek);
 
+    /* 等比缩放：窗口被最大化/拉伸时只动这一个系数（站主 m00874：比例固定不变） */
+    var stage = body.querySelector('.wmp');
+    function fit() {
+      var w = body.clientWidth, h = body.clientHeight;
+      if (!w || !h) return;
+      var s = Math.min(w / 620, h / 340);
+      stage.style.setProperty('--wmp-scale', s.toFixed(4));
+    }
+    var ro = null;
+    if (window.ResizeObserver) { ro = new window.ResizeObserver(fit); ro.observe(body); }
+    else window.addEventListener('resize', fit);
+    fit();
+
     listeners.push(render);
-    rec.onClose = function () { stop(); listeners = listeners.filter(function (f) { return f !== render; }); };
+    rec.onClose = function () {
+      stop();
+      listeners = listeners.filter(function (f) { return f !== render; });
+      if (ro) ro.disconnect(); else window.removeEventListener('resize', fit);
+    };
     if (cur < 0) fetchID3(0);   /* 还没开始听：先把第一首的内嵌封面读出来撑场面 */
     render();
   }

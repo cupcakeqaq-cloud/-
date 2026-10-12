@@ -7,9 +7,17 @@
 
 .wmp-body {
   padding: 0;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
   background: linear-gradient(180deg, #f9fdff 0%, #eaf4fc 55%, #e0edfa 100%);
 }
-.wmp { height: 100%; display: flex; min-height: 0; }
+/* 设计尺寸 620×340 是唯一比例基准：窗口被最大化/拉伸时由 JS 只算一个等比缩放系数，
+   内部一律用固定 px 排布，所以任何尺寸下比例都不变（站主 m00874）。 */
+.wmp {
+  flex: none; width: 620px; height: 340px;
+  display: flex; min-height: 0;
+  transform-origin: 50% 50%;
+  transform: scale(var(--wmp-scale, 1));
+}
 
 /* ── 左半边：封面 + 歌名/歌手 + 进度 + 走带 ── */
 .wmp-left {
