@@ -544,8 +544,12 @@ window.CONTENT = {
 ### 12.9 站主首次使用
 
 1. 复制 `.env.example` 为 `.env`，填 `ADMIN_PASSWORD` 和 `GITHUB_TOKEN`（建 token 的步骤写在 `.env.example` 注释里）。
-2. `npm start`，按控制台打印的地址打开后台。
+2. **双击项目根目录的 `启动后台.bat`**（最省事，见下），或 `npm start`，按控制台打印的地址打开后台。
 3. 改完点「保存」，再点「提交并推送」，等 1~2 分钟 Pages 更新。
+
+**`启动后台.bat`（启动器，本批新增）**：双击就完事 —— 它自己 `cd` 到脚本所在目录、按 PATH 找 `node`（找不到就再试 `%ProgramFiles%\nodejs`、`%ProgramFiles(x86)%\nodejs`、`%LOCALAPPDATA%\Programs\nodejs`、`%APPDATA%\nvm`，全都没有就提示去 nodejs.org 装一个然后 `pause` 住不闪退）、起 `node server.js`、3 秒后自动用默认浏览器打开 `http://127.0.0.1:3000/admin/`。**如果 3000 端口已经在监听，它只开页面、不再起第二个进程**。用法就是：双击 → 改内容 → 关掉那个黑窗口就是停后台（重启前记得先点「提交并推送」）。
+- 实现注意（踩过的坑，别改回去）：`.bat` 必须存成 **GBK（代码页 936）且不带 BOM**，**不能写 `chcp 65001`**；写成 UTF-8 时 cmd.exe 会把多字节汉字切错，报一串 `'xxx' is not recognized as an internal or external command`（实测过）。node 往控制台写字是走 `WriteConsoleW`，所以 GBK 控制台里 node 的中文照样正常显示，不需要切代码页。等待也不要写 `timeout /t`（stdio 被重定向时它直接报 `ERROR: Input redirection is not supported`），用 `ping -n 3 127.0.0.1 >nul`。
+- 本工具会话里**没法验证「双击弹出可见窗口」**：`Start-Process 启动后台.bat` 会卡住、也起不出可见控制台（沙箱/会话限制）；用 `cmd /c "启动后台.bat"` 跑逻辑是通的（实测起了 PID 34208、`admin.html`/`index.html` 都 200），所以启动器本身逻辑是验过的，剩下那步交给站主双击。
 
 **后台要长期开着的话，自己开一个终端跑 `npm start` 最稳**：后台是普通 Node 进程，关掉终端/那个进程，页面就变成「无法连接」。如果它挂在别人的工具会话上（比如我这边用后台任务起的），会话一收摊进程就跟着没了 —— 站主已经踩过一次：页面突然打不开，就是进程没了。重启就是再 `npm start` 一次（或 `node server.js`）；`.env` 里的密码不变，重启后**登录会话会失效，要重新登录**（会话只存在内存里，这是故意的）。
 4. 改 `server/admin.js` 之后必须重启进程才会生效（`js/*.js`、`admin.html` 是每次请求现读的，不用重启）。
