@@ -866,14 +866,15 @@ npx --yes wrangler@latest pages deploy --project-name=cupcake-gb-api --branch=ma
 - 「站主删掉的」和「网友新发的」靠内部标记区分：推送过的都打 `synced:true`，推送时**本机没有 + 打过标** = 他删的 → 真删；**没有标** = 网友新发的 → 留着。这个标记只存在 KV 里，两个接口都会剥掉（前台和「拉取」都看不到）。
 - 顺序很重要：**先拉取 → 再改 → 再推送**。只推送不拉取不会丢留言（网友新发的会被当成「新发的」保留），但站主在后台就看不到那些新留言，得先拉一次。
 
+- **仓库变重了（推之前先知道）**：2026-10 这次推送要上传 **101.7 MB**（新对象 96 个），站主这台机器的 Wi-Fi 上传只有约 100 KB/s，**推了 25 分钟才完**（`git push` 期间一直没输出，看着像卡死，其实在传）。这些重量来自 `music/*.mp3`（每首约 10 MB）和 `picture/*.png`（几张 10~17 MB）、`voice dl/萌兰露v1.0.0-beta.zip`（34 MB）——是并行会话和后台「保存 + 提交并推送」`git add -A` 一起带进来的。**以后要加大文件走 Releases，别直接提交进仓库**（HANDOFF 里早有一条同样的提醒）；查「这次要上传多少」可以用 `git rev-list --objects origin/main..HEAD` 配合 `git cat-file --batch-check` 把 blob 大小加起来。
 - 三个 .bat 都是 GBK 编码（cmd 里中文才不乱码），且都只会读 `.env` 里的网址和钥匙，不碰任何网页文件。
 
 ### 15.9 下一步
 
 1. ✅ 后端**已部署**到 `https://cupcake-gb-api.pages.dev`，线上体检 16 项全过，`js/config.js` 已填好网址。
-2. 站主自己在浏览器打开 `https://cupcake-gb-api.pages.dev/api/gb/list` 看一眼（能打开＝他这条网络没问题）；用手机流量再开一次更稳（不同运营商）。
+2. ✅ 站主已在浏览器打开 `https://cupcake-gb-api.pages.dev/api/gb/list`，看到 `{"v":1,"comments":[]}`（＝他这条网络通）。
 3. `gb/comments.json` 里已有的留言：双击「推送留言到Cloudflare.bat」搬一次（**现在文件里是空的，可以先跳过**）。
-4. 把这一批推到 GitHub（推上去前台才真的能发留言）；**注意 `git add -A` 会带上并行会话（第十四 / 十六节）未完成的改动**，要么分开提交，要么等他那边收尾。
+4. ✅ **已推到 GitHub**：`6784623..a27753e main -> main`（站主拍板「所有工程，包括另外一个会话做的网页调整全都推上去」，所以这一个提交里也含第十四 / 十六节的东西）。推完 75 秒后线上已生效：`.../js/config.js` 里是 `window.DANAMKU_API = 'https://cupcake-gb-api.pages.dev'`，`.../js/guestbook.js` 是新的远端版（含 `API += '/'`）。**留言板现在线上就能用了。**
 5. 之后日常：双击「拉取云端留言.bat」看网友留言 → 后台处理 → 双击「推送留言到Cloudflare.bat」同步回去（见 15.8）。
 6. GitHub 登录这次不做；将来要做必须服务端持 Client Secret，等我评估完再谈。
 
