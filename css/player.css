@@ -1,0 +1,167 @@
+/* ══════════════════════════════════════════════════════════
+   Windows Media Player 窗口皮肤 —— Frutiger Aero / Windows 7 风
+   （站主 m00628 第 5 条：按草稿 P5 重做，「不要花里胡哨的时长显示」→ 去掉
+     七段数码管，改成 1:18 / -0:26 的普通文字；列表挪到窗口右侧、可滚动）
+   只在 index.html 引用；跳转页不建窗口。
+   ══════════════════════════════════════════════════════════ */
+
+.wmp-body {
+  padding: 0;
+  background: linear-gradient(180deg, #f9fdff 0%, #eaf4fc 55%, #e0edfa 100%);
+}
+.wmp { height: 100%; display: flex; min-height: 0; }
+
+/* ── 左半边：封面 + 歌名/歌手 + 进度 + 走带 ── */
+.wmp-left {
+  flex: 1; min-width: 0; min-height: 0;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 14px 16px;
+}
+.wmp-hero { flex: 1; display: flex; gap: 14px; align-items: center; min-height: 0; }
+.wmp-screen {
+  position: relative; flex: none; width: 190px; height: 190px;
+  border-radius: 5px; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .9), 0 2px 6px rgba(12, 50, 90, .35);
+  background: #dfeaf4;
+}
+.wmp-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Aero 玻璃高光 */
+.wmp-screen::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, .50), rgba(255, 255, 255, .10) 38%,
+    rgba(255, 255, 255, 0) 56%, rgba(255, 255, 255, .16));
+}
+.wmp-meta { min-width: 0; display: flex; flex-direction: column; gap: 4px; padding-top: 4px; }
+.wmp-title {
+  font-size: 22px; font-weight: 700; color: #10395f; line-height: 1.3;
+  text-shadow: 0 1px 0 #fff;
+  overflow: hidden; text-overflow: ellipsis; display: -webkit-box;
+  -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.wmp-artist {
+  font-size: 13px; color: #5c81a1; text-shadow: 0 1px 0 #fff;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* ── 进度条（凹槽 + 玻璃蓝填充 + 圆钮） ── */
+.wmp-bar { display: flex; align-items: center; gap: 9px; }
+.wmp-cur, .wmp-rem { flex: none; min-width: 36px; font-size: 11px; color: #3c6382; }
+.wmp-rem { text-align: right; color: #7b98b0; }
+.wmp-seek {
+  position: relative; flex: 1; height: 10px; border-radius: 5px; cursor: pointer;
+  background: linear-gradient(180deg, #d3e2ee, #f4f9fd);
+  box-shadow: inset 0 1px 2px rgba(20, 60, 100, .35), 0 1px 0 #fff;
+}
+.wmp-seekfill {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 5px;
+  background: linear-gradient(180deg, #b6e0ff, #4aa3f0 45%, #1d7ad6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8);
+}
+.wmp-knob {
+  position: absolute; top: 50%; left: 0; width: 12px; height: 12px; margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #fff, #d3e8fb 58%, #8fbde4);
+  box-shadow: 0 1px 2px rgba(10, 50, 90, .5), inset 0 1px 0 #fff;
+}
+
+/* ── 走带 + 音量 ── */
+.wmp-ctl { display: flex; align-items: center; gap: 6px; }
+.wmp-btn {
+  position: relative; width: 30px; height: 26px; cursor: pointer;
+  border: 1px solid #9fc0dd; border-radius: 5px;
+  background: linear-gradient(180deg, #fff, #dceaf6 48%, #c3dcf0);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), 0 1px 2px rgba(20, 60, 100, .18);
+}
+.wmp-btn:hover { background: linear-gradient(180deg, #fff, #eaf5fd 48%, #cfe6f8); }
+.wmp-btn:active { background: linear-gradient(180deg, #bcd8ef, #e2eff9); }
+.wmp-btn::before, .wmp-btn::after { content: ""; position: absolute; top: 50%; left: 50%; }
+.wmp-btn.prev::before {  /* 竖条 */
+  width: 2px; height: 11px; border-radius: 1px; background: #1a6fc4;
+  transform: translate(calc(-50% - 5px), -50%);
+}
+.wmp-btn.prev::after {   /* 左三角 */
+  width: 0; height: 0; border-right: 9px solid #1a6fc4;
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+  transform: translate(calc(-50% + 2px), -50%);
+}
+.wmp-btn.next::before {
+  width: 0; height: 0; border-left: 9px solid #1a6fc4;
+  border-top: 6px solid transparent; border-bottom: 6px solid transparent;
+  transform: translate(calc(-50% - 2px), -50%);
+}
+.wmp-btn.next::after {
+  width: 2px; height: 11px; border-radius: 1px; background: #1a6fc4;
+  transform: translate(calc(-50% + 5px), -50%);
+}
+.wmp-btn.play { width: 34px; }
+.wmp-btn.play::before {  /* 播放三角 */
+  width: 0; height: 0; margin-left: 2px; border-left: 12px solid #1a6fc4;
+  border-top: 8px solid transparent; border-bottom: 8px solid transparent;
+  transform: translate(-50%, -50%);
+}
+.wmp-btn.play.playing::before {  /* 暂停＝左竖条 */
+  width: 4px; height: 13px; margin: 0; border: none; border-radius: 1px; background: #1a6fc4;
+  transform: translate(calc(-50% - 3px), -50%);
+}
+.wmp-btn.play.playing::after {   /* 暂停＝右竖条 */
+  width: 4px; height: 13px; border-radius: 1px; background: #1a6fc4;
+  transform: translate(calc(-50% + 3px), -50%);
+}
+.wmp-spacer { flex: 1; }
+.wmp-volico {
+  flex: none; width: 16px; height: 16px; margin-right: 2px;
+  background: url("../assets/winxp/windowsIcons/690(16x16).png") center / contain no-repeat;
+}
+.wmp-vol {
+  -webkit-appearance: none; appearance: none; width: 88px; height: 10px;
+  border-radius: 5px; cursor: pointer; outline: none;
+  background: linear-gradient(180deg, #d3e2ee, #f4f9fd);
+  box-shadow: inset 0 1px 2px rgba(20, 60, 100, .35), 0 1px 0 #fff;
+}
+.wmp-vol::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 11px; height: 15px; border-radius: 4px;
+  background: linear-gradient(180deg, #fff, #cfe6fa 55%, #8fbfe6);
+  box-shadow: 0 1px 2px rgba(10, 50, 90, .45), inset 0 1px 0 #fff;
+}
+.wmp-vol::-moz-range-thumb {
+  width: 11px; height: 15px; border: none; border-radius: 4px;
+  background: linear-gradient(180deg, #fff, #cfe6fa 55%, #8fbfe6);
+  box-shadow: 0 1px 2px rgba(10, 50, 90, .45);
+}
+
+/* ── 右半边：可滚动的播放列表 ── */
+.wmp-right {
+  flex: none; width: 214px; min-height: 0;
+  display: flex; flex-direction: column;
+  border-left: 1px solid #cfe0ef;
+  background: linear-gradient(180deg, #fbfdff, #edf5fc);
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, .9);
+}
+.wmp-head {
+  flex: none; padding: 8px 10px; font-size: 11px; letter-spacing: 1px;
+  text-transform: uppercase; color: #5c81a1;
+  border-bottom: 1px solid #dbe8f4;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0));
+}
+.wmp-list { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 5px 6px; }
+.wmp-row {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0 6px;
+  width: 100%; padding: 4px 6px; margin-bottom: 1px;
+  border: 1px solid transparent; border-radius: 4px; background: none;
+  font: inherit; font-size: 12px; color: #22496b; text-align: left; cursor: pointer;
+}
+.wmp-row:hover { background: #e4f1fc; border-color: #c2ddf6; }
+.wmp-row.on {
+  background: linear-gradient(180deg, #d6ecff, #abd5f8 50%, #8ec4f1);
+  border-color: #7cb4e6; color: #0d3d6b; font-weight: 700;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85);
+}
+.wmp-n { flex: none; width: 16px; font-size: 11px; color: #7e9ab3; }
+.wmp-row.on .wmp-n { color: #2f6b9e; }
+.wmp-t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wmp-a {
+  width: 100%; padding-left: 22px; font-size: 11px; font-weight: 400;
+  color: #7e9ab3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.wmp-row.on .wmp-a { color: #2f6b9e; }

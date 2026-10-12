@@ -8,6 +8,7 @@
 <link rel="icon" href="icon.png">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/winxp.css">
+<link rel="stylesheet" href="css/player.css">
 </head>
 <body data-page="index">
 
@@ -34,6 +35,10 @@
   <button class="desk-icon" type="button" data-desk data-app="guestbook" title="Double-click to open">
     <img src="assets/winxp/windowsIcons/mail.png" alt="">
     <span data-i18n="titleGuestbook">留言板</span>
+  </button>
+  <button class="desk-icon" type="button" data-desk data-app="music" title="Double-click to open">
+    <img src="assets/winxp/music.png" alt="">
+    <span data-i18n="deskMusic">音乐</span>
   </button>
   <button class="desk-icon" type="button" data-desk data-app="minesweeper" title="Double-click to open">
     <img src="assets/winxp/minesweeper/mine-icon.png" alt="">
@@ -171,10 +176,10 @@
             <div class="gb-side">
               <div class="gb-form">
                 <input id="gbName" type="text" maxlength="24" data-i18n-placeholder="gbName" placeholder="名字（可留空）">
-                <textarea id="gbText" maxlength="300" data-i18n-placeholder="gbPlaceholder" placeholder="写点什么吧…"></textarea>
+                <textarea id="gbText" maxlength="200" data-i18n-placeholder="gbPlaceholder" placeholder="写点什么吧…"></textarea>
                 <button class="gb-send" id="gbSend" type="button" data-i18n="gbSend">发送</button>
               </div>
-              <p class="gb-hint" data-i18n="gbHint">留言仅保存在你自己的浏览器里（localStorage），刷新不会丢，换设备不会同步。</p>
+              <p class="gb-hint" data-i18n="gbHint">留言所有人都能看到。发出后自己删不掉（要删请找我）。正文最多 200 字，10 分钟内最多发 3 条。</p>
             </div>
             <div class="gb-main">
               <div class="gb-list" id="gbList"></div>
@@ -219,6 +224,7 @@
 <script src="js/config.js"></script>
 <script src="js/winxp.js"></script>
 <script src="js/apps.js"></script>
+<script src="js/player.js"></script>
 <script src="js/guestbook.js"></script>
 <script src="js/starfield.js"></script>
 <script src="js/easteregg.js"></script>

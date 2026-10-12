@@ -16,3 +16,6 @@ desktop.ini
 
 # 诊断/临时资料（不入库）
 diag/
+
+# 本机试跑留言板时的假 KV 数据（不入库）
+worker/.dev-kv.json

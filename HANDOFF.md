@@ -2,7 +2,10 @@
 
 > 给接手的 AI / 协作者：读完这份就能无缝接手。**整站已改造为 Windows XP 风格**（窗口外壳 / 任务栏 / 开始菜单 / 桌面快捷方式 / 电源流程 / 6 个 XP 应用），仍是**纯静态零构建**，直接推 GitHub Pages 即可。
 >
-> 最新一轮（第 8 批 2 条）：**资源页下载项的名字硬编码成中文**，切到日/英后页面上只剩这一个词是中文，和全页语言对不上 → 新增 i18n 键 `voiceNameFlan`（zh `芙兰朵露 v1.0.0-beta` / ja `フランドール v1.0.0-beta` / en `Flandre v1.0.0-beta`），`resources.html` 的 `.rs-name` 挂上 `data-i18n`。**只改显示名，`href` 里的 zip 文件名不动**（文件名是中文的，改了链接就 404）。另按站主要求补了 `README.md`（只写开源归属，见第十一节）并把两份授权原文随素材放进仓库。
+> 最新一轮（第 10 批 4+3 条，**已落地，等站主验收**，详见第十六节）：① 错误弹窗的 **OK 按钮照 `winXP-master` 的 ErrorBox 源码重做**（80×22、1px 黑细边、平面无圆角，`:active` 反向内阴影 + 文字下移 1px），只动弹窗按钮，其它 Luna 按钮不动；② 自介名字号 **24px**（原来 12px 太小）；③ 两个跳转页 `.ie-page` 换成 `assets/background/web.jpg` 星纹壁纸 + 中间 980px 白卡，**左右各透一条背景**；④ 播放器两个 bug 修复（**切歌瞬间读到上一首的时长/位置** → 进度跳到一大半；`saveState()` 把上一首的位置配新歌文件名存进 `localStorage` → 进度乱序），统一收口到新的 `metrics()` 守卫；⑤ 播放器 UI **整文件重做成 Windows 7 Frutiger Aero**（左封面+歌名歌手+N of 12+进度+走带、右侧可滚动歌单，窗口 620×340 长方形，砍掉七段数码管）；⑥ 播放器图标换站主给的 **P4**（CD+蓝音符 → `assets/winxp/music.png`）；⑦ 桌面快捷方式把**音乐挪到留言板下面**。
+> 上一轮（第 9 批 6 条，**已落地**，详见第十四节）：① 4 处错误弹窗全部换成源码同款高清图标（`897(32x32).png`，整数倍最近邻放大 + `srcset`）；② 假 404 的 IE 纸页图标放大到原生 48px；③ 新增 **Windows Media Player** 音乐播放器（普通 XP 应用，12 首按站主截图顺序，读内嵌 ID3 歌名/歌手/封面，`music/日刊：遺書.jpg` 兜底）；④ 跨页后台续播（`localStorage`），跳转页任务栏**不加**播放器按钮；⑤ 修「跳转页任务栏一片空白」的 bug；⑥ **全站正文回像素体**（XP 外壳仍 Tahoma）+ 正文字号吸附 12/24px，两个跳转页配色统一成 XP Luna 蓝。
+> 第 9 批另一条线（**留言板后端**，详见第十五节）：访客留言改存 **Cloudflare Workers + KV**（网页仍托管在 GitHub Pages，不搬家）；匿名发言（昵称留空 = `Anonymous`）、直发不审核、不要验证码；防护只做「正文 ≤200 字 + 同 IP 10 分钟 3 条」；前台**去掉删除按钮**并提示「发出后自己删不掉」、**去掉 localStorage**；`worker/` 下 5 个文件 + 三个双击就能跑的 .bat（本机试跑 / 推送 / 拉取），本机自测 21 项全过、端到端真跑过一遍。等站主在 Cloudflare 建好 Worker 并把网址填进 `js/config.js`。
+> 上一轮（第 8 批 2 条）：**资源页下载项的名字硬编码成中文**，切到日/英后页面上只剩这一个词是中文，和全页语言对不上 → 新增 i18n 键 `voiceNameFlan`（zh `芙兰朵露 v1.0.0-beta` / ja `フランドール v1.0.0-beta` / en `Flandre v1.0.0-beta`），`resources.html` 的 `.rs-name` 挂上 `data-i18n`。**只改显示名，`href` 里的 zip 文件名不动**（文件名是中文的，改了链接就 404）。另按站主要求补了 `README.md`（只写开源归属，见第十一节）并把两份授权原文随素材放进仓库。
 > 上一轮（第 7 批 3 条）：音源撤换成**一个** `voice dl/芙兰朵露v1.0.0-beta.zip`（33.2MB）—— `ゴースト_A.zip`（65.3MB）与 `林屿.zip`（55.9MB）已从仓库删除，资源页 `.rs-item` 从两条减到一条，i18n 的 `voiceSizeGhost`/`voiceSizeLin` 合并成 `voiceSizeFlan`，顺手删掉没人引用的死键 `titleVoice`；资源简介 `rsIntro` 改成「什么都有可能放 —— 不定时上传本人制作的东西」（三语同步）；个人简介 `bio` 改成站主 2026-10-12 自己在 GitHub 网页端提交的那句半成品声明（保留「18↑一般通过十八线低精力画手」前缀 + 「此网页暂时为半成品，大部分文本为ai自动填写的占位符，请无视。」）。
 > 上一轮（第 6 批 3 条）：开始菜单友链显示名改成 **Survivor**（`menuFriend` 三语同值）；中文「委托受理」全站改成 **「委托相关事宜」**（只动中文，日/英仍是 依頼受付 / Commission）；委托价目**按语言换算货币** —— 新增 `cmCard1Price~cmCard3Price` 三个 i18n 键（zh `¥320-520` / ja `6,500〜11,000円` / en `$45-75`），汇率 1 CNY = 21 JPY = 0.14 USD，日元取 500 整、美元取 5 整。
 > 上一轮（站主第 5 批 5 条）已落地：崩坏效果**去掉整页扭动/skew**（只留扫描线+频闪+RGB 鬼影）；**全站字体换成思源黑体那一路的无衬线**（像素字体退役，XP 外壳用 Tahoma）；自介窗侧栏 `328→380px`、名字 16px 不换行，不再被挤压；委托页**去掉价目卡片大编号**、**委托流程改成普通文字行**（不再一步一个盒子）；**浏览器组件的 Back/Forward 做成真历史**（书签首页也进历史，`XP.frame` 超时不再覆盖已导航走的页面）。
@@ -46,12 +49,22 @@ E:\自介网页
 │  ├─ i18n.js           三语字典 + 语言栏（会自动把 #langDrop 挪进任务栏托盘）
 │  ├─ winxp.js          ★ XP 外壳核心（窗口系统/任务栏/开始菜单/电源/假404）
 │  ├─ apps.js           6 个 XP 应用（扫雷/记事本/画图/浏览器/Minecraft/我的电脑）
-│  ├─ guestbook.js      留言板评论区（localStorage）
+│  ├─ guestbook.js      留言板评论区（读 Cloudflare Worker，见第十五节）
 │  ├─ easteregg.js      玩具鸭 + 30 连击故障彩蛋
 │  ├─ starfield.js      背景星星字符画
-│  └─ config.js         留言板后端地址占位（当前空）
-├─ server.js             本地预览服务器（纯静态托管，无 API）
+│  └─ config.js         留言板后端地址（`window.DANMAKU_API`，填 Worker 网址；见第十五节）
+├─ server.js             本地预览服务器（纯静态托管 + 本机后台 API）
 ├─ package.json
+├─ worker/               ★ 留言板云端代码（Cloudflare Worker，见第十五节）
+│  ├─ guestbook.mjs       Worker 本体（读列表 / 收留言 / 搬留言，纯函数 + fetch 处理）
+│  ├─ test-guestbook.mjs  本机自测：假 KV + 21 项断言（`node worker/test-guestbook.mjs`）
+│  ├─ dev-server.mjs      本机试跑：8787 端口，假 KV 存 `worker/.dev-kv.json`（已 gitignore）
+│  ├─ import-to-kv.mjs    把 `gb/comments.json` 同步到 Cloudflare（以本机为准；后台删掉的真删）
+│  └─ pull-from-kv.mjs    把 Cloudflare 上网友发的留言（含藏起来的）拉回 `gb/comments.json`
+├─ 本机试跑留言板.bat       双击 = 起 worker/dev-server.mjs 并打开 127.0.0.1:8787
+├─ 推送留言到Cloudflare.bat 双击 = 跑 worker/import-to-kv.mjs（读 .env 的 GB_WORKER_URL / GB_TOKEN）
+├─ 拉取云端留言.bat         双击 = 跑 worker/pull-from-kv.mjs（把网友的留言拉回后台）
+├─ 启动后台.bat           双击 = 起本机后台（server.js，3000 端口）
 ├─ assets/
 │  ├─ winxp/             ★ 从开源项目 winXP-master 拷来的全部 XP 素材（166 文件 / 266 KB）
 │  │  ├─ windowsIcons/   131 个 XP 图标 PNG/ICO（含 start.png、各类系统图标）
@@ -253,12 +266,15 @@ zip 的 href 必须保持：`voice%20dl/%E8%8A%99%E5%85%B0%E6%9C%B5%E9%9C%B2v1.0
 - 新增 key 时三语都要写全（缺失会回落 `zh`，再缺失显示 key 本身）。
 
 ### 2. 留言板 / 评论区 `js/guestbook.js`
-- **localStorage 本地存储**（key `cupcake-guestbook-v1`，最多 200 条，名字 ≤24 字、正文 ≤300 字），刷新不丢、换设备不同步。
+- **留言存在 Cloudflare Worker + KV**（第十五节）；前台只剩「读」「发」两件事，**没有 localStorage、没有删除按钮**。
 - **每页 8 条（`PER_PAGE = 8`）+ 只有 `‹ ›` 翻页**（站主要求，没有页码按钮）；`.gb-pager` 里是 `#gbPrev` / `#gbPageInfo`（`当前页 / 总页数`）/ `#gbNext`，到头就 `disabled`。
-- 每条渲染：名字 / 时间（`YYYY-MM-DD HH:MM`）/ `×` 删除 / 正文。**不显示头像**（`.gb-ava` 与 `hash()` 已按站主要求删除）。
-- 删除按 `ts` 精确匹配（不是下标），否则翻页后索引错位删错条。
-- 一律用 `textContent` 写入（防 XSS）；空态用 `gbEmpty`（「暂无评论」）；`langchange` 时重渲染；发送后回到第 1 页。
-- 后端能力已撤（`js/config.js` 的 `window.DANMAKU_API` 只是开关占位，**当前没有任何网络代码**）。若以后要跨访客共享，需要新写接口契约（老的弹幕接口已从 `server.js` 删除，且字段形状和新留言板对不上）。
+- 每条渲染：名字 / 时间（`YYYY-MM-DD HH:MM`）/ 正文 /（有回复时）站主回复 `.gb-reply`。**不显示头像**（`.gb-ava` 与 `hash()` 已按站主要求删除）。
+- 读取：`GET (DANMAKU_API||'') + 'gb/comments.json'`（`cache:'no-store'`）；**Worker 连不上自动回落**读 Pages 上那份 `gb/comments.json`（只读，仍能看到站主后台里的留言），再失败就显示 `gbErrList` 那条文案，**不白屏**。
+- 发送：`POST API + 'api/gb/post'`，body `{name,text}`；昵称留空由服务端存成 `Anonymous`；正文 200 字上限由 `#gbText` 的 `maxlength="200"` + 服务端双重把关。成功后**直接拿服务端返回的这条插进列表**（KV 读取最长 60 秒延迟，重读可能看不到刚发的），不重读。
+- 失败弹窗走 `window.XP.msg(标题, 文案)`：`429` → `gbErrRate`（带 `{min}` 分钟数）、`400 long` → `gbErrLong`、连不上 → `gbErrNet`。
+- 一律用 `textContent` 写入（防 XSS）；空态 `gbEmpty`、加载中 `gbLoading`；`langchange` 只重渲染、**不重新请求**；发送后回到第 1 页。
+- **发送框下面必须写明**「发出后自己删不掉」（`gbHint`，站主要求：访客发之前就要看到；要删只能站主在后台做）。
+- 站主回复：`reply` 是三语字段，前台**取第一份填了的（zh → ja → en）**、固定不跟页面语言变（站主原话：「谁用什么语言留言我就用啥语言回复，不需要语言区分」）。
 
 ### 3. 彩蛋 `js/easteregg.js` + CSS
 - 点击鸭子：`1.png ↔ 2.png` + 按扁回弹 + `音效.wav`；`new Image()` 预加载过两张图。
@@ -650,6 +666,7 @@ window.CONTENT = {
 ## 十三、评论区后端：构思 + 方案（**交接给「留言板前端」那个会话**）
 
 > 本文档第 2 节（`js/guestbook.js` 现状）、12.3（留言数据契约）、12.4（后台留言管理）已经写了「是什么」；这一节写**后端到底怎么落地**，以及前台要做到什么程度。**第 13.7 的三件事要站主先拍板，其余可以照做。**
+> **（本节方案已落地，见第十五节：站主拍板「能发 / 直发 / 去掉本地 localStorage」，写入通道选的 13.5 里的 C。以下 13.4~13.7 保留原样，只当决策记录看。）**
 
 ### 13.1 结论先讲
 
@@ -683,14 +700,14 @@ window.CONTENT = {
 ### 13.3 已经有的东西（别重复造）
 
 - **后台已经能管留言**：`admin.html` 留言页（列表 / 隐藏 / 置顶 / 删除 / 三语回复），接口 `POST /api/gb`（需登录，body `{v:1,comments:[…]}`），读写 `gb/comments.json`，`GET /api/state` 里也带 `comments`。**它只负责管理，不负责访客写入**（`HANDOFF.md:427`）。
-- `js/config.js` 的 `window.DANAMKU_API` 是**开关占位，现在代码里没有任何地方用它**；要接外部写入通道就拿它当基址（空串 = 同源），**别再新增全局变量**。
+- `js/config.js` 的 `window.DANMAKU_API` 是**开关占位，现在代码里没有任何地方用它**；要接外部写入通道就拿它当基址（空串 = 同源），**别再新增全局变量**。
 - `js/guestbook.js`（118 行）是现在的前台：localStorage key `cupcake-guestbook-v1`、上限 200 条、8 条/页、只有 `‹ ›` 翻页、按 `ts` 精确删除。改造点就在这里。
-- 文案在 `js/i18n.js` 的 `DICT`（三语），已有的相关 key：`gbPlaceholder` / `gbSend` / `gbEmpty` / `gbHint` / `gbName` / `gbDelete` / `gbTimeNow`。**新增文案必须 zh/ja/en 三语补齐**（缺了回落 zh）；**由 JS 托管文案的元素不要加 `data-i18n`**（切语言会打架），JS 里走 `window.t(key)`。
+- 文案在 `js/i18n.js` 的 `DICT`（三语），相关 key：`gbPlaceholder` / `gbSend` / `gbEmpty` / `gbHint` / `gbName` / `gbTimeNow` / `gbLoading` / `gbErrList` / `gbErrNet` / `gbErrRate` / `gbErrLong`（`gbDelete` 已随删除按钮一起去掉）。**新增文案必须 zh/ja/en 三语补齐**（缺了回落 zh）；**由 JS 托管文案的元素不要加 `data-i18n`**（切语言会打架），JS 里走 `window.t(key)`；新增 key 记得补进 `js/admin.js` 的 `FIELDS` 表（后台文案页按它列条目）。
 - 样式：`.gb-*` 那套已经定好（`HANDOFF.md:106`），按钮统一用 `.gb-send` 那一种（`HANDOFF.md:293`），**别另起一套皮肤**；评论区不要头像（`HANDOFF.md:106`，站主明确要求）。
 
 ### 13.4 读路径怎么做（前台照这个写）
 
-- 取数据：`fetch((window.DANAMKU_API || '') + 'gb/comments.json')`。`DANAMKU_API` 为空 = 同源相对路径 —— **本地 `node server.js` 和线上 Pages 都是同源**，所以本地也能直接测。
+- 取数据：`fetch((window.DANMAKU_API || '') + 'gb/comments.json')`。`DANMAKU_API` 为空 = 同源相对路径 —— **本地 `node server.js` 和线上 Pages 都是同源**，所以本地也能直接测。
 - **Pages 的 CDN 会缓存静态文件**：实测推送 `js/content.js` 后线上约 **10 分钟**才变（加 `?t=<时间戳>` 能立刻拿到新的）。所以站主在后台改完留言，访客最多晚 10 分钟看到。想要即时：请求加 `cache:'no-store'` 或时间戳 query（文件才几十字节，缓存收益可以忽略）。
 - **失败兜底**：fetch 失败/超时（离线、被墙）→ 回落渲染 localStorage 里的本地留言，**别白屏、别把别人的本地留言弄丢**。
 - 合并策略（如果保留本地留言）：自己的本地留言排在最前、标一句「仅本机可见」，远端留言按 13.2 的规则接在后面。
@@ -726,6 +743,117 @@ window.CONTENT = {
 
 ---
 
+## 十五、留言板后端：Cloudflare Worker + KV（已实现 + 本机自测通过 + 站主能管网友留言）
+
+> 站主拍板：**留言存 Cloudflare Workers + KV**（**网站不搬家**，前台仍在 GitHub Pages）、**匿名发言**（GitHub 登录这次不做）、**直发不审核**、**不要人机验证**、**只做基本防护**、**前台去掉删除按钮**、**去掉本地 localStorage**、**两边都有同一条时以本机那份为准（见 15.8）**。第十三节是当时的方案分析（13.5 的 C 方案），13.7 那三个问题已在本节 15.1 回答。
+
+### 15.1 站主拍板的决定（照这个做，别再改）
+
+| 问题 | 决定 |
+| --- | --- |
+| 留言存哪 | **Cloudflare Workers + KV**；GitHub Pages 继续托管网页，一个字不改 |
+| 访客身份 | **匿名**：自己填昵称，留空 = `Anonymous`；**GitHub 登录这次不做**（要做必须服务端持 Client Secret，纯静态站做不到） |
+| 先审还是直发 | **直发**（写进去立刻出现在前台，没有审核队列） |
+| 人机验证 | **不要** |
+| 防滥用 | **只做基本防护**：正文 ≤200 字、同 IP **10 分钟内最多 3 条** |
+| 前台删除按钮 | **去掉**，访客发完删不掉；发送框下面必须写清「发出后自己删不掉」（删除只能站主做） |
+| 本地 localStorage 留言 | **去掉**，前台只显示远端 |
+| 两边都有同一条时 | **以站主本机那份为准**（`gb/comments.json` 覆盖云端），所以置顶 / 隐藏 / 回复 / 改正文都能同步上去；他在后台**删掉的会从云端真删**；**他拉取之后网友新发的照旧保留** |
+| 改动范围 | **只能影响访客端**：`server/`、`admin.html`、`gb/comments.json` 一个字没动 |
+
+### 15.2 数据流（两边各管一份，别互相假设）
+
+```
+访客（Pages 上的 index.html）
+  │ js/guestbook.js，基址 = js/config.js 的 window.DANMAKU_API
+  ├─ 读：GET  <Worker>/gb/comments.json          → {v:1,comments:[…]}（只给没 hidden 的）
+  │       连不上 → 自动回落 GET gb/comments.json（Pages 上那份，只读，不白屏）
+  └─ 写：POST <Worker>/api/gb/post {name,text}   → {ok:true,comment}
+            400 empty / 400 long / 429 rate(+retryAfter) / 500
+
+站主：admin.html（本机 3000 端口）管 gb/comments.json —— 隐藏 / 置顶 / 删除 / 三语回复
+      「推送留言到Cloudflare.bat」→ 以这份为准同步进 KV（同 id 覆盖、本机删掉的从云端真删）
+      「拉取云端留言.bat」→ 把 KV 里网友发的（含 hidden 的）并回这份，之后站主才管得着
+```
+
+- **两张表**：本机后台不知道 KV 的存在，Worker 也不改 `gb/comments.json`。两边靠两个 .bat 对表：**拉取**把网友留言并进本机（含藏起来的），**推送**把本机这份同步回云端。
+- `id` 由 Worker 生成：`c-<毫秒时间戳>-<4位hex>`，符合契约 `^[A-Za-z0-9_-]{1,60}$`。
+- 云端每条「推送过的」留言都打了内部标记 `synced:true`（只存在 KV 里，接口一律剥掉不外泄）：推送时**本机这份里没有、又打过标的**就是站主在后台删掉的 → 真删；**没有标**的是网友新发的 → 留着。
+
+### 15.3 接口清单与常量（`worker/guestbook.mjs`）
+
+| 方法 | 路径 | 行为 |
+| --- | --- | --- |
+| GET | `/` · `/gb/comments.json` · `/api/gb/list` | `{v:1,comments:[…]}`；过滤 `hidden` → `pinned` 在前 → `time` 倒序 |
+| POST | `/api/gb/post` | body `{name,text}` → `{ok:true,comment}`；`400 empty`（空正文）/ `400 long`（>200 字）/ `429 rate`（带 `retryAfter` 毫秒）/ `500`（KV 没绑或写失败） |
+| GET | `/api/gb/admin/list` | 站主「拉取」用：**含 `hidden` 的全部**；头 `x-gb-token` 不对 → `403 denied`（没配 Secret → `500 notoken`） |
+| POST | `/api/gb/import` | 头 `x-gb-token` 必须等于 Secret `GB_TOKEN` → `{ok:true,added,updated,deleted,skipped,total}`；**以本机那份为准**：同 `id` 覆盖、打过 `synced` 又不在 payload 里的真删、没标的新留言保留；不符 `403 denied` |
+| OPTIONS | 任意 | `204` + CORS（`*`） |
+
+- 常量（文件顶部 `LIMIT`）：`NAME:24` / `TEXT:200` / `IMPORTED:2000`（搬进来时保留后台写过的长正文）/ `PER_WINDOW:3` / `WINDOW_MS:600000` / `MAX:2000`。
+- KV 绑定名固定 **`GB_KV`**（Cloudflare 里变量名必须一模一样）。
+- 留言整份存**一个 key `gb:comments`**；限流 key `gb:rl:<IP>`（`expirationTtl:600`，不会越积越多）。
+- **两处有意的取舍**（文件里留了 `ponytail:` 注释）：① 整份存一个 key → 读-改-写，极端并发下可能丢一条；② 同一个 key 每秒只能写 1 次（Cloudflare 限制），同一秒来 4 条不同 IP 的留言，第 4 条可能写失败。个人站量级够用；真要撑住改成「一条留言一个 key」或上 Durable Object。
+
+### 15.4 站主要做的部署（六步）
+
+1. 打开 https://dash.cloudflare.com → 左边 **Workers & Pages** → **Create application** → **Start with Hello World!** → 起个名字（比如 `cupcake-gb`）→ Deploy。（第一项「Continue with GitHub」是从代码仓库部署，我们不用；底部那行「Continue to Pages」是另一个产品，别点。）
+2. 建 KV：左边 **Storage & Databases → KV**（新版界面里可能只写 **Storage**，找不到就直接开 https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces ）→ **Create instance**（名字随便，比如 `gb`）。回到这个 Worker → **Settings → Bindings**（有的界面在 **Variables and Secrets** 里）→ Add → **KV namespace**：**Variable name 必须填 `GB_KV`**，namespace 选刚建的那个 → Add binding。
+3. 同一个 Bindings 页 → Add → **Secret**（文本）：name = `GB_TOKEN`，value = 本机 `.env` 里 `GB_TOKEN=` 后面那串（**两边必须一字不差**）。
+4. Worker 页面 → **Edit code** → 把 `worker/guestbook.mjs` **全文**粘进去替换掉示例代码 → Deploy。
+5. 浏览器打开 `https://<你起的名字>.<你的账号>.workers.dev/` → 看到 `{"v":1,"comments":[]}` 就算通了（POST 用浏览器试不了，没关系）。
+6. 把这个网址（**不带结尾斜杠**）填进 `js/config.js` 的 `window.DANMAKU_API`，也填进 `.env` 的 `GB_WORKER_URL`，然后推上去。
+
+- **部署进度（当前）**：站主已建好 Worker → `https://cupcake-gb.cupcakeqaq.workers.dev`，网址**已填进** `js/config.js` 与 `.env` 的 `GB_WORKER_URL`；还差第 2~4 步（绑 `GB_KV`、加 Secret `GB_TOKEN`、粘代码），做完打开那个网址应看到 `{"v":1,"comments":[]}`。
+- **命名坑（已修）**：全局变量名必须写 `DANMAKU_API`。本批早先 `js/guestbook.js`、`worker/dev-server.mjs` 与 HANDOFF 里误写成 `DANAMKU_API`，和 `js/config.js` 不一致 → **填了网址也不会生效**；现已全部统一，用正则核对过四个文件。
+
+- **`GB_TOKEN` 绝不能写进任何网页文件**（`js/config.js` 只放 Worker 网址）。Worker 网址公开无害，钥匙公开 = 谁都能往你留言板塞东西。
+- 两个新 .bat 写的是 **GBK 编码**（cmd 里中文才不乱码），别用编辑器「另存为 UTF-8」。
+
+### 15.5 免费额度与风险（诚实版，别只看「免费」）
+
+- **Workers** 免费 10 万次请求/天；**KV** 免费 读 10 万次/天、写 1000 次/天、存储 1GB、**同一个 key 每秒最多写 1 次**。
+- **最大风险：`*.workers.dev` 这个临时域名在国内时好时坏**（站主上一次就是栽在这里）。真连不上时前台会自动回落读 Pages 那份 → 留言还能看，但发不出去（会弹「连不上留言服务器」）。要彻底解决得给 Worker 绑自己的域名（需要一个托管在 Cloudflare 的域名，站主目前没有）。
+- **KV 是最终一致的**：写完之后别的地区读到，最长要 60 秒。所以「A 发的留言，B 最多 60 秒后才看到」；A 自己那条立刻显示（前台直接用了接口返回的那条，没重读）。
+- 免费额度**不需要绑卡**；Cloudflare 有时会抽查新账号做验证，真被要求绑卡就停下来告诉我。
+- **防滥用只有那两条**：有意的攻击者换 IP 可以刷；撞满 1000 次写/天，当天就没人能留言了。要真挡住得上 Cloudflare Turnstile（加验证码）——站主已明确不要，先这样。
+
+### 15.6 本批改了什么 / 没碰什么
+
+- **新增**：`worker/guestbook.mjs`、`worker/test-guestbook.mjs`、`worker/dev-server.mjs`、`worker/import-to-kv.mjs`、`worker/pull-from-kv.mjs`、`本机试跑留言板.bat`、`推送留言到Cloudflare.bat`、`拉取云端留言.bat`。
+- **改动**：`js/guestbook.js`（重写）、`index.html`（留言板那段：`maxlength="200"` + 新提示文案）、`js/i18n.js`（`gb*` 文案：新增 `gbLoading` / `gbErrList` / `gbErrNet` / `gbErrRate` / `gbErrLong`，去掉 `gbDelete`）、`css/winxp.css`（删 `.gb-del` 两条，加 `.gb-reply` / `.gb-send:disabled`）、`js/config.js`（注释 + 填入 Worker 网址）、`js/admin.js`（`FIELDS` 表：加 4 个新 key、去掉 `gbDelete`、改掉 `gbHint` 标签里那句旧吐槽）、`.env` / `.env.example`（新增 `GB_WORKER_URL` / `GB_TOKEN`）、`.gitignore`（加 `worker/.dev-kv.json`）。
+- **没碰**：`server/`（后台服务端）、`admin.html`、`gb/comments.json`、`js/content.js`；**后台的留言长度上限（name 60 / text 2000）和整个后台行为一个字没变**（站主要求）。
+- ⚠ **并行改动注意**：第 9 批（第十四节）也在改 `index.html` / `js/i18n.js` / `css/style.css`。本批在这几个文件里的改动点（留言板那一段 HTML、`gb*` 文案、`.gb-*` 样式）与它不重叠，但**两个会话不要同时整文件覆盖写同一个文件**，否则会互相吞掉。
+
+### 15.7 本机验证证据
+
+- `node worker/test-guestbook.mjs` → **21 项全过**：匿名归一化、id 合契约、访客留言强制 `pinned/hidden:false`、排序过滤、10 分钟窗口限流、导入去重 / 保留后台长正文、只留契约六字段、OPTIONS 预检、空库、发一条、空正文 400、201 字 400 / 200 字 200、同 IP 第 4 条 429、限流 key 带 TTL、导入 403、未知路径、没绑 KV 报 500、拉取口没钥匙 403、拉取能看到 hidden 且 `synced` 不外泄、推送时本机删掉的真删且网友新发的保留。
+- `node worker/dev-server.mjs`（8787）真跑一遍：`GET /api/gb/list` → `{"v":1,"comments":[]}`；空正文 → 400；正常一条 → `{"ok":true,"comment":{"id":"c-1791809642357-61ad",…}}`；中文昵称/正文经 JSON `\u` 转义发出后**原样存回**（比对 `True`）；连发三次状态码 `200,429,429`（窗口内第 3 条放行、第 4/5 条被拦）。
+- 服务返回的 `/js/guestbook.js` 含 `api/gb/post`、**不含** `gb-del`；`/` 含 `maxlength="200"` 与新提示文案。
+- **两个 .bat 端到端真跑过一遍**（本机假 KV，跑完已还原 `gb/comments.json` 与 `.env`）：访客 POST 一条 → 「拉取」报「新增 1 条」并落进 `gb/comments.json` → 在文件里给它置顶 + 回复「谢谢你来」+ 隐藏，另加一条只有本机的 → 「推送」报「新增 1 条，更新 1 条，删掉 0 条」，云端读回 `hidden=True pinned=True reply=谢谢你来` → 把那条从文件里删掉再「推送」→ 报「更新 1 条，删掉 1 条」，云端只剩另一条（**网友新发的没被误删**）。
+
+### 15.8 站主怎么管网友的留言（已实现：两个 .bat 对表）
+
+站主拍板要做「拉回本机后台管理」。网友留言只在 KV 里，本机后台看不到，所以两边靠两个双击脚本对表：
+
+1. 双击 **「拉取云端留言.bat」** → 把 KV 里网友发的留言（**含他藏起来的**）并回 `gb/comments.json`；同一个 `id` **以本机那份为准**（他自己改过、还没推送的不会被云端覆盖）。
+2. 双击「启动后台.bat」→ 在 留言板 页面照常**隐藏 / 置顶 / 三语回复 / 删除**。
+3. 双击 **「推送留言到Cloudflare.bat」** → 以本机这份为准同步回云端：同 `id` 覆盖、本机删掉的从云端真删、**他拉取之后网友新发的留言不动**（等下次拉取再进后台）。
+
+- 「站主删掉的」和「网友新发的」靠内部标记区分：推送过的都打 `synced:true`，推送时**本机没有 + 打过标** = 他删的 → 真删；**没有标** = 网友新发的 → 留着。这个标记只存在 KV 里，两个接口都会剥掉（前台和「拉取」都看不到）。
+- 顺序很重要：**先拉取 → 再改 → 再推送**。只推送不拉取不会丢留言（网友新发的会被当成「新发的」保留），但站主在后台就看不到那些新留言，得先拉一次。
+
+- 三个 .bat 都是 GBK 编码（cmd 里中文才不乱码），且都只会读 `.env` 里的网址和钥匙，不碰任何网页文件。
+
+### 15.9 下一步（等站主）
+
+1. 走完 15.4 六步，把 Worker 网址给我 → 我填进 `js/config.js`（`.env` 他自己填或给我）。
+2. `gb/comments.json` 里已有的留言，双击「推送留言到Cloudflare.bat」搬一次。
+3. 之后日常：双击「拉取云端留言.bat」看网友留言 → 后台处理 → 双击「推送留言到Cloudflare.bat」同步回去（见 15.8）。
+4. GitHub 登录这次不做；将来要做必须服务端持 Client Secret，等我评估完再谈。
+
+---
+
 ## 十一、站主的沟通偏好（重要）
 
 - **要严格执行要求，不要自作主张**。改动前不确定就先问清楚再动手。
@@ -735,3 +863,157 @@ window.CONTENT = {
 - 喜欢：紧凑极繁排版、千禧年个人博客味、颜文字分隔线、**XP 界面高还原度**。
 - 涉及第三方服务**必须先说清风险和限制**再动手（之前后端方案反复失败：Cloudflare 被墙 → Deno 额度爆 → Render 要绑卡）。
 - 沟通用中文。
+
+---
+
+## 十四、第 9 批：错误弹窗高清化 + 音乐播放器 + 字体回归（**已落地，等站主确认配色**）
+
+### 14.1 站主原话与最终拍板（本轮不再重问）
+
+原话（`m00007`）：「网页内触发的所有的错误弹窗都换成高清版本，素材可以试试在 winXP-master.zip 里找」+「新增音乐播放器，做成小组件、能打开窗口、窗口内 UI 必须古早感、要显示歌手信息和封面（难就统一用音乐目录下的 jpg）、目录 `E:\自介网页\music`、播放顺序＝截图序号」。
+另加两条硬规则：**① 没把握必须问到清楚为止，问清楚前不许动手；② 此后每一步大改都要写进本文件。**
+
+拍板结果（6 问 6 答）：
+
+| 问题 | 站主决定 |
+|---|---|
+| 歌名/歌手用 ID3 还是截图 | **「以内嵌为准，截图后面跟的是歌名翻译，只需要根据截图排序就行」** → 显示一律取 ID3 的 TIT2 / TPE1；截图里的「（軌域）」「（替代品）」是**翻译，不显示**；截图**只用来定顺序** |
+| 像素体范围 | **只正文回像素体**，XP 外壳（标题栏/任务栏/开始菜单/按钮）保留 Tahoma |
+| 字号 | **吸附到 12px / 24px**（像素字体只有 12px 及整数倍才清晰） |
+| 假 404 的图标 | **保留 IE 纸页**（`ie-paper.png` 16px 最近邻放大到原生 48px），不换 897 |
+| 跳转页要不要播放器按钮 | **不要**（纯后台播放）；另报 bug：**跳转页任务栏一片空白** |
+| 跳转页配色 | **「你挑一套配色给我看」** → 由我做主按 XP Luna 蓝统一，改完截图给站主确认 |
+
+### 14.2 素材事实（别再重新侦察）
+
+- `assets/winxp/windowsIcons/` 共 125 个 PNG，**素材包最大只有 48px**（只有 `111(48x48)` `318(48x48)` `334(48x48)` 三张），36 张 32x32，其余 16x16 或无尺寸后缀。
+- **码源事实**：winXP-master 的 `src/WinXP/apps/ErrorBox/index.js` 用的错误图标是 **`897(32x32).png`**，`.error__img{width:30px;height:30px}`；其 `apps/index.js` 里 Error 应用的列表图标是 `897(16x16).png`。→ 站主「照着源码来」＝统一 897。
+- `897(32x32).png` = 经典 XP 红球 + 白叉；`147(32x32).png` = 纯红叉（**旧的默认图标，本轮退役**）；`310(32x32).png` = 红方块白圈（关机）；`334(48x48)/(32x32)` = 硬盘；`ie-paper.png` = **16×16**（旧 CSS 拿它撑 48px ＝ 全站最糊的一处）；`846(32x32).png` = 原版 Windows Media Player 彩色圆环图标（播放器就用它）。
+- `music/` = 12 首 mp3（约 101MB）+ 唯一一张 `日刊：遺書.jpg`（600×600，**全角冒号**）。12 首**全部是 ID3v2.3**、UTF-8、**都带 APIC 内嵌封面 + TIT2 + TPE1**；TPE1 用半角 `/` 分隔（`ぬゆり/GUMI`）；TALB 全是 `日刊:遺書`。
+- `music/` 不在 `.gitignore` 里；**站主自己 `git add music/` 后推送**（101MB，本会话不提交 git）。
+
+### 14.3 高清素材怎么做（**整数倍最近邻，不许插值**）
+
+生成目录 **`assets/winxp/windowsIcons/hd/`**（⚠️ 必须和原图标同目录下的 `hd/`，因为 `XP.hd()` 是按 `src` 的目录推出来的；**第一版误放到 `assets/winxp/hd/`，线上 404 变破图**）。文件名 `<原名>@<N>x.png`，N 为**相对素材原生尺寸**的倍数。只生成「显示尺寸 > 原生尺寸」的那几张，不批量放大 125 张：
+
+| 文件 | 原生 | 用途 | 显示的 CSS 尺寸 |
+|---|---|---|---|
+| `897(32x32)@2x.png` + `@3x` | 32 | 所有错误弹窗图标 | 32px（1× 直接用原生文件，2×/3× 屏吃 @2x/@3x） |
+| `334(32x32)@2x.png` + `@3x` | 32 | 我的电脑「设备未就绪」提示 | 32px |
+| `ie-paper@3x.png` + `@6x` + `@9x` | 16 | 假 404 的 `.ie404-ico` | 48px（＝原生 3×，1× 就该用 @3x 那张） |
+
+**生成方法：逐像素块拷贝**（`$b.SetPixel($x,$y,$a.GetPixel([int][math]::Floor($x/$m),[int][math]::Floor($y/$m)))`）。
+⚠️ **不要用 `Graphics.DrawImage` + `NearestNeighbor`**：源 PNG 带 DPI 元数据时缩放基准会偏移，实测 897 出现 524/1179 个错位像素；块拷贝的复核脚本（`错位像素=` 计数）5 个文件全部 0。
+
+写法固定成「1× 用真实存在的文件当 `src`，再挂 `srcset="…2x, …3x"`」——只登记有高清版的图标，**没有高清版的绝不写 srcset**（会 404 变破图）。CSS 配 `image-rendering: pixelated`（只在整数倍且按原尺寸显示时安全，所以必须成对出现）。
+
+### 14.4 改动清单（按落地顺序）
+
+1. **`js/winxp.js`**
+   - `XP.msg()` 默认图标 `147(32x32)` → `897(32x32)`；弹窗图标统一走 `XP.dlgIcon(src, size=32)`，CSS 不再靠 `font-size` 撑大小（`<img>` 带 `width/height` 属性）。
+   - `XP.notFound()` 的 `.ie404-ico` 换 48px 高清三档。
+   - 新增 `XP.hd(src, size)` 小工具：登记表 `ICON_NATIVE`（原生尺寸）+ `HD_MULT`（有哪几档高清），**只引用真实存在的文件**（唯一真源，弹窗与 404 都走它）。
+   - `XP.adopt()`：**固定式窗口也建任务栏按钮**（修「跳转页任务栏空白」）；`addTask()` 里固定窗口点击只聚焦、**不最小化**（最小化会把整页留空），并 `focusWin` 让它显示为按下态。
+   - 新增 `rec.onClose` 钩子（`closeWin` 里调用）——播放器关窗＝停止靠它。
+2. **`js/easteregg.js`**：两处文字 `⚠`（`spawnError()` 与 `showFeaturedDialog()`）换成 897 高清 `<img class="dlg-ico">`。
+3. **`js/apps.js`**：`XP.msg(label, compNotReady, …)` 的 `229(16x16)`（16px 图撑 32px ＝ 2 倍糊）换成原生 32px 的 `334(32x32).png`（光驱图标，语义对得上「设备未就绪」）。
+4. **`css/style.css`**：`--font-body` 首位加 `'Pixel'`（XP 外壳的 `--font-ui` 不动、仍 Tahoma）；`.main-col .win-body, .side-col .win-body` 显式用像素体（`.win` 本身是外壳），所以 6 个 XP 应用不受影响；`.dlg-ico` 加 `image-rendering: pixelated`；正文字号吸附 12/24（`.divider` 14→12、`.bio-title` 15→12、`.note-box` 13→12、`.cn` 16→12、`.bio` 14→12、`.social-label` 13→12、`.entry-text` 13→12、`.cm-open` 17→**24**、`.cm-status-note` 13→12、`.cm-steps li` 13→12）。
+5. **`js/player.js`（新）** + **`css/player.css`（新）**
+   - 单例 `<audio>`（**不放在窗口里**，窗口只是 UI），`XP.register({key:'music', name:'Windows Media Player', icon: ICON+'846(32x32).png', w:430, h:560, build})`。
+   - 12 首顺序写死在 `player.js`（数组＝截图顺序）；歌名/歌手/封面走 ID3v2 解析（`fetch` + `Range: bytes=0-65535`，边下边解，解完 `reader.cancel()`，避免为封面拖走整个 8-11MB）；解析失败回落文件名 `歌手 - 歌名.mp3`，封面回落 `music/日刊：遺書.jpg`（`file://` 下 fetch 必失败 → 全走兜底）。
+   - UI＝WMP 9 皮肤（蓝黑面板 + 大封面 + 歌名/歌手 + CSS 七段式蓝色 LCD 时间 + 进度条 + 音量 + 上一首/播放/下一首 + 12 首列表），标准一套控件，**打开时不自动播**。播放器文字一律 12px（原 10/11/13px 太小且糊）。
+   - **最小化继续播；关窗＝停止**（走 `rec.onClose`）。
+   - 跨页续播：`localStorage` 键 `cupcake-music-v1` 存 `{file, t}`（只在播放中写，暂停即清）、音量 `cupcake-music-vol`；跳转页只加载引擎、**不建窗口不建按钮**，加载后接着放；被浏览器拦自动播放就挂一次性 `pointerdown` 续播。
+6. **`i18n.js`**：只新增桌面快捷方式名（`deskMusic`，zh 音乐 / ja 音楽 / en Music），播放器 UI 文案沿用「XP 应用界面全英文」的既有约定。
+7. **`index.html`**：桌面加第 9 个快捷方式（`data-app="music"`，图标 846）；引 `css/player.css` + `js/player.js`。
+8. **`commission.html` / `resources.html`**：只引 `js/player.js`（后台续播），**不加窗口/按钮**。
+9. **`css/winxp.css`**：两个跳转页配色统一成 XP Luna 蓝——旧暖米色系（标题 `#8a5a22` / 虚线 `#d8c9ad` / 悬停 `#f7edd8` / 例图底 `#f3ecdd` / 卡片阴影 `rgba(120,80,40,.12)`）全部退役，换成 **`#0c327d` 海军蓝字 + `linear-gradient(180deg,#fbfcff,#c9d7f4)` 标题条 + `#9ab0dd` 描边 + `#eef3fc` 悬停/例图底 + `rgba(12,50,125,.10)` 阴影**；`.cm-panel > h2` 与 `.cm-sec > h2` 用负 margin 顶到面板边缘做成一整条（XP 任务窗格标题条）；`.ie404` 与 `.ie-wrap` 改 `var(--font-body)`（404 页与跳转页正文＝像素体），内容字号吸附 12/24（`.cm-open` 19→24、`.cm-card h3` 21→24、`.cm-card-price` 30→24、`.ie404 h2` 20→24、其余 13/14/15/11.5/12.5→12）；`.desk-icon span` 显式 `var(--font-ui)`（桌面快捷方式名属于外壳，仍是 Tahoma 11px）。
+
+### 14.5 已知限制（先说清楚，别当 bug 修）
+
+- 跨页续播天然有 ~0.2s 断点，且**浏览器可能拦自动播放**（降级为首次点击续播）；这是物理限制，不是代码问题。回到主页也会接着放（同一条 `resume()` 逻辑），不想这样就在主页按暂停。
+- 封面走 `fetch` 读内嵌 APIC：`file://` 直接开 HTML 时必然失败（走到 jpg 兜底）；`node server.js` 下 `server.js` **不实现 Range**，所以本地会多下一点数据再 `cancel()`（GitHub Pages 支持 Range，线上只取头部）。解析上限 8MB，超了就不读了。
+- `music/` 101MB 进仓库会让 `git clone` 变慢；站主知情并已决定全量上线（**发布前站主自己 `git add music/`**，本会话不提交 git）。
+- 无头截图里 `--virtual-time-budget` 下媒体不走时间轴（`currentTime` 停在 0、`t` 不增长），所以「续播后进度前进」没法用截图证明，只能看 mp3 是否被重新请求。
+
+### 14.6 本轮验证证据
+
+命令形态（沙箱策略已是 danger-full-access + 审批 never，不需要再申请升级）：
+
+```
+node --check js/winxp.js js/player.js js/easteregg.js js/apps.js js/i18n.js   # 全部通过
+& $edge --headless=new --disable-gpu --no-first-run --user-data-dir="$env:TEMP\edge-shot-<随机>" `
+  --hide-scrollbars --virtual-time-budget=6000 --window-size=1400,1000 `
+  --screenshot="E:\自介网页\diag\shots\x.png" "http://127.0.0.1:3000/<page>"
+```
+
+| 验图（`diag/shots/`，gitignored） | 结论 |
+|---|---|
+| `index.png` | 桌面 **9 个**快捷方式（新增「音乐」/846 图标）；任务栏 4 个按钮（自我介绍 / 委托相关事宜 / 资源配布 / 留言板） |
+| `music.png`（经 `_probe.html?act=music` 双击桌面图标） | 播放器窗口成型：**第 1 首内嵌 APIC 封面真的解析出来了**（没走 jpg 兜底）、歌名 おるびたる / 歌手 ぬゆり、七段式 LCD `00:00`、总长 `--:--`、12 首列表顺序＝截图顺序、歌手右对齐、打开时无高亮（**不自动播**） |
+| `msg.png` | `XP.msg` 弹窗：标题栏小图标 + 正文 897 红球 **32px 清晰无插值**（并放大 3× 复看确认边缘是硬像素） |
+| `nf404.png` | 假 404：`ie-paper` 48px 高清版（放大 2× 复看，蓝 e 与纸页是硬像素块）；标题 24px 像素体 |
+| `duck.png`（连点 `#duck` 30 次） | 报错弹窗雨 4 个窗的图标**全部是 897 真图标**（不再是文字 `⚠`） |
+| `commission.png` / `resources.png` | 跳转页 Luna 蓝标题条 + 深蓝标题字 + 像素体正文；**任务栏出现「委托相关事宜」/「资源配布」按钮（bug 修复）** |
+| `_probe.html?act=xpage`（已删） | 先写 `localStorage['cupcake-music-v1']={"file":"ぬゆり - おるびたる.mp3","t":5}` 再加载 `commission.html`：**mp3 请求数=2、首个请求就是 おるびたる.mp3**（＝跳转页真的接着放）；`MusicPlayer=true`；`任务栏按钮数=1 文案="委托相关事宜"` |
+
+素材正确性另用块拷贝复核脚本验过：`hd/` 里 7 个文件的「错位像素」计数全为 0。
+
+---
+
+## 十六、第 10 批：错误框 OK 按钮照源码 + 自介名号 + 跳转页镂空 + 播放器重做（**已落地，等站主验收**）
+
+### 16.1 站主原话与拍板
+
+> 站主 m00615：「按钮UI有问题（P1）为正常版，P2为我的网页（OK按钮不一致，这个也直接给我去扒源代码），其他地方不用改 / 另外自介名字的字号有问题，太小了，适当调大 / 以及跳转页左右两边太空了，左右各做两条空白镂空并且设置网页背景，背景使用 `E:\自介网页\assets\background\web.jpg` / 有拿不准的地方必须问我」
+>
+> 站主 m00628：「还有，音乐播放器有问题，会有听完歌后跳转到下一首下一首的进度直接跳了一大半，另外听歌进度全是乱序的 / 以及音乐UI也要重做，做成Windows7那样的frutiger aero 风格，大致草稿为p5，不要做过于花里胡哨的时长显示（音乐的图标改成P4，以及改一下桌面图标顺序，放在留言板下面）」
+
+站主四答（本轮不再重问）：① 跳转页镂空＝**居中白卡、两侧各透一条背景**；② 播放器列表＝**放窗口右侧、可滚动**，窗口**固定长方形**（比例自定）；③ 播放器 bug 现象确认「对，就是这个现象」；④ 自介名字号＝**24px**。
+
+### 16.2 素材事实
+
+- **P4 播放器图标**：源 webp 736×736 RGBA、四角 alpha=0（真透明），alpha bbox `(47,50,691,658)` → 裁成 644×608 → 补正方形 → LANCZOS 缩到 32×32 → **`assets/winxp/music.png`**（2851B）。转换脚本 `diag/mk_music_icon.py`（可重跑）。
+  - 坑：**系统 `System.Drawing` 解不了 webp**（报「内存不足」）；用插件自带 Python + Pillow 12.3.0：`C:\Users\CupCakeQAQ_\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\python\python.exe`。
+- **`assets/background/web.jpg`**：1200×675、60668B，浅青绿渐变 + 白/青描边星星圆环壁纸（配 Luna 蓝白卡不冲突）。
+- **ErrorBox 源码按钮**（`winXP-master/src/WinXP/apps/ErrorBox/index.js`，styled-components 原文）：`width:80px; height:22px; display:flex; border:1px solid black; justify-content:center; align-items:center; box-shadow:inset -1px -1px 1px black`；`:hover:active { box-shadow:inset 1px 1px 1px black; &>*{transform:translate(1px,1px)} }`；容器 `background-color:#f5f5f5; font-size:11px; padding:12px`。
+
+### 16.3 改动清单
+
+1. **`css/style.css`**：`.xp-dialog .dlg-btn` 整条换成源码样式 —— `font-size:11px; width:80px; height:22px; padding:0; line-height:20px; border:1px solid #000; border-radius:0; background:transparent; color:#000; box-shadow:inset -1px -1px 1px #000`，`:active` 反向 + `padding:1px 0 0 1px`（＝源码的 translate，只挪文字不挪边框）；删掉原来的 `filter: brightness()` 两行。**只动弹窗按钮**，`.pw-btn`/`.btn`/`.rs-dl`/`.gb-send` 等 Luna 蓝按钮一律不碰。
+2. **`css/style.css`**：自介名字 `.cn` `12px→24px`（像素体只有 12 及整数倍清晰），响应式里 `.side-col .cn` 同步 24px。
+3. **`css/winxp.css`**：`.ie-page` 加 `padding:14px 14px 0` + `background:#eaf6fb url("../assets/background/web.jpg") center / cover no-repeat fixed`；`.ie-wrap` 改 `max-width:980px` + 白底 + `border-radius:6px` + `box-shadow:0 0 0 1px #b9c9e8, 0 10px 30px rgba(12,50,125,.18)` ＝ 居中白卡、左右各透一条壁纸。
+4. **`css/player.css` 整文件重写**成 Windows 7 Frutiger Aero：`.wmp` 浅蓝玻璃渐变里左右分栏 —— 左 `.wmp-left`（`.wmp-hero`＝`.wmp-screen` **190px** 玻璃高光封面（m00815 微调：148→176→190）+ `.wmp-meta` 歌名 **22px** `#10395f`（m00815：15px 调大）/ 歌手 13px `#5c81a1`，文字在封面旁垂直居中；`.wmp-bar`＝`.wmp-cur` + 凹槽 `.wmp-seek`(`.wmp-seekfill`/`.wmp-knob`) + `.wmp-rem`；`.wmp-ctl`＝30×26 玻璃蓝 `.wmp-btn`（`::before/::after` 画 |◀ ▶ ▶| 与暂停双竖条）+ 音量图标 `690(16x16).png` + 自绘 range），右 `.wmp-right` 214px 可滚动列表（`.wmp-row` 两行式：序号 / 歌名 / 歌手，`.on` 玻璃蓝高亮）。**七段数码管那套 CSS（`.wmp-lcd/.lcd-d/.s0-.s6/.lcd-colon`）整段删除**（站主：「不要做过于花里胡哨的时长显示」）；**「N of 12」计数（`.wmp-count`）已按 m00815 删除**。
+5. **`js/player.js`**：删掉 `SEG` 七段表 / `showTime()` / 数码管 DOM / `mkEl()` / 死函数 `esc()` / 没用的 `var ICON`；新增 **`metrics()`**（唯一时间出口）；`build()` DOM 换成上条那套；时间文本＝`00:00` / `-00:00`（「N of 12」随 m00815 一起去掉）；注册改 `XP.register({ key:'music', name:'Windows Media Player', icon:'assets/winxp/music.png', w:620, h:340, build:build })`（**长方形 + P4 图标**）。
+6. **`index.html`**：桌面快捷方式顺序改成 我的电脑 → IE → 委托相关事宜 → 资源配布 → **留言板 → 音乐** → 扫雷 → 画图 → Minecraft（音乐从末尾挪到留言板下面），图标换 `assets/winxp/music.png`。
+
+### 16.4 两个 bug 的根因（别再退回）
+
+- **「下一首进度直接跳了一大半」**：切歌那一瞬间 `audio.src` 刚换、`readyState` 已归 0，但 `audio.duration` / `audio.currentTime` **仍能读到上一首播完的值** —— 旧 `render()` 直接读它，于是新歌一出现进度条就在 ~90%。现在 `render()` 与 `seekTo()` **一律只从 `metrics()` 取**（`cur<0 || readyState<1 || !isFinite(duration)` 就返回 `{t:0,d:0}`）。
+- **「进度全是乱序」** 同源且更隐蔽：旧 `saveState()` 只判断「没暂停」，于是过渡窗口里会把**上一首的位置配上新歌的文件名**写进 `localStorage`，下次打开就停在一个莫名其妙的位置。现在 `saveState()` 加 `if (!mt.d) return;` 守卫；`pause` 监听也从「一律清状态」改成 `if (audio.paused) clearState()`，避免 `ended → next()` 之后旧播放的 pause 事件把新歌的续播状态清掉。
+
+### 16.5 已知限制
+
+- 无头截图下 `--virtual-time-budget` 不推进媒体时间轴，所以「切歌后进度是否正确」只能验到「UI 立刻归零 + 高亮/歌名/封面跟随」，**实际听感要站主自己跑一遍确认**。
+- `.wmp` 里是被窗口 body 包着的（`.win-body` 是 Tahoma 外壳字体），列表里的日文用系统回退字体渲染（像素体只覆盖到 12px 拉丁/汉字/假名区段，播放器属于 XP 应用、按既有约定保持 Tahoma）。
+
+### 16.6 本轮验证证据
+
+```
+# 语法
+node --check js/player.js        # 通过（PATH 里的 node 与插件自带 node 都过）
+# 无头截图（策略已是 danger-full-access + 审批 never，别申请升级；必须看 stderr 的 "N bytes written"）
+& $edge --headless=new --disable-gpu --no-first-run --user-data-dir="$env:TEMP\edge-shot-<随机>" `
+  --hide-scrollbars --virtual-time-budget=7000 --window-size=1400,1000 `
+  --screenshot="E:\自介网页\diag\shots\<name>.png" "http://127.0.0.1:3000/<page>"
+```
+
+| 验图（`diag/shots/`，gitignored） | 结论 |
+|---|---|
+| `index.png` | 桌面快捷方式顺序＝我的电脑/IE/委托/资源/留言板/**音乐**/扫雷/画图/Minecraft（音乐已在留言板下面）；「音乐」图标＝新 P4（CD+蓝音符）；自介名字 24px 明显变大 |
+| `music.png`（`_probe2.html?act=music`） | 新 Frutiger Aero 皮肤成型：左大封面（190px，第 1 首内嵌 APIC）＋歌名 おるびたる 22px／歌手 ぬゆり／`00:00 — -00:00`／玻璃蓝走带键＋音量；右栏 `PLAYLIST` 12 行可滚动、两行式（歌名/歌手）、打开时无高亮（不自动播）；窗口 620×340 长方形，标题栏与任务栏图标＝新 P4；**「N of 12」已按 m00815 删除** |
+| `_probe2.html?act=next`（报告已删图） | 点播放→点下一首后：`cur=00:00  rem=-00:00  fill=0%  高亮行=02  歌名=DE-Pression` ＝ **切歌后进度归零、不吃上一首的值**（16.4 的修复生效） |
+| `msg.png` | `XP.msg('C:\\', "Something's wrong!")`：OK 按钮＝源码同款 80×22 平面黑细边（与 P1 一致），正文仍 897 红球 32px 硬像素 |
+| `commission.png` / `resources.png` | `.ie-page` 换成 web.jpg 星纹壁纸，中间 980px 白卡居中、**左右各透一条背景**；卡内仍是 Luna 蓝标题条 + 像素体正文 |
+
+临时探针 `_probe2.html` 与临时验图（`_next.png` 等）用完已删；`diag/shots/` 里保留 5 张正式验图供站主查看（`diag/` 已 gitignore，不进仓库）。

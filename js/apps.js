@@ -573,7 +573,9 @@
     }).join('');
 
     function notReady(label) {
-      XP.msg(label, t('compNotReady', { drive: label }), I + '229(16x16).png');
+      /* 图标必须是 32px 的原生素材（弹窗按 32px 显示，塞 16px 的会被拉糊）——
+         用光驱图标 334(32x32).png，和「设备未就绪」的语义也对得上 */
+      XP.msg(label, t('compNotReady', { drive: label }), I + '334(32x32).png');
     }
     groups.addEventListener('click', function (e) {
       var it = e.target.closest('.comp-item');

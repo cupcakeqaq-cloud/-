@@ -4,6 +4,6 @@
    - 留空 '' = 同源（本地用 node server.js 跑整站时，或前后端同域名）。
    - 前端放在 GitHub Pages、后端部署在 Cloudflare Workers 时，
      在这里填 Worker 的地址（不带结尾斜杠），例如：
-     window.DANMAKU_API = 'https://cupcake-danmaku.你的账号.workers.dev';
+     window.DANMAKU_API = 'https://cupcake-gb.cupcakeqaq.workers.dev';
    ══════════════════════════════════════════════════════════ */
-window.DANMAKU_API = '';
+window.DANMAKU_API = 'https://cupcake-gb.cupcakeqaq.workers.dev';

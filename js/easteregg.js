@@ -177,7 +177,7 @@
     dlg.style.top = pos.y + 'px';
     dlg.innerHTML =
       '<div class="titlebar"><span class="tb-title">' + ERR_TITLES[(Math.random() * ERR_TITLES.length) | 0] + '</span><span class="tb-btns"><i class="tb-close">×</i></span></div>' +
-      '<div class="dlg-body"><span class="dlg-ico">⚠</span><span>' + ERR_MSGS[(Math.random() * ERR_MSGS.length) | 0] + '</span></div>' +
+      '<div class="dlg-body">' + XP.dlgIcon() + '<span>' + ERR_MSGS[(Math.random() * ERR_MSGS.length) | 0] + '</span></div>' +
       '<div class="dlg-btns"><button class="dlg-btn">OK</button></div>';
     document.body.appendChild(dlg);
     dlg.querySelector('.dlg-btn').addEventListener('click', function () { dlg.remove(); });
@@ -210,7 +210,7 @@
     dlg.className = 'xp-dialog featured-dialog';
     dlg.innerHTML =
       '<div class="titlebar"><span class="tb-title">' + TT('ceInfoTitle', '信息') + '</span><span class="tb-btns"><i class="tb-close">×</i></span></div>' +
-      '<div class="dlg-body"><span class="dlg-ico">⚠</span><span>' + TT('ceFeatured', '你在期待什么？') + '</span></div>' +
+      '<div class="dlg-body">' + XP.dlgIcon() + '<span>' + TT('ceFeatured', '你在期待什么？') + '</span></div>' +
       '<div class="dlg-btns"><button class="dlg-btn">' + TT('ceOk', '确定') + '</button></div>';
     document.body.appendChild(dlg);
     var done = false;

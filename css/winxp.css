@@ -695,15 +695,19 @@ body.grayed #winLayer { pointer-events: none; }
 .ie404 {
   background: #fff;
   color: #000;
-  font-family: var(--font-ui);
-  font-size: 13px;
+  font-family: var(--font-body);
+  font-size: 12px;
   line-height: 1.7;
   padding: 16px 20px;
   height: 100%;
   overflow: auto;
 }
-.ie404 h2 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
-.ie404 .ie404-ico { float: left; margin: 2px 14px 8px 0; width: 48px; }
+.ie404 h2 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+.ie404 .ie404-ico {
+  float: left; margin: 2px 14px 8px 0;
+  width: 48px; height: 48px;
+  image-rendering: pixelated;   /* srcset 给出的 96/144px 最近邻放大图，缩放时保持硬边 */
+}
 .ie404 p { margin-bottom: 8px; }
 .ie404 ol { margin: 0 0 10px 26px; }
 .ie404 hr { border: none; border-top: 1px solid #ccc; margin: 12px 0; }
@@ -928,8 +932,21 @@ body.grayed #winLayer { pointer-events: none; }
   padding: 2px 5px; background: #fff; outline: none;
   border: 2px solid; border-color: #9c9c9c #fff #fff #9c9c9c;
 }
-.ie-page { flex: 1; min-height: 0; overflow: auto; background: #fff; }
-.ie-wrap { max-width: 1080px; margin: 0 auto; padding: 18px 16px 56px; }
+/* 站主 m00628：跳转页左右太空 —— 整页铺 web.jpg 壁纸，内容收成居中的白卡，
+   左右各透出一条壁纸（＝「空白镂空」）。background-attachment:fixed 让卡在窗口里
+   滚动时壁纸不动，白卡像浮在壁纸上。 */
+.ie-page {
+  flex: 1; min-height: 0; overflow: auto;
+  padding: 14px 14px 0;
+  background: #eaf6fb url("../assets/background/web.jpg") center / cover no-repeat fixed;
+}
+.ie-wrap {
+  max-width: 980px; margin: 0 auto; padding: 18px 16px 56px;
+  font-family: var(--font-body);   /* 跳转页的正文用像素体（窗口外壳仍是 --font-ui 的 Tahoma） */
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px #b9c9e8, 0 10px 30px rgba(12, 50, 125, .18);
+}
 
 /* ══════════ 委托页：左栏（状态 / 流程 / 联系方式）+ 右侧价目卡片 ══════════ */
 .ie-cols { display: grid; grid-template-columns: 302px minmax(0, 1fr); gap: 18px; align-items: start; }
@@ -940,22 +957,25 @@ body.grayed #winLayer { pointer-events: none; }
   border-radius: 6px; padding: 13px 15px;
 }
 .cm-lead { display: flex; flex-direction: column; gap: 5px; }
-.cm-lead .cm-open { font-size: 19px; font-weight: 700; color: #4c7a34; letter-spacing: .5px; }
+.cm-lead .cm-open { font-size: 24px; font-weight: 700; color: #4c7a34; letter-spacing: .5px; }
 /* 受理状态另外两档的配色（由 js/content-render.js 按 js/content.js 的 status 加 class） */
 .cm-lead .cm-open.cm-paused { color: #a06a1f; }
 .cm-lead .cm-open.cm-closed { color: #8a4b4b; }
-.cm-lead .cm-status-note { font-size: 12px; color: #6b5f4e; line-height: 1.6; }
+.cm-lead .cm-status-note { font-size: 12px; color: #4a4a4a; line-height: 1.6; }
+/* 面板标题 = XP Luna 任务窗格标题条（浅蓝渐变 + 海军蓝字），不再是原来的褐色虚线 */
 .cm-panel > h2 {
-  font-size: 13px; color: #8a5a22; font-weight: 700; letter-spacing: 1px;
-  padding-bottom: 6px; margin-bottom: 9px;
-  border-bottom: 1px dashed #d8c9ad;
+  font-size: 12px; color: #0c327d; font-weight: 700; letter-spacing: 1px;
+  margin: -13px -15px 10px; padding: 5px 15px 6px;
+  background: linear-gradient(180deg, #fbfcff, #c9d7f4);
+  border-bottom: 1px solid #9ab0dd;
+  border-radius: 4px 4px 0 0;
 }
 .cm-panel .cm-steps { display: flex; flex-direction: column; gap: 7px; }
 /* 站主 m02125 第 4 条：流程不要盒子，一行行写清楚就行 */
-.cm-panel .cm-steps li { font-size: 12.5px; line-height: 1.7; padding: 0; }
+.cm-panel .cm-steps li { font-size: 12px; line-height: 1.7; padding: 0; }
 .cm-panel .cm-steps b { display: inline; margin-right: 4px; }
 .cm-panel .cm-contact { grid-template-columns: 1fr; gap: 5px; }
-.cm-panel .note-box { margin-top: 10px; font-size: 11.5px; }
+.cm-panel .note-box { margin-top: 10px; font-size: 12px; }
 
 /* 价目卡片：蓝色价格 + 两行说明 + 例图排（大编号已按站主 m02125 第 4 条去掉） */
 .cm-card {
@@ -964,11 +984,11 @@ body.grayed #winLayer { pointer-events: none; }
   border: 2px solid; border-color: #fff #b9b9b9 #b9b9b9 #fff;
   border-radius: 8px;
   padding: 20px 22px 18px; margin-bottom: 18px;
-  box-shadow: 3px 3px 0 rgba(120, 80, 40, .12);
+  box-shadow: 3px 3px 0 rgba(12, 50, 125, .10);
 }
-.cm-card h3 { font-size: 21px; font-weight: 700; color: #0c327d; margin-bottom: 6px; letter-spacing: 1px; }
-.cm-card-price { font-size: 30px; font-weight: 700; color: #0c327d; line-height: 1.2; margin-bottom: 12px; }
-.cm-card-desc { font-size: 14px; color: #000; line-height: 1.85; }
+.cm-card h3 { font-size: 24px; font-weight: 700; color: #0c327d; margin-bottom: 6px; letter-spacing: 1px; }
+.cm-card-price { font-size: 24px; font-weight: 700; color: #0c327d; line-height: 1.2; margin-bottom: 12px; }
+.cm-card-desc { font-size: 12px; color: #000; line-height: 1.85; }
 .cm-card-desc + .cm-card-desc { margin-top: 2px; }
 .cm-card-shots { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
 .cm-card-shots a { display: block; width: calc((100% - 20px) / 3); min-width: 110px; }
@@ -977,15 +997,15 @@ body.grayed #winLayer { pointer-events: none; }
   display: block; width: 100%; height: auto;
   aspect-ratio: 3 / 4;
   object-fit: cover; object-position: top center;
-  border: 1px solid #d8c9ad; border-radius: 4px; cursor: zoom-in;
-  background: #f3ecdd;
+  border: 1px solid #b9c9e8; border-radius: 4px; cursor: zoom-in;
+  background: #eef3fc;
 }
 .cm-card-shots img.ratio-sq { aspect-ratio: 1 / 1; }
 .cm-card-shots img.ratio-land { aspect-ratio: 4 / 3; }
 /* 裁剪过的例图：a 当裁剪框，img 由内联 style 放大/偏移（后台「裁剪」按钮存的 zoom/cx/cy） */
 .cm-card-shots a.crop {
   position: relative; overflow: hidden;
-  border: 1px solid #d8c9ad; border-radius: 4px; background: #f3ecdd;
+  border: 1px solid #b9c9e8; border-radius: 4px; background: #eef3fc;
 }
 .cm-card-shots a.crop img {
   position: absolute; inset: auto;
@@ -999,21 +1019,23 @@ body.grayed #winLayer { pointer-events: none; }
   border-radius: 6px; padding: 16px 18px; margin-bottom: 18px;
 }
 .cm-sec > h2 {
-  font-size: 14px; color: #8a5a22; font-weight: 700; letter-spacing: 1px;
-  padding-bottom: 7px; margin-bottom: 11px;
-  border-bottom: 1px dashed #d8c9ad;
+  font-size: 12px; color: #0c327d; font-weight: 700; letter-spacing: 1px;
+  margin: -16px -18px 12px; padding: 6px 18px 7px;
+  background: linear-gradient(180deg, #fbfcff, #c9d7f4);
+  border-bottom: 1px solid #9ab0dd;
+  border-radius: 4px 4px 0 0;
 }
 .cm-sec .cm-steps { display: flex; flex-direction: column; gap: 8px; }
-.cm-sec .cm-steps li { font-size: 13px; line-height: 1.75; }
+.cm-sec .cm-steps li { font-size: 12px; line-height: 1.75; }
 .cm-sec .cm-steps li span { display: block; }
 .cm-contact { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 7px; }
 .cm-contact .social {
   display: flex; align-items: center; gap: 8px;
   padding: 7px 9px; border: 2px solid; border-color: #fff #b9b9b9 #b9b9b9 #fff;
-  border-radius: 5px; background: #fff; font-size: 13px; color: #000;
+  border-radius: 5px; background: #fff; font-size: 12px; color: #000;
 }
 .cm-contact .social img { width: 20px; height: 20px; }
-.cm-contact .social:hover { background: #f7edd8; }
+.cm-contact .social:hover { background: #eef3fc; }
 /* 资源页 */
 .rs-item {
   display: flex; align-items: center; gap: 12px;
@@ -1022,7 +1044,7 @@ body.grayed #winLayer { pointer-events: none; }
 }
 .rs-item img { width: 32px; height: 32px; flex: none; }
 .rs-item .rs-info { flex: 1; min-width: 0; }
-.rs-item .rs-name { font-size: 15px; font-weight: 700; color: #0c327d; }
+.rs-item .rs-name { font-size: 12px; font-weight: 700; color: #0c327d; }
 .rs-item .rs-size { font-size: 12px; color: #767676; }
 .rs-item .rs-dl {
   flex: none; font-size: 12px; padding: 5px 18px; border-radius: 3px;
@@ -1046,6 +1068,7 @@ body.grayed #winLayer { pointer-events: none; }
 .desk-icon img { width: 32px; height: 32px; object-fit: contain; pointer-events: none; }
 .desk-icon span {
   font-size: 11px; line-height: 1.25; text-align: center; color: #fff;
+  font-family: var(--font-ui);   /* 桌面快捷方式名属于 XP 外壳 → Tahoma（站主 m02318 第 5 条） */
   text-shadow: 1px 1px 2px rgba(0, 0, 0, .9), 0 0 4px rgba(0, 0, 0, .7);
   word-break: break-word;
 }
@@ -1072,13 +1095,15 @@ body.grayed #winLayer { pointer-events: none; }
 }
 .gb-head { display: flex; align-items: baseline; gap: 7px; margin-bottom: 3px; }
 .gb-name { font-size: 12px; font-weight: 700; color: #0c327d; }
-.gb-time { font-size: 10px; color: #767676; }
-.gb-del {
-  margin-left: auto; font-size: 11px; color: #b9a99a;
-  background: none; border: 0; cursor: pointer; font-family: inherit;
+.gb-time { font-size: 12px; color: #767676; }
+.gb-text { font-size: 12px; line-height: 1.6; color: #000; white-space: pre-wrap; word-break: break-word; }
+/* 站主回复：取第一份填了的三语字段，固定中文优先 */
+.gb-reply {
+  margin-top: 5px; padding-left: 8px;
+  border-left: 2px solid #0c327d;
+  font-size: 12px; line-height: 1.55; color: #143a7a;
+  white-space: pre-wrap; word-break: break-word;
 }
-.gb-del:hover { color: #c4442c; }
-.gb-text { font-size: 13px; line-height: 1.6; color: #000; white-space: pre-wrap; word-break: break-word; }
 .gb-empty { font-size: 12px; color: #767676; text-align: center; padding: 26px 0; }
 .gb-form { display: flex; flex-direction: column; gap: 6px; }
 .gb-form input, .gb-form textarea {
@@ -1095,19 +1120,20 @@ body.grayed #winLayer { pointer-events: none; }
   border: 1px solid #9aa7c0;
 }
 .gb-send:hover { filter: brightness(1.04); }
-.gb-hint { font-size: 10px; color: #767676; line-height: 1.5; }
+.gb-send:disabled { opacity: .5; cursor: default; filter: none; }
+.gb-hint { font-size: 12px; color: #767676; line-height: 1.5; }
 
 /* 翻页：只有 ‹ ›，每页 8 条 */
 .gb-pager { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .gb-pager button {
-  font: inherit; font-size: 13px; line-height: 1;
+  font: inherit; font-size: 12px; line-height: 1;
   width: 24px; height: 20px; cursor: pointer; color: #0c327d;
   background: linear-gradient(180deg, #fdfdfd, #dfe4ee);
   border: 1px solid #9aa7c0; border-radius: 3px;
 }
 .gb-pager button:hover:not(:disabled) { filter: brightness(1.04); }
 .gb-pager button:disabled { opacity: .4; cursor: default; }
-.gb-page-info { font-size: 11px; color: #767676; }
+.gb-page-info { font-size: 12px; color: #767676; }
 
 /* ══════════ 响应式 ══════════ */
 @media (max-width: 1180px) {

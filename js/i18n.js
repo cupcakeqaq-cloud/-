@@ -45,19 +45,28 @@
     deskComputer: { zh: '我的电脑', ja: 'マイ コンピュータ', en: 'My Computer' },
     deskMines: { zh: '扫雷', ja: 'マインスイーパ', en: 'Minesweeper' },
     deskPaint: { zh: '画图', ja: 'ペイント', en: 'Paint' },
+    deskMusic: { zh: '音乐', ja: '音楽', en: 'Music' },
 
-    /* ---------- 留言板（本地存储） ---------- */
+    /* ---------- 留言板（存在 Cloudflare KV，前台只读+发） ---------- */
     gbPlaceholder: { zh: '写点什么吧…', ja: 'なにか書いてね…', en: 'Say something…' },
     gbSend: { zh: '发送', ja: '送信', en: 'Send' },
     gbEmpty: { zh: '暂无评论', ja: 'まだコメントがありません', en: 'No comments yet' },
     gbHint: {
-      zh: '留言仅保存在你自己的浏览器里（localStorage），刷新不会丢，换设备不会同步。',
-      ja: 'コメントは自分のブラウザ内（localStorage）にのみ保存されます。更新しても消えませんが、別の端末とは同期しません。',
-      en: 'Comments are stored only in your own browser (localStorage). They survive a refresh but do not sync across devices.'
+      zh: '留言所有人都能看到。发出后自己删不掉（要删请找我）。正文最多 200 字，10 分钟内最多发 3 条。',
+      ja: 'コメントは誰でも見られます。投稿後は自分で削除できません（削除は管理人まで）。本文は 200 字まで、10 分間に 3 件までです。',
+      en: 'Comments are visible to everyone. You cannot delete your own post (ask the site owner to). Max 200 characters, up to 3 posts per 10 minutes.'
     },
-    gbName: { zh: '名字（可留空）', ja: '名前（空欄可）', en: 'Name (optional)' },
-    gbDelete: { zh: '删除', ja: '削除', en: 'Delete' },
+    gbName: { zh: '名字（留空则显示 Anonymous）', ja: '名前（空欄なら Anonymous）', en: 'Name (blank = Anonymous)' },
     gbTimeNow: { zh: '刚刚', ja: 'たった今', en: 'just now' },
+    gbLoading: { zh: '加载中…', ja: '読み込み中…', en: 'Loading…' },
+    gbErrList: { zh: '留言加载失败，稍后再试。', ja: 'コメントを読み込めませんでした。あとでもう一度どうぞ。', en: 'Could not load comments. Please try again later.' },
+    gbErrNet: { zh: '发送失败：连不上留言服务器，稍后再试。', ja: '送信できませんでした。サーバーに接続できません。', en: 'Send failed: cannot reach the comment server.' },
+    gbErrRate: {
+      zh: '发得太快了，10 分钟内最多 3 条，请等 {min} 分钟再发。',
+      ja: '投稿が速すぎます。10 分間に 3 件までです。約 {min} 分後にもう一度どうぞ。',
+      en: 'Too fast — up to 3 posts per 10 minutes. Try again in about {min} min.'
+    },
+    gbErrLong: { zh: '正文最多 200 字。', ja: '本文は 200 字までです。', en: 'Max 200 characters.' },
 
     /* ---------- 主页上的两个入口 ---------- */
     ceText: {

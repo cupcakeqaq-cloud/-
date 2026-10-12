@@ -42,6 +42,53 @@
     });
   }
 
+  /* ══════════ 高清素材（站主 m02318 第 1 条） ══════════
+     原素材包最大只有 48px，图标被放大显示时（假 404 的 16px→48px）会被浏览器拉糊。
+     assets/winxp/windowsIcons/hd/ 里是**整数倍最近邻**放大的副本（脚本生成，逐像素等于原图块拷贝）：
+     文件名 <原名>@<N>x.png，N = 相对素材原生尺寸的倍数。
+     只登记这几张：其它图标都按原生尺寸显示，用不着高清版。 */
+  var ICON_NATIVE = {
+    '897(32x32).png': 32,   /* 错误图标：源码 ErrorBox 用的就是它，弹窗按 32px 显示（原尺寸 1:1） */
+    '334(32x32).png': 32,   /* 光驱图标：我的电脑里「设备未就绪」提示用 */
+    'ie-paper.png': 16      /* 假 404 的 IE 纸页：CSS 按 48px 显示（3×） */
+  };
+  var HD_MULT = {
+    '897(32x32).png': [2, 3],
+    '334(32x32).png': [2, 3],
+    'ie-paper.png': [3, 6, 9]
+  };
+
+  /* 按「要显示的尺寸」算出该用哪张 + 2x/3x 变体；只引用真实存在的文件 */
+  XP.hd = function (src, size) {
+    var name = src.split('/').pop();
+    var mult = HD_MULT[name];
+    if (!mult) return { src: src, srcset: '' };   /* 没高清版的就原样用，绝不写死 srcset（会 404 变破图） */
+    var dir = src.slice(0, src.length - name.length) + 'hd/';
+    var stem = name.replace(/\.png$/i, '');
+    var native = ICON_NATIVE[name] || 32;
+    /* 1x 用哪张：显示尺寸刚好等于原生尺寸的整数倍就用那一档，否则就用原图 */
+    var base = Math.round(size / native);
+    var use = (base > 1 && mult.indexOf(base) >= 0 && base * native === size) ? base : 1;
+    var set = [];
+    for (var i = 0; i < mult.length; i++) {
+      if (mult[i] === use) continue;
+      set.push(dir + stem + '@' + mult[i] + 'x.png ' + mult[i] + 'x');
+    }
+    return {
+      src: use === 1 ? src : dir + stem + '@' + use + 'x.png',
+      srcset: set.join(', ')   /* 高分屏浏览器自己挑 @2x/@3x，1x 屏仍用上面那张 */
+    };
+  };
+
+  /* 弹窗左边那颗图标（XP.msg / 彩蛋报错窗共用同一段 HTML） */
+  XP.dlgIcon = function (src, size) {
+    size = size || 32;
+    var h = XP.hd(src || ICON + '897(32x32).png', size);
+    return '<img class="dlg-ico" src="' + h.src + '"' +
+      (h.srcset ? ' srcset="' + h.srcset + '"' : '') +
+      ' width="' + size + '" height="' + size + '" alt="">';
+  };
+
   /* ══════════ 应用注册 ══════════ */
   XP.register = function (app) {
     XP.apps.push(app);
@@ -106,6 +153,7 @@
   };
 
   function closeWin(rec) {
+    if (rec.onClose) rec.onClose(); /* 窗口自己的收尾（播放器关窗＝停止播放） */
     /* 页面里本来就写好的窗口（data-win）：关闭 = 先归位再隐藏，任务栏按钮撤掉，
        之后可以用开始菜单的「整理所有窗口」把它们全部请回来 */
     if (rec.adopted) {
@@ -343,7 +391,11 @@
       min: false, floating: false, ph: null, adopted: true, fixed: fixed
     };
     XP.wins.push(rec);
-    if (!fixed) { bindWindow(rec); addTask(rec); }
+    if (!fixed) bindWindow(rec);
+    /* 固定式整页窗（委托页/资源页的浏览器窗）也要有任务栏按钮：
+       之前一律跳过，那两页就只剩「开始 + 托盘」，看上去任务栏一片空白（站主 m02318 报的 bug） */
+    addTask(rec);
+    if (fixed) focusWin(rec); /* 整页窗＝当前活动窗，按钮显示为按下态 */
     return rec;
   };
 
@@ -358,6 +410,8 @@
     b.querySelector('span').textContent = rec.title;
     b.title = rec.title;
     b.addEventListener('click', function () {
+      /* 固定式整页窗：只聚焦。最小化会把整页留空，不能给这个按钮 */
+      if (rec.fixed) { focusWin(rec); return; }
       if (rec.min) restoreWin(rec);
       else if (XP.active === rec) minimizeWin(rec);
       else { if (!rec.floating) rec.el.scrollIntoView({ block: 'nearest' }); focusWin(rec); }
@@ -631,13 +685,15 @@
   /* ══════════ XP 提示框 ══════════ */
   XP.msg = function (title, text, icon) {
     var wrap = mk('div', 'xp-msg');
-    icon = icon || ICON + '147(32x32).png'; /* 红叉错误图标：素材包里唯一的 32px 原生错误图标 */
+    /* 默认图标 897(32x32).png = 经典 XP 红球白叉，与 winXP-master 的 ErrorBox 源码同款
+       （旧的 147(32x32) 是「纯红叉」，不是正牌错误图标，第 9 批退役） */
+    icon = icon || ICON + '897(32x32).png';
     wrap.innerHTML =
       '<div class="xp-dialog">' +
         '<div class="titlebar"><img class="tb-icon" src="' + icon + '" alt="">' +
         '<span class="tb-title">' + esc(title) + '</span>' +
         '<span class="tb-btns"><i class="tb-close" title="Close">×</i></span></div>' +
-        '<div class="dlg-body"><img class="dlg-ico" src="' + icon + '" alt="" style="width:32px;height:32px">' +
+        '<div class="dlg-body">' + XP.dlgIcon(icon) +
         '<div class="dlg-msg"><b>' + esc(title) + '</b><br>' + esc(text) + '</div></div>' +
         '<div class="dlg-btns"><button type="button" class="dlg-btn">OK</button></div>' +
       '</div>';
@@ -657,9 +713,13 @@
   };
 
   XP.notFound = function (stage, url, retry) {
+    /* 站主 m02318：假 404 **保留 IE 纸页图标**，但它原生只有 16px 而 CSS 按 48px 显示
+       → 走 3× 最近邻的高清版（1× 屏用 @3x 当基准，2x/3x 屏再上 @6x/@9x） */
+    var ico = XP.hd(ICON + 'ie-paper.png', 48);
     stage.innerHTML =
       '<div class="ie404">' +
-        '<img class="ie404-ico" src="' + ICON + 'ie-paper.png" alt="">' +
+        '<img class="ie404-ico" src="' + ico.src + '"' +
+        (ico.srcset ? ' srcset="' + ico.srcset + '"' : '') + ' width="48" height="48" alt="">' +
         '<h2>' + esc(t('nfTitle')) + '</h2>' +
         '<p>' + esc(t('nfLede')) + '</p>' +
         '<p>' + esc(t('nfWhy')) + '</p>' +
