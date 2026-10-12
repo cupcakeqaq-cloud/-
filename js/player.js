@@ -401,7 +401,7 @@
      两个跳转页只跑引擎做后台续播，站主 m02318 明确要求那边不留按钮。 */
   var page = document.body.getAttribute('data-page') || 'index';
   if (page === 'index') {
-    XP.register({ key: 'music', name: 'Windows Media Player', icon: 'assets/winxp/music.png', w: 620, h: 340, build: build });
+    XP.register({ key: 'music', name: 'Windows Media Player', icon: 'assets/winxp/music.png', w: 620, h: 340, ratio: 620 / 340, build: build });
   }
   window.MusicPlayer = { play: play, toggle: toggle, next: next, prev: prev, files: FILES.slice() };
 })();

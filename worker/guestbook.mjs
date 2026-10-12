@@ -1,6 +1,10 @@
 /* ══════════════════════════════════════════════════════════
-   留言板后端 —— Cloudflare Worker + KV
+   留言板后端 —— Cloudflare Pages 函数 + KV（2026-10 起从 Worker 换成 Pages）
    ──────────────────────────────────────────────────────────
+   为什么不用 Workers：`*.workers.dev` 这个临时域名在国内被 DNS 污染 + TLS 阻断
+   （站主这台机器实测：解析到假 IP，强行连真实 IP 也被 reset），而 `*.pages.dev` 实测能连。
+   部署形态：Cloudflare Pages 项目 `cupcake-gb-api`，入口 worker/functions/[[path]].js，
+   KV 还是原来那个 namespace，数据不用搬。
    站主拍板：匿名发言（自己填昵称，留空 = Anonymous）、直发不审核、
    访客自己删不掉（只能站主在后台清理）、正文 200 字以内、
    同一个人（同 IP）10 分钟最多 3 条。
@@ -18,7 +22,7 @@
    数据结构完全按 HANDOFF.md 第 13.2 节的契约：
      {v:1, comments:[{id,name,text,time,pinned,hidden,reply:{zh,ja,en}}]}
 
-   本文件是标准 ES module，既能丢进 Cloudflare，也能被 node 直接 import 做本机自测
+   本文件是标准 ES module，既能被 Pages 函数 import 上线，也能被 node 直接 import 做本机自测
    （worker/test-guestbook.mjs 传一个假 KV 进来）；部署步骤见 HANDOFF.md 第十五节。
    ══════════════════════════════════════════════════════════ */
 
@@ -250,6 +254,5 @@ export async function handleRequest(request, env) {
   return json({ ok: false, error: 'notfound' }, 404);
 }
 
-export default {
-  fetch: (request, env) => handleRequest(request, env)
-};
+/* Pages 函数的入口（worker/functions/[[path]].js 负责把 ctx 拆成 request / env） */
+export const onRequest = (ctx) => handleRequest(ctx.request, ctx.env);

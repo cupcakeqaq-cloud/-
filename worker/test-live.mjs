@@ -1,6 +1,6 @@
-/* 线上体检：对已经部署好的 Cloudflare Worker 真跑一遍（会写一条测试留言，跑完自己删掉）
+/* 线上体检：对已经部署好的留言板后端真跑一遍（会写一条测试留言，跑完自己删掉）
    用法：node worker/test-live.mjs
-   地址取 .env 的 GB_WORKER_URL（没有就用下面这个默认值），钥匙取 .env 的 GB_TOKEN。 */
+   地址取 .env 的 GB_API_URL（没有就用下面这个默认值），钥匙取 .env 的 GB_TOKEN。 */
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -11,7 +11,7 @@ const env = Object.fromEntries(
     .filter((l) => /^[A-Z_]+=/.test(l))
     .map((l) => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1).trim()])
 );
-const BASE = (env.GB_WORKER_URL || 'https://cupcake-gb.cupcakeqaq.workers.dev').replace(/\/+$/, '');
+const BASE = (env.GB_API_URL || 'https://cupcake-gb-api.pages.dev').replace(/\/+$/, '');
 const TOKEN = env.GB_TOKEN || '';
 
 let pass = 0, fail = 0;
@@ -35,8 +35,8 @@ const call = async (url, method = 'GET', body, headers) => {
 console.log('体检地址：' + BASE);
 console.log('（发一条测试留言 → 检查 → 删掉；10 分钟内重复跑可能撞限流）\n');
 
-const root = await call('/');
-ok('探活 GET / 返回 200', root.status === 200, 'status=' + root.status);
+const root = await call('/api/gb/list');
+ok('探活 GET /api/gb/list 返回 200', root.status === 200, 'status=' + root.status);
 ok('内容是 {v:1,comments:[…]}', root.json?.v === 1 && Array.isArray(root.json?.comments), root.text.slice(0, 120));
 
 const empty = await call('/api/gb/post', 'POST', { name: '', text: '' });
@@ -72,6 +72,19 @@ ok('以文件为准：清空后那条被删', imp2.status === 200 && (imp2.json?
 
 const final = await call('/api/gb/list');
 ok('清理干净：列表已空', (final.json?.comments || []).length === 0, '剩 ' + (final.json?.comments || []).length + ' 条');
+
+/* 前台拼地址的方式也要对一遍：js/config.js 里填的地址 + 'gb/comments.json' 必须真能打开。
+   这里故意照抄 js/guestbook.js 的收尾斜杠逻辑 —— 以前就踩过「填了网址但不生效」这个坑。 */
+const cfg = fs.readFileSync(path.join(ROOT, 'js', 'config.js'), 'utf8');
+const m = cfg.match(/window\.DANAMKU_API\s*=\s*'([^']*)'/);
+const front = (m ? m[1] : '').replace(/\/+$/, '');
+if (!front) {
+  ok('前台地址：留空 = 只读同源那份（不算失败）', true);
+} else {
+  const r = await fetch(front + '/gb/comments.json', { cache: 'no-store' });
+  const j = await r.json().catch(() => null);
+  ok('前台地址拼出来能打开（' + front + '/gb/comments.json）', r.status === 200 && j?.v === 1, 'status=' + r.status);
+}
 
 console.log(`\n结果：${pass} 项通过，${fail} 项失败`);
 process.exit(fail ? 1 : 0);

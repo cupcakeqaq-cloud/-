@@ -1,8 +1,10 @@
 /* 留言板：留言存在 Cloudflare（worker/guestbook.mjs 那份代码），前台只负责读和发。
    本地 localStorage 那份按站主要求去掉了；访客发完删不掉，只能站主在后台清理。
-   Worker 地址填在 js/config.js 的 window.DANMAKU_API；留空则只读同源 gb/comments.json（能看不能发）。 */
+   后端地址填在 js/config.js 的 window.DANMAKU_API；留空则只读同源 gb/comments.json（能看不能发）。 */
 (function () {
-  var API = window.DANMAKU_API || '';
+  /* 地址统一收成「末尾一定有一个斜杠」，这样下面拼 gb/comments.json、api/gb/post 都不会拼错 */
+  var API = String(window.DANAMKU_API || '').replace(/\/+$/, '');
+  if (API) API += '/';
   var PER_PAGE = 8;
   var MAX_TEXT = 200;
   var MAX_NAME = 24;

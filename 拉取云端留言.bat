@@ -23,7 +23,7 @@ exit /b 1
 echo 把 Cloudflare 上网友发的留言拉回 gb\comments.json。
 echo 同一个 id 以你本机那份为准，你自己改过的不会被覆盖。
 echo 拉回来之后，双击「启动后台.bat」就能隐藏 / 置顶 / 回复 / 删除。
-echo Worker 地址和钥匙读的是 .env 里的 GB_WORKER_URL / GB_TOKEN。
+echo 后端地址和钥匙读的是 .env 里的 GB_API_URL / GB_TOKEN。
 echo.
 "%NODE%" worker\pull-from-kv.mjs
 echo.

@@ -2,8 +2,8 @@
    留言板后端地址配置
    ──────────────────────────────────────────────────────────
    - 留空 '' = 同源（本地用 node server.js 跑整站时，或前后端同域名）。
-   - 前端放在 GitHub Pages、后端部署在 Cloudflare Workers 时，
-     在这里填 Worker 的地址（不带结尾斜杠），例如：
-     window.DANMAKU_API = 'https://cupcake-gb.cupcakeqaq.workers.dev';
+   - 前端放在 GitHub Pages、后端部署在 Cloudflare Pages 时，在这里填后端地址
+     （不带结尾斜杠）。注意别用 *.workers.dev：那个后缀国内被 DNS 污染 + TLS 阻断。
+   - 这个值不是秘密，写在网页里人人可见；钥匙（GB_TOKEN）只在 .env 和 Cloudflare 里。
    ══════════════════════════════════════════════════════════ */
-window.DANMAKU_API = 'https://cupcake-gb.cupcakeqaq.workers.dev';
+window.DANAMKU_API = 'https://cupcake-gb-api.pages.dev';

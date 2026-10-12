@@ -4,7 +4,7 @@
 >
 > 最新一轮（第 10 批 4+3 条，**已落地，等站主验收**，详见第十六节）：① 错误弹窗的 **OK 按钮照 `winXP-master` 的 ErrorBox 源码重做**（80×22、1px 黑细边、平面无圆角，`:active` 反向内阴影 + 文字下移 1px），只动弹窗按钮，其它 Luna 按钮不动；② 自介名字号 **24px**（原来 12px 太小）；③ 两个跳转页 `.ie-page` 换成 `assets/background/web.jpg` 星纹壁纸 + 中间 980px 白卡，**左右各透一条背景**；④ 播放器两个 bug 修复（**切歌瞬间读到上一首的时长/位置** → 进度跳到一大半；`saveState()` 把上一首的位置配新歌文件名存进 `localStorage` → 进度乱序），统一收口到新的 `metrics()` 守卫；⑤ 播放器 UI **整文件重做成 Windows 7 Frutiger Aero**（左封面+歌名歌手+N of 12+进度+走带、右侧可滚动歌单，窗口 620×340 长方形，砍掉七段数码管）；⑥ 播放器图标换站主给的 **P4**（CD+蓝音符 → `assets/winxp/music.png`）；⑦ 桌面快捷方式把**音乐挪到留言板下面**。
 > 上一轮（第 9 批 6 条，**已落地**，详见第十四节）：① 4 处错误弹窗全部换成源码同款高清图标（`897(32x32).png`，整数倍最近邻放大 + `srcset`）；② 假 404 的 IE 纸页图标放大到原生 48px；③ 新增 **Windows Media Player** 音乐播放器（普通 XP 应用，12 首按站主截图顺序，读内嵌 ID3 歌名/歌手/封面，`music/日刊：遺書.jpg` 兜底）；④ 跨页后台续播（`localStorage`），跳转页任务栏**不加**播放器按钮；⑤ 修「跳转页任务栏一片空白」的 bug；⑥ **全站正文回像素体**（XP 外壳仍 Tahoma）+ 正文字号吸附 12/24px，两个跳转页配色统一成 XP Luna 蓝。
-> 第 9 批另一条线（**留言板后端**，详见第十五节）：访客留言改存 **Cloudflare Workers + KV**（网页仍托管在 GitHub Pages，不搬家）；匿名发言（昵称留空 = `Anonymous`）、直发不审核、不要验证码；防护只做「正文 ≤200 字 + 同 IP 10 分钟 3 条」；前台**去掉删除按钮**并提示「发出后自己删不掉」、**去掉 localStorage**；`worker/` 下 5 个文件 + 三个双击就能跑的 .bat（本机试跑 / 推送 / 拉取），本机自测 21 项全过、端到端真跑过一遍。等站主在 Cloudflare 建好 Worker 并把网址填进 `js/config.js`。
+> 第 9 批另一条线（**留言板后端**，详见第十五节）：访客留言改存 **Cloudflare Pages 函数 + KV**（网页仍托管在 GitHub Pages，不搬家）；匿名发言（昵称留空 = `Anonymous`）、直发不审核、不要验证码；防护只做「正文 ≤200 字 + 同 IP 10 分钟 3 条」；前台**去掉删除按钮**并提示「发出后自己删不掉」、**去掉 localStorage**；`worker/` 下 9 个文件 + 三个双击就能跑的 .bat（本机试跑 / 推送 / 拉取）。**已部署到 `https://cupcake-gb-api.pages.dev`，线上体检 16 项、本机自测 21 项全过**。原方案的 Cloudflare Worker 因为 `*.workers.dev` 在国内被 DNS 污染 + TLS 阻断而弃用（证据见 15.5）。
 > 上一轮（第 8 批 2 条）：**资源页下载项的名字硬编码成中文**，切到日/英后页面上只剩这一个词是中文，和全页语言对不上 → 新增 i18n 键 `voiceNameFlan`（zh `芙兰朵露 v1.0.0-beta` / ja `フランドール v1.0.0-beta` / en `Flandre v1.0.0-beta`），`resources.html` 的 `.rs-name` 挂上 `data-i18n`。**只改显示名，`href` 里的 zip 文件名不动**（文件名是中文的，改了链接就 404）。另按站主要求补了 `README.md`（只写开源归属，见第十一节）并把两份授权原文随素材放进仓库。
 > 上一轮（第 7 批 3 条）：音源撤换成**一个** `voice dl/芙兰朵露v1.0.0-beta.zip`（33.2MB）—— `ゴースト_A.zip`（65.3MB）与 `林屿.zip`（55.9MB）已从仓库删除，资源页 `.rs-item` 从两条减到一条，i18n 的 `voiceSizeGhost`/`voiceSizeLin` 合并成 `voiceSizeFlan`，顺手删掉没人引用的死键 `titleVoice`；资源简介 `rsIntro` 改成「什么都有可能放 —— 不定时上传本人制作的东西」（三语同步）；个人简介 `bio` 改成站主 2026-10-12 自己在 GitHub 网页端提交的那句半成品声明（保留「18↑一般通过十八线低精力画手」前缀 + 「此网页暂时为半成品，大部分文本为ai自动填写的占位符，请无视。」）。
 > 上一轮（第 6 批 3 条）：开始菜单友链显示名改成 **Survivor**（`menuFriend` 三语同值）；中文「委托受理」全站改成 **「委托相关事宜」**（只动中文，日/英仍是 依頼受付 / Commission）；委托价目**按语言换算货币** —— 新增 `cmCard1Price~cmCard3Price` 三个 i18n 键（zh `¥320-520` / ja `6,500〜11,000円` / en `$45-75`），汇率 1 CNY = 21 JPY = 0.14 USD，日元取 500 整、美元取 5 整。
@@ -52,17 +52,22 @@ E:\自介网页
 │  ├─ guestbook.js      留言板评论区（读 Cloudflare Worker，见第十五节）
 │  ├─ easteregg.js      玩具鸭 + 30 连击故障彩蛋
 │  ├─ starfield.js      背景星星字符画
-│  └─ config.js         留言板后端地址（`window.DANMAKU_API`，填 Worker 网址；见第十五节）
+│  └─ config.js         留言板后端地址（`window.DANMAKU_API`，现填 Pages 网址；见第十五节）
 ├─ server.js             本地预览服务器（纯静态托管 + 本机后台 API）
 ├─ package.json
-├─ worker/               ★ 留言板云端代码（Cloudflare Worker，见第十五节）
-│  ├─ guestbook.mjs       Worker 本体（读列表 / 收留言 / 搬留言，纯函数 + fetch 处理）
-│  ├─ test-guestbook.mjs  本机自测：假 KV + 21 项断言（`node worker/test-guestbook.mjs`）
-│  ├─ dev-server.mjs      本机试跑：8787 端口，假 KV 存 `worker/.dev-kv.json`（已 gitignore）
-│  ├─ import-to-kv.mjs    把 `gb/comments.json` 同步到 Cloudflare（以本机为准；后台删掉的真删）
-│  └─ pull-from-kv.mjs    把 Cloudflare 上网友发的留言（含藏起来的）拉回 `gb/comments.json`
+├─ worker/               ★ 留言板云端代码（Cloudflare Pages 函数，见第十五节）
+│  ├─ guestbook.mjs       全部逻辑（路由 / 规范化 / 限流 / 合并导入），本机可测
+│  ├─ functions/[[path]].js  Pages 函数入口：只把请求转给 `guestbook.mjs`
+│  ├─ public/index.html    自检页（打开后端根地址看到的那张）
+│  ├─ public/_routes.json  只让 `/api/*` 和 `/gb/*` 进函数，其余走静态文件
+│  ├─ wrangler.toml        Pages 部署配置（项目名 + `pages_build_output_dir` + KV 绑定 `GB_KV`）
+│  ├─ test-guestbook.mjs   本机自测：假 KV + 21 项断言（`node worker/test-guestbook.mjs`）
+│  ├─ test-live.mjs        线上体检：对已部署地址真发一条再删掉（`node worker/test-live.mjs`）
+│  ├─ dev-server.mjs       本机试跑：8787 端口，假 KV 存 `worker/.dev-kv.json`（已 gitignore）
+│  ├─ import-to-kv.mjs     把 `gb/comments.json` 同步到云端（以本机为准；后台删掉的真删）
+│  └─ pull-from-kv.mjs     把云端上网友发的留言（含藏起来的）拉回 `gb/comments.json`
 ├─ 本机试跑留言板.bat       双击 = 起 worker/dev-server.mjs 并打开 127.0.0.1:8787
-├─ 推送留言到Cloudflare.bat 双击 = 跑 worker/import-to-kv.mjs（读 .env 的 GB_WORKER_URL / GB_TOKEN）
+├─ 推送留言到Cloudflare.bat 双击 = 跑 worker/import-to-kv.mjs（读 .env 的 GB_API_URL / GB_TOKEN）
 ├─ 拉取云端留言.bat         双击 = 跑 worker/pull-from-kv.mjs（把网友的留言拉回后台）
 ├─ 启动后台.bat           双击 = 起本机后台（server.js，3000 端口）
 ├─ assets/
@@ -266,10 +271,10 @@ zip 的 href 必须保持：`voice%20dl/%E8%8A%99%E5%85%B0%E6%9C%B5%E9%9C%B2v1.0
 - 新增 key 时三语都要写全（缺失会回落 `zh`，再缺失显示 key 本身）。
 
 ### 2. 留言板 / 评论区 `js/guestbook.js`
-- **留言存在 Cloudflare Worker + KV**（第十五节）；前台只剩「读」「发」两件事，**没有 localStorage、没有删除按钮**。
+- **留言存在 Cloudflare Pages 函数 + KV**（第十五节）；前台只剩「读」「发」两件事，**没有 localStorage、没有删除按钮**。
 - **每页 8 条（`PER_PAGE = 8`）+ 只有 `‹ ›` 翻页**（站主要求，没有页码按钮）；`.gb-pager` 里是 `#gbPrev` / `#gbPageInfo`（`当前页 / 总页数`）/ `#gbNext`，到头就 `disabled`。
 - 每条渲染：名字 / 时间（`YYYY-MM-DD HH:MM`）/ 正文 /（有回复时）站主回复 `.gb-reply`。**不显示头像**（`.gb-ava` 与 `hash()` 已按站主要求删除）。
-- 读取：`GET (DANMAKU_API||'') + 'gb/comments.json'`（`cache:'no-store'`）；**Worker 连不上自动回落**读 Pages 上那份 `gb/comments.json`（只读，仍能看到站主后台里的留言），再失败就显示 `gbErrList` 那条文案，**不白屏**。
+- 读取：`GET API + 'gb/comments.json'`（`API = String(window.DANMAKU_API||'').replace(/\/+$/,'')`，非空时补一个结尾斜杠；`cache:'no-store'`）；**后端连不上自动回落**读 GitHub Pages 上那份 `gb/comments.json`（只读，仍能看到站主后台里的留言），再失败就显示 `gbErrList` 那条文案，**不白屏**。
 - 发送：`POST API + 'api/gb/post'`，body `{name,text}`；昵称留空由服务端存成 `Anonymous`；正文 200 字上限由 `#gbText` 的 `maxlength="200"` + 服务端双重把关。成功后**直接拿服务端返回的这条插进列表**（KV 读取最长 60 秒延迟，重读可能看不到刚发的），不重读。
 - 失败弹窗走 `window.XP.msg(标题, 文案)`：`429` → `gbErrRate`（带 `{min}` 分钟数）、`400 long` → `gbErrLong`、连不上 → `gbErrNet`。
 - 一律用 `textContent` 写入（防 XSS）；空态 `gbEmpty`、加载中 `gbLoading`；`langchange` 只重渲染、**不重新请求**；发送后回到第 1 页。
@@ -743,15 +748,15 @@ window.CONTENT = {
 
 ---
 
-## 十五、留言板后端：Cloudflare Worker + KV（已实现 + 本机自测通过 + 站主能管网友留言）
+## 十五、留言板后端：Cloudflare Pages 函数 + KV（**已部署 + 线上体检通过** + 站主能管网友留言）
 
-> 站主拍板：**留言存 Cloudflare Workers + KV**（**网站不搬家**，前台仍在 GitHub Pages）、**匿名发言**（GitHub 登录这次不做）、**直发不审核**、**不要人机验证**、**只做基本防护**、**前台去掉删除按钮**、**去掉本地 localStorage**、**两边都有同一条时以本机那份为准（见 15.8）**。第十三节是当时的方案分析（13.5 的 C 方案），13.7 那三个问题已在本节 15.1 回答。
+> 站主拍板：**留言存 Cloudflare**（**网站不搬家**，前台仍在 GitHub Pages）、**匿名发言**（GitHub 登录这次不做）、**直发不审核**、**不要人机验证**、**只做基本防护**、**前台去掉删除按钮**、**去掉本地 localStorage**、**两边都有同一条时以本机那份为准（见 15.8）**。第十三节是当时的方案分析（13.5 的 C 方案）。**部署形态在 15.4 从 Worker 换成了 Pages**：`*.workers.dev` 在国内被 DNS 污染 + TLS 阻断（实测证据见 15.5），`*.pages.dev` 实测能连。
 
 ### 15.1 站主拍板的决定（照这个做，别再改）
 
 | 问题 | 决定 |
 | --- | --- |
-| 留言存哪 | **Cloudflare Workers + KV**；GitHub Pages 继续托管网页，一个字不改 |
+| 留言存哪 | **Cloudflare Pages 函数 + KV**（原方案 Worker 弃用，原因见 15.4 / 15.5）；GitHub Pages 继续托管网页，一个字不改 |
 | 访客身份 | **匿名**：自己填昵称，留空 = `Anonymous`；**GitHub 登录这次不做**（要做必须服务端持 Client Secret，纯静态站做不到） |
 | 先审还是直发 | **直发**（写进去立刻出现在前台，没有审核队列） |
 | 人机验证 | **不要** |
@@ -764,11 +769,11 @@ window.CONTENT = {
 ### 15.2 数据流（两边各管一份，别互相假设）
 
 ```
-访客（Pages 上的 index.html）
-  │ js/guestbook.js，基址 = js/config.js 的 window.DANMAKU_API
-  ├─ 读：GET  <Worker>/gb/comments.json          → {v:1,comments:[…]}（只给没 hidden 的）
-  │       连不上 → 自动回落 GET gb/comments.json（Pages 上那份，只读，不白屏）
-  └─ 写：POST <Worker>/api/gb/post {name,text}   → {ok:true,comment}
+访客（GitHub Pages 上的 index.html）
+  │ js/guestbook.js，基址 = js/config.js 的 window.DANMAKU_API（现为 https://cupcake-gb-api.pages.dev）
+  ├─ 读：GET  <后端>/gb/comments.json           → {v:1,comments:[…]}（只给没 hidden 的）
+  │       连不上 → 自动回落 GET gb/comments.json（GitHub Pages 上那份，只读，不白屏）
+  └─ 写：POST <后端>/api/gb/post {name,text}    → {ok:true,comment}
             400 empty / 400 long / 429 rate(+retryAfter) / 500
 
 站主：admin.html（本机 3000 端口）管 gb/comments.json —— 隐藏 / 置顶 / 删除 / 三语回复
@@ -791,37 +796,52 @@ window.CONTENT = {
 | OPTIONS | 任意 | `204` + CORS（`*`） |
 
 - 常量（文件顶部 `LIMIT`）：`NAME:24` / `TEXT:200` / `IMPORTED:2000`（搬进来时保留后台写过的长正文）/ `PER_WINDOW:3` / `WINDOW_MS:600000` / `MAX:2000`。
+- 入口是 `worker/functions/[[path]].js`（Pages 函数只做接线：`onRequest(ctx) → handleRequest(ctx.request, ctx.env)`），**全部逻辑在 `worker/guestbook.mjs`**，所以本机 node 能直接 import 测。Pages 上 `/` 由 `worker/public/index.html` 静态页接管，**自检要开 `/api/gb/list`**。
 - KV 绑定名固定 **`GB_KV`**（Cloudflare 里变量名必须一模一样）。
 - 留言整份存**一个 key `gb:comments`**；限流 key `gb:rl:<IP>`（`expirationTtl:600`，不会越积越多）。
 - **两处有意的取舍**（文件里留了 `ponytail:` 注释）：① 整份存一个 key → 读-改-写，极端并发下可能丢一条；② 同一个 key 每秒只能写 1 次（Cloudflare 限制），同一秒来 4 条不同 IP 的留言，第 4 条可能写失败。个人站量级够用；真要撑住改成「一条留言一个 key」或上 Durable Object。
 
-### 15.4 站主要做的部署（六步）
+### 15.4 部署形态与现状（**已部署完成**，2026-10）
 
-1. 打开 https://dash.cloudflare.com → 左边 **Workers & Pages** → **Create application** → **Start with Hello World!** → 起个名字（比如 `cupcake-gb`）→ Deploy。（第一项「Continue with GitHub」是从代码仓库部署，我们不用；底部那行「Continue to Pages」是另一个产品，别点。）
-2. 建 KV：左边 **Storage & Databases → KV**（新版界面里可能只写 **Storage**，找不到就直接开 https://dash.cloudflare.com/?to=/:account/workers/kv/namespaces ）→ **Create instance**（名字随便，比如 `gb`）。回到这个 Worker → **Settings → Bindings**（有的界面在 **Variables and Secrets** 里）→ Add → **KV namespace**：**Variable name 必须填 `GB_KV`**，namespace 选刚建的那个 → Add binding。
-3. 同一个 Bindings 页 → Add → **Secret**（文本）：name = `GB_TOKEN`，value = 本机 `.env` 里 `GB_TOKEN=` 后面那串（**两边必须一字不差**）。
-4. Worker 页面 → **Edit code** → 把 `worker/guestbook.mjs` **全文**粘进去替换掉示例代码 → Deploy。
-5. 浏览器打开 `https://<你起的名字>.<你的账号>.workers.dev/` → 看到 `{"v":1,"comments":[]}` 就算通了（POST 用浏览器试不了，没关系）。
-6. 把这个网址（**不带结尾斜杠**）填进 `js/config.js` 的 `window.DANMAKU_API`，也填进 `.env` 的 `GB_WORKER_URL`，然后推上去。
+**用的是 Cloudflare Pages 项目 `cupcake-gb-api`，不是 Worker。** 原因：Worker 的临时域名 `*.workers.dev` 在国内被拦死（实测证据见 15.5），`*.pages.dev` 实测能连。KV 还是原来那个 namespace，数据不用搬。
 
-- **部署进度（当前）**：站主已建好 Worker → `https://cupcake-gb.cupcakeqaq.workers.dev`，网址**已填进** `js/config.js` 与 `.env` 的 `GB_WORKER_URL`；还差第 2~4 步（绑 `GB_KV`、加 Secret `GB_TOKEN`、粘代码），做完打开那个网址应看到 `{"v":1,"comments":[]}`。
-- **命名坑（已修）**：全局变量名必须写 `DANMAKU_API`。本批早先 `js/guestbook.js`、`worker/dev-server.mjs` 与 HANDOFF 里误写成 `DANAMKU_API`，和 `js/config.js` 不一致 → **填了网址也不会生效**；现已全部统一，用正则核对过四个文件。
+| 项 | 值 |
+| --- | --- |
+| 后端网址 | **`https://cupcake-gb-api.pages.dev`** |
+| 入口 | `worker/functions/[[path]].js`（只做接线）→ `worker/guestbook.mjs`（全部逻辑） |
+| 只让函数接管的路径 | `worker/public/_routes.json`：`/api/*`、`/gb/*`；`/` 返回 `worker/public/index.html` 那张静态自检页 |
+| KV 绑定 | 变量名 **`GB_KV`** → namespace `gb`（id `0727b2d9ef0b41de846e64c8b2d68e19`） |
+| Secret | **`GB_TOKEN`**（值 = 本机 `.env` 里那串，两边一字不差） |
+| 配置文件 | `worker/wrangler.toml`（`pages_build_output_dir = "public"` + KV 绑定） |
 
-- **`GB_TOKEN` 绝不能写进任何网页文件**（`js/config.js` 只放 Worker 网址）。Worker 网址公开无害，钥匙公开 = 谁都能往你留言板塞东西。
-- 两个新 .bat 写的是 **GBK 编码**（cmd 里中文才不乱码），别用编辑器「另存为 UTF-8」。
+我用的命令（在 `worker/` 目录里跑；站主这台机器上 wrangler 已登录 `cupcakeqaq@gmail.com`，不用再登录）：
+
+```
+npx --yes wrangler@latest pages project create cupcake-gb-api --production-branch main
+npx --yes wrangler@latest pages secret put GB_TOKEN --project-name=cupcake-gb-api   （值从 .env 的 GB_TOKEN 来）
+npx --yes wrangler@latest pages deploy --project-name=cupcake-gb-api --branch=main
+```
+
+**以后改了 `worker/guestbook.mjs` 要重新部署，只要再跑最后那条 `pages deploy`。**（`--branch=main` 别省：省了只会出随机预览地址，生产地址不更新。）
+
+- **旧的 Worker 还在**（`cupcake-gb.cupcakeqaq.workers.dev`，同一套逻辑的旧版本），国内连不上、没人用；它的配置 `worker/wrangler.jsonc` 已删（一个目录不能同时放 `wrangler.jsonc` 和 `wrangler.toml`）。不用管它、也不用删。
+- **自检地址**：浏览器打开 `https://cupcake-gb-api.pages.dev/api/gb/list` → 看到 `{"v":1,"comments":[]}` 就是好的（**`/` 现在是静态页，不再是接口**）。
+- **`GB_TOKEN` 绝不能写进任何网页文件**（`js/config.js` 只放网址，网址公开无害）。钥匙公开 = 谁都能往你留言板塞东西。
+- 两个 .bat 写的是 **GBK 编码**（cmd 里中文才不乱码），别用编辑器「另存为 UTF-8」。
 
 ### 15.5 免费额度与风险（诚实版，别只看「免费」）
 
-- **Workers** 免费 10 万次请求/天；**KV** 免费 读 10 万次/天、写 1000 次/天、存储 1GB、**同一个 key 每秒最多写 1 次**。
-- **最大风险：`*.workers.dev` 这个临时域名在国内时好时坏**（站主上一次就是栽在这里）。真连不上时前台会自动回落读 Pages 那份 → 留言还能看，但发不出去（会弹「连不上留言服务器」）。要彻底解决得给 Worker 绑自己的域名（需要一个托管在 Cloudflare 的域名，站主目前没有）。
+- **Pages / Workers 免费额度**：请求 10 万次/天；**KV** 免费 读 10 万次/天、写 1000 次/天、存储 1GB、**同一个 key 每秒最多写 1 次**（Pages 与 Workers 共用这套额度）。
+- **`*.workers.dev` 在国内被拦死（实测证据，2026-10，站主这台机器）**：公网 DoH 查 `cupcake-gb.cupcakeqaq.workers.dev` 真实地址是 `172.67.220.10`，本机解析出来却是 `199.59.150.39`（**DNS 污染**）；强行 `curl --resolve` 到真实 IP，TCP 连上了（1.2 秒）但 TLS 阶段直接 **`Connection was reset`**（SNI 阻断）。同一台机器实测能通：`api.cloudflare.com`（所以命令行能部署）、`github.com`、**`*.pages.dev`**（`astro-paper.pages.dev` 返回 200，本机 DNS 与真实 IP 一致）、`*.deno.dev`。→ 这就是从 Worker 换到 Pages 的原因；**以后别再回头用 workers.dev**。
 - **KV 是最终一致的**：写完之后别的地区读到，最长要 60 秒。所以「A 发的留言，B 最多 60 秒后才看到」；A 自己那条立刻显示（前台直接用了接口返回的那条，没重读）。
 - 免费额度**不需要绑卡**；Cloudflare 有时会抽查新账号做验证，真被要求绑卡就停下来告诉我。
 - **防滥用只有那两条**：有意的攻击者换 IP 可以刷；撞满 1000 次写/天，当天就没人能留言了。要真挡住得上 Cloudflare Turnstile（加验证码）——站主已明确不要，先这样。
 
 ### 15.6 本批改了什么 / 没碰什么
 
-- **新增**：`worker/guestbook.mjs`、`worker/test-guestbook.mjs`、`worker/dev-server.mjs`、`worker/import-to-kv.mjs`、`worker/pull-from-kv.mjs`、`本机试跑留言板.bat`、`推送留言到Cloudflare.bat`、`拉取云端留言.bat`。
-- **改动**：`js/guestbook.js`（重写）、`index.html`（留言板那段：`maxlength="200"` + 新提示文案）、`js/i18n.js`（`gb*` 文案：新增 `gbLoading` / `gbErrList` / `gbErrNet` / `gbErrRate` / `gbErrLong`，去掉 `gbDelete`）、`css/winxp.css`（删 `.gb-del` 两条，加 `.gb-reply` / `.gb-send:disabled`）、`js/config.js`（注释 + 填入 Worker 网址）、`js/admin.js`（`FIELDS` 表：加 4 个新 key、去掉 `gbDelete`、改掉 `gbHint` 标签里那句旧吐槽）、`.env` / `.env.example`（新增 `GB_WORKER_URL` / `GB_TOKEN`）、`.gitignore`（加 `worker/.dev-kv.json`）。
+- **新增**：`worker/guestbook.mjs`、`worker/functions/[[path]].js`、`worker/public/index.html`、`worker/public/_routes.json`、`worker/wrangler.toml`、`worker/test-guestbook.mjs`、`worker/test-live.mjs`、`worker/dev-server.mjs`、`worker/import-to-kv.mjs`、`worker/pull-from-kv.mjs`、`本机试跑留言板.bat`、`推送留言到Cloudflare.bat`、`拉取云端留言.bat`。
+- **删除**：`worker/wrangler.jsonc`（Worker 时代的配置，换成 Pages 用的 `worker/wrangler.toml`）。
+- **改动**：`js/guestbook.js`（重写：纯远端、无删除按钮、**地址统一补结尾斜杠**）、`index.html`（留言板那段：`maxlength="200"` + 新提示文案）、`js/i18n.js`（`gb*` 文案：新增 `gbLoading` / `gbErrList` / `gbErrNet` / `gbErrRate` / `gbErrLong`，去掉 `gbDelete`）、`css/winxp.css`（删 `.gb-del` 两条，加 `.gb-reply` / `.gb-send:disabled`）、`js/config.js`（注释 + 填 `https://cupcake-gb-api.pages.dev`）、`js/admin.js`（`FIELDS` 表：加 4 个新 key、去掉 `gbDelete`、改掉 `gbHint` 标签里那句旧吐槽）、`.env` / `.env.example`（**`GB_WORKER_URL` 改名 `GB_API_URL`**，值/说明都改成 Pages）、`.gitignore`（加 `worker/.dev-kv.json`、`worker/.wrangler/`）。
 - **没碰**：`server/`（后台服务端）、`admin.html`、`gb/comments.json`、`js/content.js`；**后台的留言长度上限（name 60 / text 2000）和整个后台行为一个字没变**（站主要求）。
 - ⚠ **并行改动注意**：第 9 批（第十四节）也在改 `index.html` / `js/i18n.js` / `css/style.css`。本批在这几个文件里的改动点（留言板那一段 HTML、`gb*` 文案、`.gb-*` 样式）与它不重叠，但**两个会话不要同时整文件覆盖写同一个文件**，否则会互相吞掉。
 
@@ -831,6 +851,9 @@ window.CONTENT = {
 - `node worker/dev-server.mjs`（8787）真跑一遍：`GET /api/gb/list` → `{"v":1,"comments":[]}`；空正文 → 400；正常一条 → `{"ok":true,"comment":{"id":"c-1791809642357-61ad",…}}`；中文昵称/正文经 JSON `\u` 转义发出后**原样存回**（比对 `True`）；连发三次状态码 `200,429,429`（窗口内第 3 条放行、第 4/5 条被拦）。
 - 服务返回的 `/js/guestbook.js` 含 `api/gb/post`、**不含** `gb-del`；`/` 含 `maxlength="200"` 与新提示文案。
 - **两个 .bat 端到端真跑过一遍**（本机假 KV，跑完已还原 `gb/comments.json` 与 `.env`）：访客 POST 一条 → 「拉取」报「新增 1 条」并落进 `gb/comments.json` → 在文件里给它置顶 + 回复「谢谢你来」+ 隐藏，另加一条只有本机的 → 「推送」报「新增 1 条，更新 1 条，删掉 0 条」，云端读回 `hidden=True pinned=True reply=谢谢你来` → 把那条从文件里删掉再「推送」→ 报「更新 1 条，删掉 1 条」，云端只剩另一条（**网友新发的没被误删**）。
+- **部署后线上体检**（对 `https://cupcake-gb-api.pages.dev` 真跑）：`node worker/test-live.mjs` → **16 项通过、0 失败**：探活、空正文 400、201 字 400、正常发一条 200、昵称留空 → `Anonymous`、id 形如 `c-<时间戳>-<4位hex>`、公开列表可见、`admin/list` 无钥匙 403 / 带钥匙 200、`import` 打标 200 / 无钥匙 403、以文件为准清空后真删、清理干净，**外加「前台地址拼出来能打开」那一项**。
+- **前台拼地址的坑（已修，别再犯）**：`js/config.js` 里网址不带结尾斜杠，而 `js/guestbook.js` 是 `API + 'gb/comments.json'`、`API + 'api/gb/post'` 拼的 → 会拼成 `https://cupcake-gb-api.pages.devgb/comments.json`：**永远发不出去，读还会悄悄回落成「只读」**（看着像后端挂了，其实是网址拼错）。修法：`var API = String(window.DANMAKU_API||'').replace(/\/+$/,''); if (API) API += '/';`（收尾斜杠只在这一个地方补）。`worker/test-live.mjs` 最后一项专门照抄这个逻辑去真开一次 `/gb/comments.json`，防它复发。
+- 本机 3000 端口的服务返回的 `/js/config.js` 含 `pages.dev`、`/js/guestbook.js` 含 `API += '/'`（改完确认过服务端拿到的是新文件，不是缓存）。
 
 ### 15.8 站主怎么管网友的留言（已实现：两个 .bat 对表）
 
@@ -845,12 +868,14 @@ window.CONTENT = {
 
 - 三个 .bat 都是 GBK 编码（cmd 里中文才不乱码），且都只会读 `.env` 里的网址和钥匙，不碰任何网页文件。
 
-### 15.9 下一步（等站主）
+### 15.9 下一步
 
-1. 走完 15.4 六步，把 Worker 网址给我 → 我填进 `js/config.js`（`.env` 他自己填或给我）。
-2. `gb/comments.json` 里已有的留言，双击「推送留言到Cloudflare.bat」搬一次。
-3. 之后日常：双击「拉取云端留言.bat」看网友留言 → 后台处理 → 双击「推送留言到Cloudflare.bat」同步回去（见 15.8）。
-4. GitHub 登录这次不做；将来要做必须服务端持 Client Secret，等我评估完再谈。
+1. ✅ 后端**已部署**到 `https://cupcake-gb-api.pages.dev`，线上体检 16 项全过，`js/config.js` 已填好网址。
+2. 站主自己在浏览器打开 `https://cupcake-gb-api.pages.dev/api/gb/list` 看一眼（能打开＝他这条网络没问题）；用手机流量再开一次更稳（不同运营商）。
+3. `gb/comments.json` 里已有的留言：双击「推送留言到Cloudflare.bat」搬一次（**现在文件里是空的，可以先跳过**）。
+4. 把这一批推到 GitHub（推上去前台才真的能发留言）；**注意 `git add -A` 会带上并行会话（第十四 / 十六节）未完成的改动**，要么分开提交，要么等他那边收尾。
+5. 之后日常：双击「拉取云端留言.bat」看网友留言 → 后台处理 → 双击「推送留言到Cloudflare.bat」同步回去（见 15.8）。
+6. GitHub 登录这次不做；将来要做必须服务端持 Client Secret，等我评估完再谈。
 
 ---
 
@@ -1016,4 +1041,20 @@ node --check js/player.js        # 通过（PATH 里的 node 与插件自带 nod
 | `msg.png` | `XP.msg('C:\\', "Something's wrong!")`：OK 按钮＝源码同款 80×22 平面黑细边（与 P1 一致），正文仍 897 红球 32px 硬像素 |
 | `commission.png` / `resources.png` | `.ie-page` 换成 web.jpg 星纹壁纸，中间 980px 白卡居中、**左右各透一条背景**；卡内仍是 Luna 蓝标题条 + 像素体正文 |
 
-临时探针 `_probe2.html` 与临时验图（`_next.png` 等）用完已删；`diag/shots/` 里保留 5 张正式验图供站主查看（`diag/` 已 gitignore，不进仓库）。
+临时探针 `_probe2.html` / `_probe3.html` / `_probe4.html` 与临时验图（`_next.png`、`_pz.png`）用完都已删；`diag/shots/` 里保留 8 张正式验图供站主查看（`diag/` 已 gitignore，不进仓库）。
+
+### 16.7 站主验收后的两次微调（m00815 / 比例锁）
+
+- **m00815**（微调播放器）：封面 `.wmp-screen` 148→**190px**、歌名 `.wmp-title` 15→**22px**（歌手 13px）、**删掉「1 of 12」计数**（`.wmp-count` 的 DOM / `render()` 写入 / CSS 规则全部移除，不是藏起来）；顺手把 `.wmp-hero` 改 `align-items:center`，让歌名歌手在封面旁垂直居中。
+- **m00874「比例微调一下固定这样，无论怎么缩放都不会改变比例」→ 第一版做错了**：当时只在 `.wmp` 上写死 620×340 + `transform:scale(var(--wmp-scale))`（`.wmp-body` flex 居中 + `ResizeObserver` 观察 `.win-body` 算系数），结果是**内容等比但窗口外框照旧会被拉长**，被站主 m00911 当场否掉。下面这版才是对的；`fit()` 那套（`--wmp-scale`）**留着别删**，它保证内容不超过窗口。
+- **m00874 → m00911 纠正后的最终做法**（站主 `m00911` 原话：「我是说整个窗口比例不变啊，不是内部页面比例不变」）：
+  - `css/winxp.css`：`.win.keep-ratio { aspect-ratio: var(--win-ratio); }` + `.win.keep-ratio > .win-body { min-height:0; overflow:hidden; }`（第二行必须写，否则内容的最小高度会把窗口顶高、比例锁不住）；最大化时 `.win.maximized.keep-ratio { right:auto; bottom:auto; border-radius:8px; box-shadow:3px 6px 20px rgba(0,0,0,.45) }`，因为 `.win.maximized` 原本是 `left/top/right/bottom` 全定的铺满写法，**不放掉 right/bottom 就没法只改宽度**。
+  - `js/winxp.js`：
+    - `XP.openWindow` 里建完窗口后，若 `o.ratio` 存在 → 用**实测外框**算 `--win-ratio`：`cw0 = el.offsetWidth - body.offsetWidth`、`ch0 = el.offsetHeight - body.offsetHeight`，`--win-ratio = (o.w + cw0) / (o.h + ch0)`（≈1.6738，即**站主验收时那个默认窗口的形状**），并给窗口加 `.keep-ratio` 类。比例只在建窗时算一次，之后全交给 CSS，不再做任何 chrome 加减法。
+    - `toggleMax`：`rec.ratio` 的窗口最大化＝`ow = min(视口宽-8, (视口高-30-8) * R)`、`oh = ow / R`，只写 `el.style.width`（高度由 `aspect-ratio` 自己跟）+ 居中 `left/top` + 清空 `.win-body` 的内联宽高（否则 flex 的 stretch 被内联宽度挡住、内容填不满），**不铺满屏幕**；还原时只摘 `.maximized`（**别摘 `.keep-ratio`**，那是窗口自带的身形锁）并清掉 `el.style.width`。
+    - `bindGrip`：`rec.ratio` 的窗口拖的是**外框宽度**（`el.style.width = ew + dx`）并同样清空 `.win-body` 内联宽高；非锁比例窗口保持原来的「宽高各拖各的」。
+    - `XP.launch` 透传 `ratio: app.ratio`；rec 上存 `ratio` 与 `baseW/baseH`。
+  - `js/player.js`：注册改成 `XP.register({ …, w:620, h:340, ratio: 620 / 340, … })`（`ratio` 只是「要锁身形」的开关 + 设计比例，实际锁的是外框）。
+  - `.wmp` 上的 `fit()`（`min(body.clientWidth/620, body.clientHeight/340)`）保留：外框锁死后内容区比例会有几 px 偏差，`fit()` 保证内容永远不超过窗口（留一点 Aero 渐变边，肉眼无感）。
+  - 证据（`--window-size=1400,1000`，`getBoundingClientRect()` 实测）：常态 626×374＝**1.6738**、拖握把 +300/+40 后 926×553.2＝**1.6738**、最大化 1366×816.1＝**1.6738** —— 三个尺寸外框比例完全一致；`diag/shots/music.png` / `music-max.png` 两张图肉眼同形（最大化不再铺满，四周留桌面）。
+

@@ -113,6 +113,7 @@
       icon: app.icon,
       w: app.w || 420,
       h: app.h || 320,
+      ratio: app.ratio,   /* 锁比例的窗口（播放器）：拖右下角握把、最大化都按这个比例缩放（站主 m00911） */
       build: app.build
     });
   };
@@ -121,7 +122,7 @@
   function bodyOf(rec) { return rec.el.querySelector('.win-body'); }
 
   XP.openWindow = function (o) {
-    var rec = { key: o.key, title: o.title, icon: o.icon, min: false, floating: true, ph: null };
+    var rec = { key: o.key, title: o.title, icon: o.icon, min: false, floating: true, ph: null, ratio: o.ratio || 0, baseW: o.w, baseH: o.h };
     var el = mk('div', 'win floating');
     el.style.left = o.x != null ? o.x + 'px' : Math.max(12, Math.round((window.innerWidth - o.w) / 2) + (Math.random() * 40 - 20)) + 'px';
     el.style.top = o.y != null ? o.y + 'px' : (52 + Math.round(Math.random() * 48)) + 'px';
@@ -144,6 +145,14 @@
     rec.el = el;
     rec.body = body;
     XP.layer.appendChild(el);
+    if (o.ratio) {
+      /* 锁比例的窗口（播放器）：把「外框」比例写进 --win-ratio，之后靠 CSS 的
+         aspect-ratio 保证形状恒定（拖握把 / 最大化都只改外框宽度，高自动跟）。
+         站主 m00911：整个窗口比例不变 —— 注意锁的是外框，不是里面的内容区。 */
+      var cw0 = el.offsetWidth - body.offsetWidth, ch0 = el.offsetHeight - body.offsetHeight;
+      el.style.setProperty('--win-ratio', ((o.w + cw0) / (o.h + ch0)).toFixed(5));
+      el.classList.add('keep-ratio');
+    }
     XP.wins.push(rec);
     bindWindow(rec);
     addTask(rec);
@@ -247,7 +256,8 @@
     var b = bodyOf(rec);
     if (rec.maxed) {
       rec.maxed = false;
-      rec.el.classList.remove('maximized');
+      rec.el.classList.remove('maximized');   /* keep-ratio 是窗口自带的身形锁，别摘 */
+      rec.el.style.width = '';
       b.style.width = rec.prevW || '';
       b.style.height = rec.prevH || '';
       if (rec.prevFloating) {
@@ -262,9 +272,22 @@
       rec.prevL = rec.el.style.left; rec.prevT = rec.el.style.top;
       if (!rec.floating) toFloat(rec);
       rec.maxed = true;
-      rec.el.classList.add('maximized');
-      b.style.width = ''; b.style.height = '';
-      rec.el.style.left = ''; rec.el.style.top = '';
+      if (rec.ratio) {
+        /* 锁比例的窗口：最大化＝「能放下的最大同形状窗口」并居中，不铺满屏幕。
+           只写外框宽度，高度交给 CSS 的 aspect-ratio（站主 m00911：整个窗口比例不变）。 */
+        var vw = window.innerWidth - 8, vh = window.innerHeight - 30 - 8;
+        var R = parseFloat(rec.el.style.getPropertyValue('--win-ratio')) || 1;
+        var ow = Math.max(240, Math.min(vw, vh * R));
+        rec.el.classList.add('maximized', 'keep-ratio');
+        rec.el.style.width = Math.round(ow) + 'px';
+        b.style.width = ''; b.style.height = '';
+        rec.el.style.left = Math.round((window.innerWidth - ow) / 2) + 'px';
+        rec.el.style.top = Math.round((window.innerHeight - 30 - ow / R) / 2) + 'px';
+      } else {
+        rec.el.classList.add('maximized');
+        b.style.width = ''; b.style.height = '';
+        rec.el.style.left = ''; rec.el.style.top = '';
+      }
       rec.el.style.zIndex = (XP.zTop = XP.zTop >= 68 ? 50 : XP.zTop + 1);
     }
     if (rec.maxBtn) rec.maxBtn.classList.toggle('restore', !!rec.maxed);
@@ -278,7 +301,7 @@
     var g = mk('div', 'win-grip');
     rec.el.appendChild(g);
     rec.grip = g;
-    var sizing = false, sx = 0, sy = 0, w0 = 0, h0 = 0;
+    var sizing = false, sx = 0, sy = 0, w0 = 0, h0 = 0, ew = 0;
     g.addEventListener('pointerdown', function (e) {
       if (e.button !== 0) return;
       focusWin(rec);
@@ -288,6 +311,7 @@
       sizing = true;
       sx = e.clientX; sy = e.clientY;
       w0 = b.offsetWidth; h0 = b.offsetHeight;
+      ew = rec.el.offsetWidth;   /* 锁比例的窗口拖的是外框宽度 */
       try { g.setPointerCapture(e.pointerId); } catch (err) {}
       e.preventDefault();
       e.stopPropagation();
@@ -295,7 +319,16 @@
     g.addEventListener('pointermove', function (e) {
       if (!sizing) return;
       var b = bodyOf(rec);
-      b.style.width = Math.max(190, w0 + e.clientX - sx) + 'px';
+      if (rec.ratio) {
+        /* 锁比例的窗口：拖的是**外框**宽度，高度由 CSS 的 aspect-ratio 自己跟，
+           所以拖哪个方向窗口形状都不变（站主 m00911）。
+           内容区必须清掉内联宽高，否则 flex 的 stretch 被内联宽度挡住、填不满窗口。 */
+        rec.el.style.width = Math.max(240, ew + e.clientX - sx) + 'px';
+        b.style.width = ''; b.style.height = '';
+        return;
+      }
+      var bw = Math.max(190, w0 + e.clientX - sx);
+      b.style.width = bw + 'px';
       b.style.height = Math.max(110, h0 + e.clientY - sy) + 'px';
     });
     function end(e) {

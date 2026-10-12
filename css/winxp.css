@@ -68,6 +68,22 @@
 .win.maximized > .win-body { border-radius: 0; }
 .win.maximized > .win-grip { display: none; }
 
+/* 锁比例的窗口（“身形锁”，播放器用）：外框比例交给 aspect-ratio，JS 只改外框宽度。
+   --win-ratio 由 XP.openWindow 按设计尺寸实测外框算出来（含边框 + 标题栏）。
+   站主 m00911：整个窗口比例不变 —— 锁的是外框，不是里面的内容区。 */
+.win.keep-ratio { aspect-ratio: var(--win-ratio); }
+.win.keep-ratio > .win-body { min-height: 0; overflow: hidden; }
+
+/* 锁比例窗口最大化：只放大到「同形状的最大尺寸」并居中，不铺满
+   —— 左右/下边要放掉，宽度由 JS 写进内联 style */
+.win.maximized.keep-ratio {
+  right: auto;
+  bottom: auto;
+  border-radius: 8px;
+  box-shadow: 3px 6px 20px rgba(0, 0, 0, .45);
+}
+.win.maximized.keep-ratio > .win-body { border-radius: 8px; }
+
 /* 右下角缩放握把（XP 状态栏那种斜排小点） */
 .win-grip {
   position: absolute;

@@ -1,0 +1,10 @@
+# Cloudflare Pages 项目配置（部署留言板后端用）
+# 用法：在 worker/ 目录里跑 `npx wrangler pages deploy`（首次要先建项目，见 HANDOFF.md 第十五节）
+# 这里没有钥匙：GB_TOKEN 放在 Cloudflare 的 Secret 里，不在本文件。
+name = "cupcake-gb-api"
+compatibility_date = "2026-10-12"
+pages_build_output_dir = "public"
+
+[[kv_namespaces]]
+binding = "GB_KV"
+id = "0727b2d9ef0b41de846e64c8b2d68e19"

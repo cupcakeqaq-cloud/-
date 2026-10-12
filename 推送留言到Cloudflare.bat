@@ -20,9 +20,9 @@ exit /b 1
 
 :found
 
-echo 把 gb\comments.json 同步到 Cloudflare（以你本机这份为准）。
+echo 把 gb\comments.json 同步到 Cloudflare 云端（以你本机这份为准）。
 echo 你在后台隐藏 / 置顶 / 回复 / 删除的都会生效；网友刚发的不受影响。
-echo Worker 地址和钥匙读的是 .env 里的 GB_WORKER_URL / GB_TOKEN。
+echo 后端地址和钥匙读的是 .env 里的 GB_API_URL / GB_TOKEN。
 echo.
 "%NODE%" worker\import-to-kv.mjs
 echo.
