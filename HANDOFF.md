@@ -117,7 +117,7 @@ E:\自介网页
 
 - 窗口：`.win`（3px 外框 + 8px 上圆角 + flex 列）、`.win.blur`、`.win.floating`（position:fixed）、`.win.minimized`、`.win.closed`（页面窗口关掉=藏起来，DOM 还在，可复原）、`.win-placeholder`（占位用，**已设成完全不可见**）、`.win.maximized`、`.win-grip`（右下角缩放手柄）、`.titlebar`、`.tb-icon`、`.tb-title`、`.tb-btns`、`.tb-min`、`.tb-max`（`.restore` 变还原图标）、`.tb-close`、`.win-body`、`.win-body.flush`
 - 整页固定浏览器窗（委托/资源页）：`.win.browser-fixed`、`.ie-home`、`.ie-back`、`.ie-back-txt`、`.ie-addr`、`.ie-page`、`.ie-wrap`
-- 委托页两栏：`.ie-cols`（`302px + 1fr`）、`.cm-side`（左栏，`position:sticky`）、`.cm-panel`；右侧卡片：`.cm-card`、`.cm-card-no`、`.cm-card-price`、`.cm-card-desc`、`.cm-card-shots`、`.cm-shots-hint`、`.cm-sec`、`.cm-contact`
+- 委托页两栏：`.ie-cols`（`302px + 1fr`）、`.cm-side`（左栏，`position:sticky`）、`.cm-panel`；右侧卡片：`.cm-card`、`.cm-card-no`、`.cm-card-price`、`.cm-card-desc`、`.cm-card-shots`、`.cm-sec`、`.cm-contact`
 - 例图预设比例（**由 JS 按图片自然宽高比自动打 class，不要写死比例字段**）：`.cm-card-shots img` 默认 3:4、`img.ratio-sq` = 1:1、`img.ratio-land` = 4:3；都是 `object-fit:cover` + `object-position:top center`
 - 资源页：`.rs-item`、`.rs-info`、`.rs-name`、`.rs-size`、`.rs-dl`
 - 桌面快捷方式：`.desktop`（宽 78px、`gap:6px`，1180px 以下隐藏）、`.desk-icon`、`.desk-icon.sel`
@@ -224,7 +224,7 @@ body[data-page=...]
 - `.ie-home` = 浏览器式工具条：`.ie-back#ieBack`（`back.png` 图标按钮，点了 `history.back()`，没历史就回主页）+ `.ie-back-txt#ieHome`「← 返回主页」（**占据原 forward 的位置**，没有 forward）+ `Address` + `#ieAddr`（只读，显示当前 URL）。
 - 正文 `.ie-page`（背景 `#ebe0cb` 暖色）整页可滚动，`.ie-wrap` 内是 `.ie-cols` 两栏：
   - 左 `.cm-side`（`position:sticky`）三个 `.cm-panel`：受理状态（`.cm-open` + `.cm-status-note`，**绿呼吸灯 `.cm-dot` 已按站主要求删除**）/ 委托申请方式（`.cm-steps` 三条，紧凑不分模块）/ 联系方式（`.cm-contact` 五个外链）。
-  - 右 `.cm-cards` 四张 `.cm-card`，每张按站主参考图版式：标题、`.cm-card-price`（大号蓝字，**值来自 i18n 的 `cmCard1Price~cmCard3Price`，按语言换算货币**）、两行说明、下面三张等宽例图（点开原图）。末尾 `.note-box`（价目备注）+ `.cm-shots-hint`。
+  - 右 `.cm-cards` 四张 `.cm-card`，每张按站主参考图版式：标题、`.cm-card-price`（大号蓝字，**值来自 i18n 的 `cmCard1Price~cmCard3Price`，按语言换算货币**）、两行说明、下面三张等宽例图（点开原图）。末尾 `.note-box`（价目备注）。**`<p class="cm-shots-hint">`「点击例图可在新标签查看原图」这条提示站主后来说去掉，四处一起清了：`commission.html`、`js/i18n.js` 的 key、`css/winxp.css` 的规则、`js/admin.js` 文案表的 `['cmShotsHint', '委托页', '例图下方提示']`。**
 - 四档：01 白底头像 ¥320-520 / 02 半身插画 ¥600-900 / 03 全身插画 ¥1000-1500 / 04 场景·多人（私信议价）。**01 是站主的真实价，02~04 是我编的占位，等站主改。**
 - 例图是**手工挑选硬编码**在 HTML 里的（01=插画53/57/54、02=插画34-RE/47-2/56、03=插画35/67/59、04=插画31/37/62）。换图直接改 HTML 的 `<img src="picture/...">`。
 - 例图比例由 `js/winxp.js` 的 `boot()` 按 `naturalWidth/Height` 自动打 `.ratio-sq` / `.ratio-land`（**为将来接后端编辑器留的后路：不要在 HTML 里写死比例字段**）。

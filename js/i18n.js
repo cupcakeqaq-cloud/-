@@ -119,7 +119,6 @@
       ja: '料金とスケジュールを確認し、着手金をお支払いいただいてからラフ→着色→完成へ進みます。',
       en: 'After confirming the quote and schedule, pay the deposit; then sketch → color → final delivery.'
     },
-    cmShotsHint: { zh: '点击例图可在新标签查看原图', ja: '画像をクリックすると原寸で開きます', en: 'Click a sample to open the full image' },
 
     /* ---------- 委托页卡片（01 白底头像用的是站长米画师实价，02-04 为占位）
        价位按语言换算当地货币，汇率基准写在这里，改汇率就改这三对数字：

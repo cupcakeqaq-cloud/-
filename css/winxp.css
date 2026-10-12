@@ -1029,7 +1029,6 @@ body.grayed #winLayer { pointer-events: none; }
   object-position: top center; cursor: zoom-in;
 }
 .cm-card-shots img:hover { opacity: .92; }
-.cm-shots-hint { font-size: 12px; color: #767676; text-align: center; margin: -6px 0 18px; }
 .cm-sec {
   background: #fff; border: 2px solid; border-color: #fff #b9b9b9 #b9b9b9 #fff;
   border-radius: 6px; padding: 16px 18px; margin-bottom: 18px;
