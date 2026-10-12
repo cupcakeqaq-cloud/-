@@ -61,17 +61,26 @@ const withTok = await call('/api/gb/admin/list', 'GET', undefined, { 'x-gb-token
 ok('admin/list 带钥匙返回 200', withTok.status === 200, 'status=' + withTok.status);
 ok('admin/list 里能看到那条', (withTok.json?.comments || []).some((x) => x.id === c?.id));
 
-const imp1 = await call('/api/gb/import', 'POST', { v: 1, comments: [c] }, { 'x-gb-token': TOKEN });
+/* 体检自己发的那条最后要删掉，但**绝不能踩到站主真实的留言**：
+   先把云端现有的（不含测试那条）快照下来，测完整套流程后原样推回去。 */
+const others = (withTok.json?.comments || []).filter((x) => x.id !== c?.id);
+console.log('  · 站主云端现有 ' + others.length + ' 条真实留言，本次体检会原样保留');
+
+const imp1 = await call('/api/gb/import', 'POST', { v: 1, comments: [c].concat(others) }, { 'x-gb-token': TOKEN });
 ok('import 打标记（200）', imp1.status === 200, 'status=' + imp1.status + ' ' + imp1.text.slice(0, 120));
 
 const bad = await call('/api/gb/import', 'POST', { v: 1, comments: [] });
 ok('import 没钥匙被拒（403）', bad.status === 403, 'status=' + bad.status);
 
-const imp2 = await call('/api/gb/import', 'POST', { v: 1, comments: [] }, { 'x-gb-token': TOKEN });
-ok('以文件为准：清空后那条被删', imp2.status === 200 && (imp2.json?.deleted ?? 0) >= 1, imp2.text.slice(0, 120));
+/* 站主 2026-10 报的 bug 就是这条：网友发的 →「拉取」（= 上面 imp1 那次打标记）→ 后台删掉 → 再「推送」。
+   推送时云端必须真删，不能当成「网友刚发的」留下来。 */
+const imp2 = await call('/api/gb/import', 'POST', { v: 1, comments: others }, { 'x-gb-token': TOKEN });
+ok('站主流程：拉取打标记 → 后台删 → 推送 → 云端真删了', imp2.status === 200 && (imp2.json?.deleted ?? 0) >= 1, imp2.text.slice(0, 120));
 
-const final = await call('/api/gb/list');
-ok('清理干净：列表已空', (final.json?.comments || []).length === 0, '剩 ' + (final.json?.comments || []).length + ' 条');
+const after = await call('/api/gb/admin/list', 'GET', undefined, { 'x-gb-token': TOKEN });
+const left = after.json?.comments || [];
+ok('测试那条已经不在云端了', !left.some((x) => x.id === c?.id));
+ok('站主的留言一条没少（' + others.length + ' 条）', others.every((o) => left.some((x) => x.id === o.id)), '云端现在 ' + left.length + ' 条');
 
 /* 前台拼地址的方式也要对一遍：js/config.js 里填的地址 + 'gb/comments.json' 必须真能打开。
    这里故意照抄 js/guestbook.js 的收尾斜杠逻辑 —— 以前就踩过「填了网址但不生效」这个坑。 */

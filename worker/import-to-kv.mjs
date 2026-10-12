@@ -51,6 +51,26 @@ const comments = Array.isArray(doc.comments) ? doc.comments : [];
 console.log('本地 gb/comments.json 里共 ' + comments.length + ' 条，开始往 Cloudflare 搬…');
 console.log('  服务器：' + url);
 
+/* 防手滑：本机那份空了、云端却还有留言 —— 这一推会把云端全清掉，先拦一下。
+   （文件被 git 还原成空的、或者忘了先「拉取云端留言」都会走到这里。）
+   确实要把留言全清掉：给脚本加 --force，见 HANDOFF 15.8。 */
+if (!comments.length && !process.argv.includes('--force')) {
+  try {
+    const res = await fetch(url + '/api/gb/admin/list', { headers: { 'x-gb-token': token } });
+    const b = await res.json().catch(() => ({}));
+    const n = Array.isArray(b.comments) ? b.comments.length : 0;
+    if (n > 0) {
+      console.log('拦住了：本机 gb/comments.json 里一条留言都没有，云端却有 ' + n + ' 条，这一推会把云端清空。');
+      console.log('多半是文件被 git 还原空了，或者你还没「拉取云端留言」。');
+      console.log('先双击「拉取云端留言.bat」把云端的留言拉回来再改。');
+      console.log('确实要把云端清空（比如删掉最后一条）：等下会问你一句，按 Y 就行。');
+      process.exit(9);
+    }
+  } catch (e) {
+    console.log('（没能先问云端现有几条：' + e.message + '，继续按原样推送）');
+  }
+}
+
 try {
   const res = await fetch(url + '/api/gb/import', {
     method: 'POST',

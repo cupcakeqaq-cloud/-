@@ -854,6 +854,9 @@ npx --yes wrangler@latest pages deploy --project-name=cupcake-gb-api --branch=ma
 - **部署后线上体检**（对 `https://cupcake-gb-api.pages.dev` 真跑）：`node worker/test-live.mjs` → **16 项通过、0 失败**：探活、空正文 400、201 字 400、正常发一条 200、昵称留空 → `Anonymous`、id 形如 `c-<时间戳>-<4位hex>`、公开列表可见、`admin/list` 无钥匙 403 / 带钥匙 200、`import` 打标 200 / 无钥匙 403、以文件为准清空后真删、清理干净，**外加「前台地址拼出来能打开」那一项**。
 - **前台拼地址的坑（已修，别再犯）**：`js/config.js` 里网址不带结尾斜杠，而 `js/guestbook.js` 是 `API + 'gb/comments.json'`、`API + 'api/gb/post'` 拼的 → 会拼成 `https://cupcake-gb-api.pages.devgb/comments.json`：**永远发不出去，读还会悄悄回落成「只读」**（看着像后端挂了，其实是网址拼错）。修法：`var API = String(window.DANMAKU_API||'').replace(/\/+$/,''); if (API) API += '/';`（收尾斜杠只在这一个地方补）。`worker/test-live.mjs` 最后一项专门照抄这个逻辑去真开一次 `/gb/comments.json`，防它复发。
 - 本机 3000 端口的服务返回的 `/js/config.js` 含 `pages.dev`、`/js/guestbook.js` 含 `API += '/'`（改完确认过服务端拿到的是新文件，不是缓存）。
+- **修「后台删不掉留言」这个 bug（2026-10，站主报的，原因见 15.8）改完重跑**：`node worker/test-guestbook.mjs` → **21 项全过**；`node worker/test-live.mjs` → **17 项通过、0 失败**，其中新增一项「站主流程：拉取打标记 → 后台删 → 推送 → 云端真删了」；体检现在会**先快照云端已有留言再测、测完原样保留**（报「站主云端现有 N 条真实留言，本次体检会原样保留」），不会再误删站主的留言。
+- **两个脚本连线上真跑一遍（不是假 KV）**：访客 POST 一条 → 双击「拉取」报「新增 2 条」并且**顺手给云端打了标记** → 在 `gb/comments.json` 里删掉测试那条 → 「推送」报「更新 1 条，删掉 1 条」，云端只剩站主那条 → 再把站主那条也删掉 → 「推送」被防手滑拦下（退出码 9）→ 弹 Y/N 问句按 **Y**（＝`--force`）→ 报「删掉 1 条」，云端清空。**站主那条测试评论就是这样删掉的。**
+- **.bat 编码的坑（踩过，别再踩）**：用 PowerShell here-string 往 .bat 里插内容，插进去的是 **LF 换行**，而 .bat 其余部分是 CRLF → cmd 解析 `if errorlevel 9 (` 这类块会散架（报 `'rlevel' is not recognized`）。**写完必须把裸 LF 全部换成 CRLF，再以 GBK（codepage 936）存回**。
 
 ### 15.8 站主怎么管网友的留言（已实现：两个 .bat 对表）
 
@@ -865,6 +868,8 @@ npx --yes wrangler@latest pages deploy --project-name=cupcake-gb-api --branch=ma
 
 - 「站主删掉的」和「网友新发的」靠内部标记区分：推送过的都打 `synced:true`，推送时**本机没有 + 打过标** = 他删的 → 真删；**没有标** = 网友新发的 → 留着。这个标记只存在 KV 里，两个接口都会剥掉（前台和「拉取」都看不到）。
 - 顺序很重要：**先拉取 → 再改 → 再推送**。只推送不拉取不会丢留言（网友新发的会被当成「新发的」保留），但站主在后台就看不到那些新留言，得先拉一次。
+- **踩过的坑：站主 2026-10 报的「后台删不掉留言」**。以前「拉取」只写本机文件、**不告诉云端**，所以网友那条从来没被打过标记；站主拉取后在后台把它删掉、再推送时，云端只看到「这条我没见过」→ 当成网友新发的留下来 → 表现就是**删不掉**。修法：**「拉取」写完文件后立刻把同一份 POST 给 `/api/gb/import`**，把这批留言都打上标记（`worker/pull-from-kv.mjs` 末段；失败会明确提示「重新拉一次」）。**没改 `worker/guestbook.mjs`，所以线上函数不用重新部署**，只改了本机两个脚本。
+- **防手滑**：`gb/comments.json` 为空、云端却还有留言时，「推送」会先拦一下（`worker/import-to-kv.mjs` 退出码 9），防止文件被 git 还原成空的之后一推就把云端清空；**确实要清空**（比如删掉最后一条）就在 .bat 弹出的问句里按 **Y**（等于 `--force`）。
 
 - **仓库变重了（推之前先知道）**：2026-10 这次推送要上传 **101.7 MB**（新对象 96 个），站主这台机器的 Wi-Fi 上传只有约 100 KB/s，**推了 25 分钟才完**（`git push` 期间一直没输出，看着像卡死，其实在传）。这些重量来自 `music/*.mp3`（每首约 10 MB）和 `picture/*.png`（几张 10~17 MB）、`voice dl/萌兰露v1.0.0-beta.zip`（34 MB）——是并行会话和后台「保存 + 提交并推送」`git add -A` 一起带进来的。**以后要加大文件走 Releases，别直接提交进仓库**（HANDOFF 里早有一条同样的提醒）；查「这次要上传多少」可以用 `git rev-list --objects origin/main..HEAD` 配合 `git cat-file --batch-check` 把 blob 大小加起来。
 - 三个 .bat 都是 GBK 编码（cmd 里中文才不乱码），且都只会读 `.env` 里的网址和钥匙，不碰任何网页文件。
@@ -877,6 +882,7 @@ npx --yes wrangler@latest pages deploy --project-name=cupcake-gb-api --branch=ma
 4. ✅ **已推到 GitHub**：`6784623..a27753e main -> main`（站主拍板「所有工程，包括另外一个会话做的网页调整全都推上去」，所以这一个提交里也含第十四 / 十六节的东西）。推完 75 秒后线上已生效：`.../js/config.js` 里是 `window.DANAMKU_API = 'https://cupcake-gb-api.pages.dev'`，`.../js/guestbook.js` 是新的远端版（含 `API += '/'`）。**留言板现在线上就能用了。**
 5. 之后日常：双击「拉取云端留言.bat」看网友留言 → 后台处理 → 双击「推送留言到Cloudflare.bat」同步回去（见 15.8）。
 6. GitHub 登录这次不做；将来要做必须服务端持 Client Secret，等我评估完再谈。
+7. 2026-10 修了站主报的「后台删不掉留言」（原因与改法见 15.8）：改的是**本机两个脚本**，`worker/guestbook.mjs` 一个字没动，**线上函数不用重新部署**。本次提交 `fb95a7a`。
 
 ---
 

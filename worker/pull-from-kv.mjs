@@ -4,6 +4,8 @@
    规矩（不会丢东西）：
      · 同一个 id 两边都有 → 以你本机这份为准（你还没推送的改动不会被云端覆盖掉）
      · 云端多出来的（网友新发的）→ 追加进来
+     · 拉完顺手告诉云端「这些都在你本机那份里了」——没有这一步，你在后台把某条删掉再推送时，
+       云端会以为那是网友刚发的、不肯删（站主 2026-10 踩过这个坑，见 HANDOFF 15.8）
 
    不用手敲命令：双击根目录的「拉取云端留言.bat」。
    需要的两个值写在 .env 里（不会进仓库）：
@@ -81,6 +83,23 @@ console.log(fresh.length
   ? '拉回来了：新增 ' + fresh.length + ' 条（网友发的），本机原有的 ' + local.length + ' 条没动。'
   : '云端没有新留言，什么都没变。');
 console.log('现在 gb/comments.json 共 ' + next.comments.length + ' 条。');
+
+/* 把「这些留言已经在你本机那份里了」同步回云端（Worker 会给它们打 synced 标记）。
+   Worker 就是靠这个标记区分「你在后台删掉的」和「网友刚发的」：
+   少了这一步，你删掉某条再推送，云端会当成网友新发的而留下它 —— 这就是删不掉的原因。 */
+try {
+  const res = await fetch(url + '/api/gb/import', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-gb-token': token },
+    body: JSON.stringify(next)
+  });
+  const b = await res.json().catch(() => ({}));
+  if (!res.ok || !b.ok) throw new Error('HTTP ' + res.status + ' ' + (b.error || ''));
+  console.log('已告诉云端：这 ' + next.comments.length + ' 条都在你本机那份里了（之后你在后台删掉它们，推送时会真的删）。');
+} catch (e) {
+  console.log('注意：这次没能把「已拉取」这个标记同步回云端（' + e.message + '）。');
+  console.log('      这样你在后台删掉留言后可能推送不掉，重新双击一次「拉取云端留言.bat」再试。');
+}
 console.log('');
 console.log('接下来：双击「启动后台.bat」，在 留言板 页面隐藏 / 置顶 / 回复 / 删除，');
 console.log('        改完再双击「推送留言到Cloudflare.bat」，把改动同步回云端。');

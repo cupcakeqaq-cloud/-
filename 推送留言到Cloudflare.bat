@@ -25,6 +25,14 @@ echo 你在后台隐藏 / 置顶 / 回复 / 删除的都会生效；网友刚发的不受影响。
 echo 后端地址和钥匙读的是 .env 里的 GB_API_URL / GB_TOKEN。
 echo.
 "%NODE%" worker\import-to-kv.mjs
+if errorlevel 9 (
+  echo.
+  choice /c yn /n /m "要把云端留言全清空吗？(Y = 清空 / N = 算了) "
+  if errorlevel 2 goto done
+  echo.
+  "%NODE%" worker\import-to-kv.mjs --force
+)
+:done
 echo.
 echo 按任意键关窗口。
 pause >nul
