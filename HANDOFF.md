@@ -1156,7 +1156,14 @@ window.BLOG_DRAFTS = [ /* 同形状 */ ];
 3. 端到端（真起服务器、真走 HTTP，脚本 `diag/bl-e2e.js`）：登录拿会话 → `POST /api/upload` 传图 → `POST /api/blog` 写 3 篇（1 篇置顶、1 篇含 `.bl-row` 并排图＋居中图＋引用、1 篇草稿）→ `GET /api/state` 读回 `posts=3 drafts=1 置顶=1 标签=["公告","置顶"]`，并排的 `class="bl-row"` 原样保住 → 再 `--reset` 清空并删掉测试图。**交出去的仓库是干净的：`blog/posts.js`、`blog/drafts.js` 都是空数组，`uploads/` 里没有测试图。**
 4. 静态自检（脚本 `diag/bl-check.js`，20 项全过）：132 个文案 key 三语齐全；5 个 HTML 里 90 处 `data-i18n` 都有对应 key；`js/blog.js`＋`js/admin.js` 里 12 个 `t()` key 存在；`FIELDS` 里 131 个 key 全存在；HTML 引用的本地文件全部存在；`blog.html`/`index.html` 都没引草稿；`js/blog.js` 用的 8 个元素 id 在页面上都存在；排序结果 `cba`、`blogRecent(2)`＝`cb`。
 
-**没做到的验证（这条要说清楚）**：这台机器的当前沙箱**不让拉无头浏览器**——`msedge --headless` 被拒（crashpad `OpenProcess: 拒绝访问 (0x5)`），`Start-Process` 直接 `Access is denied`，加了 `danger-full-access` 重试也一样，一张截图都没写出来。所以**视觉排版没有截图验收过**，只有上面这些文件级／DOM 契约级检查。站主自己开 `http://127.0.0.1:3000/index.html`、`http://127.0.0.1:3000/blog.html`、`/admin/` 扫一眼即可。
+**视觉验收（一开始做不到，后来做到了）**：早期沙箱不让拉无头浏览器 —— `msedge --headless` 被拒（crashpad `OpenProcess: 拒绝访问 (0x5)`），`Start-Process` 直接 `Access is denied`，一张截图都没写出来，所以第一轮只有文件级／DOM 契约级检查。**会话后半段沙箱策略改成 danger-full-access 之后截图跑通了**，用第 7 节那个无头 Edge 配方（`--headless=new --hide-scrollbars --virtual-time-budget=7000 --window-size=1400,1000`），截图只放 `diag/shots/`（已 gitignore，自己看，不给站主导出）：
+
+- `diag/shots/bl-list.png`：博客列表页（3 篇示例）—— 标签计数、按月归档、「最近更新」、日期／置顶／标签徽章、摘要与「阅读全文」全部对位。
+- `diag/shots/bl-post1.png`：文章页 —— 正文排版（H2/H3、列表、引用、行内 `code`／`pre`）、`figure.bl-figure.bl-mid` 单图居中＋图注、`.bl-row` 两张并排，都对；`.ie-page` 内部滚动、窗口固定不动。
+- `diag/shots/bl-index.png`：主页 —— 主栏两行（委托＋资源 ／ 留言板整行）、留言板拿回高度、侧栏「自介撑满 ＋ 博客入口贴底」。
+- 空状态（0 篇）也截过：`blog.html` 与入口窗都显示「还没有文章…第一篇正在酝酿中♡」。
+
+站主仍建议自己开 `http://127.0.0.1:3000/index.html`、`/blog.html`、`/admin/` 扫一眼（我的截图是 1400×1000 这一种窗口尺寸）。
 
 ### 17.6 如果站主觉得不合适，最省事的两个改动
 
@@ -1206,7 +1213,22 @@ window.BLOG_DRAFTS = [ /* 同形状 */ ];
 
 **验证**：`node diag/bl-check.js` 20 项里 19 项过（唯一没过的仍是「`blog/posts.js` 现在有 3 篇示例」那条故意的，见 17.9）；元素 id 契约检查通过。视觉请站主刷新确认（沙箱开不了无头浏览器，见 17.4 末段）。
 
-### 17.9 临时给站主看效果的 3 篇示例文章（**还没删**）
+### 17.9 临时给站主看效果的 3 篇示例文章（已按站主选择删掉）
 
-`diag/bl-seed.js`（临时脚本，`diag/` 已 gitignore）：`node diag/bl-seed.js` 往 `blog/posts.js` 写 3 篇示例（置顶 ＋ 全格式 ＋ 无摘要 ＋ 标签），`node diag/bl-seed.js --reset` 一条命令删光。**站主看完前不要在后台「提交」页推送**，否则示例会跟着上线。删掉后 `diag/bl-check.js` 的第 20 项自动变绿。
+`diag/bl-seed.js`（临时脚本，`diag/` 已 gitignore）：`node diag/bl-seed.js` 往 `blog/posts.js` 写 3 篇示例（置顶 ＋ 全格式 ＋ 无摘要 ＋ 标签），`node diag/bl-seed.js --reset` 一条命令删光 —— **本地想再看排版随时能再塞回来**。站主选「先删掉 3 篇示例再推」后已执行 `--reset`：`blog/posts.js`／`blog/drafts.js` 都是 0 篇，`node diag/bl-check.js` **20 项全绿**（之前没过的第 20 项就是这条）。
+
+### 17.10 推送到 GitHub（本轮）
+
+站主原话：「**先直接把更新推到GitHub上吧**」。
+
+- 提交 `c3c67a4`：`个人博客：新增前台 blog.html（列表/文章/标签/月归档/搜索）与后台「博客」页签（富文本、草稿、插图压缩）+ 主页侧栏入口`，14 个文件、+1162 / −16；`5ff2b71..c3c67a4  main -> main`，本地与远端已同步。
+- 用命令行 git 推（exe 路径见第 8 节）。**`blog/drafts.js` 没上线**（`.gitignore:2` 挡住，`git check-ignore -v blog/drafts.js` 验证过）；`diag/` 也没进仓库；没有 music／voice dl 之类大文件被顺带加上。
+- **坑 1（以后推送必看）**：git 全局配了 `http.proxy = http://127.0.0.1:7897`。站主的代理软件没开时，`git push` 直接报 `Failed to connect to github.com port 443 via 127.0.0.1`。绕过办法：`git -c http.proxy= push origin main`（本轮就是这么推上去的；直连需要沙箱外，见坑 2）。
+- **坑 2（本会话特有，不是站主环境的问题）**：我这轮起的后台服务器跑在沙箱里，后台自己的 git 调用拿不到输出 —— `/api/state` 回 `{"ok":false,"error":"调用 git 失败：spawn EPERM"}`（沙箱不允许子进程用管道抓 stdout，Node 的 `execFile` 默认就是管道）。**站主照常 `启动后台.bat` 不受影响**，后台「提交」页该怎么用还怎么用。
+
+### 17.11 截图验收时顺手修的一处 ＋ 一个已知遮挡
+
+1. **修了（`css/blog.css`）**：`.bl-title` / `.bl-tagline` 原来是行内元素，在 238px 的博客侧栏里站名和副标题挤在一行，「资源存档」被折到第二行（第一版截图里很难看）。改成两者各占一行（`.bl-tagline` 加 `margin-top: 4px`）；顺手删掉那条不起作用的 `.bl-lead { gap: 6px; }` —— `.cm-panel` 不是 flex 容器，`gap` 本来就没效果。
+2. **已知遮挡（不是 bug，但站主得知道）**：`css/style.css:326` 的鸭子玩具 `.duck { position: fixed; right: 6px; bottom: 18px; z-index: 85 }`，按同文件 134-135 行那段注释是**故意压在所有窗口之上**的「桌面玩具」。博客入口窗现在贴在侧栏最底部，正好在它脚下：玩具会盖住窗口右下角一块（正文左对齐，正常长度的标题都在玩具左边，只有极长标题的尾巴可能被挡）。要彻底避开只有三条路 —— 入口窗挪回自介上面（站主已否）、侧栏底部留白（站主讨厌留白）、或把 `.duck` 的 `right`/`bottom` 挪几像素。**等站主定，本轮不动。**
+3. 本轮 `blog/posts.js`／`blog/drafts.js` 已再次清空（截图用的 3 篇示例又 `--reset` 掉了），`node diag/bl-check.js` 20 项全绿。
 
