@@ -215,8 +215,55 @@
     duckAria: { zh: '玩具鸭彩蛋', ja: 'おもちゃのアヒルのお楽しみ', en: 'Toy duck surprise' },
     ceInfoTitle: { zh: '信息', ja: '情報', en: 'Information' },
     ceFeatured: { zh: '你在期待什么？', ja: '何を期待してるの？', en: 'What were you expecting?' },
-    ceOk: { zh: '确定', ja: 'OK', en: 'OK' }
+    ceOk: { zh: '确定', ja: 'OK', en: 'OK' },
     /* 蓝屏文案**不做多语言**（站主要求纯英文保证还原度），已硬编码在 js/easteregg.js */
+
+    /* ---------- 个人博客 ---------- */
+    blogPageTitle: {
+      zh: '个人博客 ★ 12あKa@被告人杯糕_',
+      ja: '個人ブログ ★ 12あKa@被告人杯糕_',
+      en: 'Blog ★ 12あKa@被告人杯糕_'
+    },
+    titleBlog: { zh: '个人博客', ja: '個人ブログ', en: 'Blog' },
+    menuBlog: { zh: '个人博客', ja: '個人ブログ', en: 'Blog' },
+    blTagline: {
+      zh: '感想 · 生活记录 · 资源存档',
+      ja: '感想・生活記録・素材アーカイブ',
+      en: 'Thoughts · daily life · archive'
+    },
+    blSearchPh: { zh: '搜索文章…', ja: '記事を検索…', en: 'Search posts…' },
+    blSearchGo: { zh: '搜索', ja: '検索', en: 'Search' },
+    blTagsTitle: { zh: '标签', ja: 'タグ', en: 'Tags' },
+    blMonthsTitle: { zh: '按月归档', ja: '月別アーカイブ', en: 'Archive' },
+    blRecentTitle: { zh: '最近更新', ja: '最近の更新', en: 'Recent posts' },
+    blAboutTitle: { zh: '关于本博', ja: 'このブログについて', en: 'About' },
+    blAbout: {
+      zh: '放我平时写的东西：感想、生活流水账、收集到的资源。想到什么写什么，不定期更新。',
+      ja: '感想・日常・集めた素材などを置いています。気が向いたときに更新します。',
+      en: 'Thoughts, daily notes and collected resources. Updated whenever I feel like it.'
+    },
+    blAll: { zh: '全部文章', ja: 'すべての記事', en: 'All posts' },
+    blCount: { zh: '共 {n} 篇', ja: '全 {n} 件', en: '{n} posts' },
+    blEmpty: {
+      zh: '还没有文章……第一篇正在酝酿中♡',
+      ja: 'まだ記事がありません……最初の一本を準備中♡',
+      en: 'No posts yet… the first one is brewing ♡'
+    },
+    blEmptySearch: { zh: '没有找到匹配的文章。', ja: '一致する記事はありません。', en: 'No matching posts.' },
+    blBackList: { zh: '← 返回列表', ja: '← 一覧へ戻る', en: '← Back to list' },
+    blReadMore: { zh: '阅读全文 →', ja: '続きを読む →', en: 'Read more →' },
+    blPinned: { zh: '置顶', ja: '固定', en: 'Pinned' },
+    blPrev: { zh: '上一篇', ja: '前の記事', en: 'Previous' },
+    blNext: { zh: '下一篇', ja: '次の記事', en: 'Next' },
+    blEntryText: {
+      zh: '感想、生活记录、各种资源存档都写在博客里，点下面的按钮进去看。',
+      ja: '感想・生活記録・素材アーカイブはブログに書いています。下のボタンからどうぞ。',
+      en: 'Thoughts, daily notes and resource archives live in the blog — click below to read.'
+    },
+    blEntryGo: { zh: '进入博客 →', ja: 'ブログへ →', en: 'Enter blog →' },
+    blFilterTag: { zh: '标签：{tag}', ja: 'タグ：{tag}', en: 'Tag: {tag}' },
+    blFilterMonth: { zh: '{month} 的文章', ja: '{month} の記事', en: 'Posts from {month}' },
+    blSearched: { zh: '搜索「{q}」', ja: '「{q}」の検索結果', en: 'Search: {q}' }
   };
 
   var STORE_KEY = 'cupcake-lang-v2';

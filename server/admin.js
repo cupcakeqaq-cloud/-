@@ -28,6 +28,8 @@ const ROOT = path.join(__dirname, '..');
 const ENV_FILE = path.join(ROOT, '.env');
 const ENV_EXAMPLE = path.join(ROOT, '.env.example');
 const CONTENT_JS = path.join(ROOT, 'js', 'content.js');
+const BLOG_JS = path.join(ROOT, 'blog', 'posts.js');
+const BLOG_DRAFT_JS = path.join(ROOT, 'blog', 'drafts.js');
 const GB_JSON = path.join(ROOT, 'gb', 'comments.json');
 const UPLOAD_DIR = path.join(ROOT, 'uploads');
 const PICTURE_DIR = path.join(ROOT, 'picture');
@@ -305,6 +307,67 @@ function writeContent(obj) {
   fs.writeFileSync(CONTENT_JS, body, 'utf8');
 }
 
+// ───────────────────────── 博客数据读写 ─────────────────────────
+
+/** 定位文件里「行首的 window.XXX =」赋值（不能直接 indexOf：文件前面的工具函数里也会引用 window.XXX） */
+function jsAssign(text, varName) {
+  const m = new RegExp('^' + varName.replace(/\./g, '\\.') + '[ \\t]*=', 'm').exec(text);
+  if (!m) return null;
+  return { at: m.index, eq: m.index + m[0].length - 1 };
+}
+
+/** 读 blog/*.js 里的 `window.XXX = [...]`（数据永远在文件末尾，前面的注释和工具函数不动） */
+function readJsArray(file, varName) {
+  try {
+    const t = fs.readFileSync(file, 'utf8');
+    const loc = jsAssign(t, varName);
+    if (!loc) return [];
+    const rest = t.slice(loc.eq + 1);
+    if (rest.trimStart().indexOf('[]') === 0) return [];
+    const end = rest.indexOf('\n]');
+    if (end < 0) return [];
+    const arr = JSON.parse(rest.slice(0, end + 2));
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/** 整段重写 `window.XXX = [...]`，只保留赋值行之前的内容（别在数据后面写东西） */
+function writeJsArray(file, varName, arr) {
+  const old = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : '';
+  const loc = jsAssign(old, varName);
+  const head = loc && loc.at > 0 ? old.slice(0, loc.at) : '';
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, head + varName + ' = ' + JSON.stringify(arr, null, 2) + ';\n', 'utf8');
+}
+
+function today() {
+  const d = new Date();
+  const pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+}
+
+/** 一篇文章：标题必填（空的直接丢掉），id/日期格式不对就补一个 */
+function normPost(p) {
+  if (!p || typeof p !== 'object') return null;
+  const title = str(p.title, 200).trim();
+  if (!title) return null;
+  const tags = (Array.isArray(p.tags) ? p.tags : []).map(function (t) { return str(t, 24).trim(); }).filter(Boolean);
+  return {
+    id: /^p-[A-Za-z0-9_-]{1,40}$/.test(String(p.id || '')) ? String(p.id) : 'p-' + Date.now().toString(36) + crypto.randomBytes(2).toString('hex'),
+    title: title,
+    date: /^\d{4}-\d{2}-\d{2}$/.test(String(p.date || '')) ? String(p.date) : today(),
+    tags: tags.filter(function (t, i) { return tags.indexOf(t) === i; }).slice(0, 8),
+    summary: str(p.summary, 400).trim(),
+    html: str(p.html, 200000),
+    pinned: !!p.pinned,
+  };
+}
+function normPosts(list, max) {
+  return (Array.isArray(list) ? list : []).map(normPost).filter(Boolean).slice(0, max);
+}
+
 function readComments() {
   try {
     const j = JSON.parse(fs.readFileSync(GB_JSON, 'utf8'));
@@ -469,6 +532,7 @@ async function route(req, res, url) {
     return json(res, 200, {
       ok: true,
       content: readContent() || normContent({}),
+      blog: { posts: readJsArray(BLOG_JS, 'window.BLOG_POSTS'), drafts: readJsArray(BLOG_DRAFT_JS, 'window.BLOG_DRAFTS') },
       comments: readComments(),
       git: await gitSummary(),
       files: files,
@@ -499,6 +563,19 @@ async function route(req, res, url) {
     try { doc = { v: 1, comments: normComments(body.comments) }; } catch (e) { return fail(res, 400, e.message); }
     writeComments(doc);
     return json(res, 200, { ok: true, comments: doc, git: await gitSummary() });
+  }
+
+  if (p === '/api/blog' && req.method === 'POST') {
+    let body;
+    try { body = await readJson(req); } catch (e) { return fail(res, 400, '请求格式不对'); }
+    let posts, drafts;
+    try {
+      posts = normPosts(body.posts, 500);
+      drafts = normPosts(body.drafts, 200);
+    } catch (e) { return fail(res, 400, e.message); }
+    writeJsArray(BLOG_JS, 'window.BLOG_POSTS', posts);
+    writeJsArray(BLOG_DRAFT_JS, 'window.BLOG_DRAFTS', drafts);
+    return json(res, 200, { ok: true, posts: posts, drafts: drafts, git: await gitSummary() });
   }
 
   if (p === '/api/upload' && req.method === 'POST') {
@@ -582,4 +659,4 @@ function handle(req, res, url) {
   return true;
 }
 
-module.exports = { handle, ADMIN_HTML: path.join(ROOT, 'admin.html'), CFG: CFG, _test: { normContent, normComments, asciiName, parseEnv, readContent } };
+module.exports = { handle, ADMIN_HTML: path.join(ROOT, 'admin.html'), CFG: CFG, _test: { normContent, normComments, asciiName, parseEnv, readContent, readJsArray, writeJsArray, normPost, normPosts } };

@@ -1,0 +1,120 @@
+/* 个人博客（blog.html 右侧主区 + 主页那两个「最近文章」小窗）
+   配色跟着 css/style.css 的变量走，版式跟委托页（css/winxp.css 的 .ie-cols/.cm-panel）一致 */
+
+/* ── 版面：左栏比委托页窄一点，给正文留宽度 ── */
+.bl-cols { grid-template-columns: 238px minmax(0, 1fr); }
+.bl-side { gap: 12px; }
+
+.bl-lead { gap: 6px; }
+.bl-title { font-size: 19px; font-weight: 700; color: var(--accent); letter-spacing: .5px; }
+.bl-tagline { font-size: 11px; color: #666; line-height: 1.6; }
+.bl-about { font-size: 12px; color: #4a4a4a; line-height: 1.75; }
+
+.bl-search { display: flex; gap: 5px; margin-top: 8px; }
+.bl-search input {
+  flex: 1; min-width: 0; font: inherit; font-size: 12px; padding: 3px 6px;
+  border: 1px solid #7f9db9; background: #fff;
+}
+.bl-search button {
+  font: inherit; font-size: 12px; padding: 3px 9px; cursor: pointer;
+  border: 1px solid #7f9db9; background: #ece9d8;
+}
+.bl-search button:hover { background: #f7f4e6; }
+
+/* ── 标签 / 归档 ── */
+.bl-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+a.bl-tag {
+  display: inline-block; font-size: 11px; line-height: 1.6; padding: 1px 7px;
+  color: #2f5a17; background: #eef7e6; border: 1px solid #bcd8a6;
+  text-decoration: none; white-space: nowrap;
+}
+a.bl-tag:hover { background: #dff0cf; }
+a.bl-tag b { color: #7a9c5e; font-weight: 400; }
+a.bl-tag.sm { padding: 0 5px; font-size: 10px; }
+.bl-none { font-size: 11px; color: #888; }
+
+/* ── 最近更新 / 主页小窗列表 ── */
+.bl-recent, .bl-mini { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.bl-recent li, .bl-mini li { font-size: 12px; line-height: 1.5; }
+.bl-rd { color: #888; font-size: 11px; margin-right: 5px; font-family: var(--font-ui, Tahoma, sans-serif); }
+.bl-recent a, .bl-mini a { color: var(--accent); text-decoration: none; }
+.bl-recent a:hover, .bl-mini a:hover { text-decoration: underline; }
+
+/* 主页入口窗：说明 + 「最近更新」小标题 + 五篇标题 + 按钮 */
+.bl-entry-sub { font-size: 11px; font-weight: bold; color: var(--accent); margin: 10px 0 5px; }
+.bl-entry-list { margin: 0 0 2px; }
+.bl-entry-list li { padding-left: 1px; }
+
+/* ── 主区 ── */
+.bl-main { min-width: 0; }
+.bl-head {
+  display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap;
+  border-bottom: 1px solid #c9d8f0; padding-bottom: 7px; margin-bottom: 14px;
+}
+.bl-head h1 { font-size: 17px; font-weight: 700; color: var(--accent); letter-spacing: .5px; }
+.bl-count { font-size: 11px; color: #888; }
+.bl-empty { font-size: 12px; color: #777; padding: 22px 0; line-height: 1.9; }
+
+/* ── 列表项 ── */
+.bl-item { padding: 0 0 15px; margin-bottom: 15px; border-bottom: 1px dashed #ccd8ea; }
+.bl-item:last-child { border-bottom: 0; }
+.bl-item h2.bl-ititle { font-size: 15px; font-weight: 700; margin: 3px 0 5px; }
+.bl-item h2.bl-ititle a { color: #0c327d; text-decoration: none; }
+.bl-item h2.bl-ititle a:hover { text-decoration: underline; }
+.bl-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; font-size: 11px; }
+.bl-date { color: #888; font-family: var(--font-ui, Tahoma, sans-serif); }
+.bl-pin {
+  font-size: 10px; color: #8a4b00; background: #ffe9c9; border: 1px solid #e0b070;
+  padding: 0 5px;
+}
+.bl-sum { font-size: 12px; color: #333; line-height: 1.85; margin: 5px 0 6px; }
+a.bl-more { font-size: 12px; color: var(--accent2, #2f6ac4); text-decoration: none; }
+a.bl-more:hover { text-decoration: underline; }
+
+/* ── 文章 ── */
+.bl-ptitle { font-size: 20px; font-weight: 700; color: #0c327d; letter-spacing: .5px; margin: 4px 0 12px; line-height: 1.4; }
+.bl-body { font-size: 13px; line-height: 2; color: #222; word-wrap: break-word; }
+.bl-body p { margin: 0 0 12px; }
+.bl-body h2 { font-size: 16px; font-weight: 700; color: #0c327d; margin: 20px 0 8px; }
+.bl-body h3 { font-size: 14px; font-weight: 700; color: #0c327d; margin: 16px 0 6px; }
+.bl-body ul, .bl-body ol { margin: 0 0 12px; padding-left: 22px; }
+.bl-body li { margin: 2px 0; }
+.bl-body blockquote {
+  margin: 0 0 12px; padding: 6px 11px; color: #444;
+  border-left: 3px solid #b9c9e8; background: #f5f8fd;
+}
+.bl-body a { color: var(--accent2, #2f6ac4); }
+.bl-body hr { border: 0; border-top: 1px dashed #c9d8f0; margin: 16px 0; }
+.bl-body img { max-width: 100%; height: auto; vertical-align: top; }
+.bl-body code { font-family: Consolas, monospace; font-size: 12px; background: #f2f2f2; padding: 0 3px; }
+.bl-body pre {
+  font-family: Consolas, monospace; font-size: 12px; line-height: 1.7;
+  background: #f7f7f7; border: 1px solid #e2e2e2; padding: 8px 10px;
+  overflow: auto; margin: 0 0 12px;
+}
+.bl-body pre code { background: 0; padding: 0; }
+
+/* 图：单张 / 两张并排 / 居中 —— 后台工具栏插的就是这几个 class */
+.bl-body figure.bl-figure { margin: 0 0 12px; }
+.bl-body figure.bl-figure figcaption { font-size: 11px; color: #888; margin-top: 4px; }
+.bl-body figure.bl-mid { text-align: center; }
+.bl-body .bl-row { display: flex; gap: 8px; margin: 0 0 12px; align-items: flex-start; }
+.bl-body .bl-row figure { margin: 0; flex: 1 1 0; min-width: 0; }
+.bl-body .bl-row img { width: 100%; height: auto; }
+
+/* ── 上一篇 / 下一篇 / 返回 ── */
+.bl-nav {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin: 20px 0 10px; padding-top: 11px; border-top: 1px dashed #ccd8ea; font-size: 12px;
+}
+.bl-nav a { color: var(--accent2, #2f6ac4); text-decoration: none; max-width: 48%; }
+.bl-nav a:hover { text-decoration: underline; }
+a.bl-back { display: inline-block; font-size: 12px; color: #555; text-decoration: none; margin-top: 6px; }
+a.bl-back:hover { text-decoration: underline; }
+
+/* ── 窄屏：左右栏叠起来（跟委托页一样没有专门优化，只保证不撑破） ── */
+@media (max-width: 820px) {
+  .bl-cols { grid-template-columns: minmax(0, 1fr); }
+  .bl-side { position: static; }
+  .bl-nav a { max-width: 100%; }
+}

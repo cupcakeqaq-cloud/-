@@ -67,6 +67,32 @@
     ['voiceNoteTitle', '资源页', '使用说明标题'],
     ['voiceNote', '资源页', '使用说明正文'],
 
+    ['blogPageTitle', '博客', '浏览器标题：博客页'],
+    ['titleBlog', '博客', '窗口标题：个人博客'],
+    ['menuBlog', '博客', '开始菜单/桌面：个人博客'],
+    ['blTagline', '博客', '博客副标题（站点名下面那行）'],
+    ['blSearchPh', '博客', '搜索框提示文字'],
+    ['blSearchGo', '博客', '搜索按钮'],
+    ['blTagsTitle', '博客', '侧栏「标签」标题'],
+    ['blMonthsTitle', '博客', '侧栏「按月归档」标题'],
+    ['blRecentTitle', '博客', '「最近更新」窗口标题'],
+    ['blAboutTitle', '博客', '侧栏「关于本博」标题'],
+    ['blAbout', '博客', '侧栏「关于本博」正文'],
+    ['blEntryText', '博客', '主页博客入口窗的说明文字'],
+    ['blEntryGo', '博客', '主页博客入口窗的按钮'],
+    ['blAll', '博客', '列表标题：全部文章 / 侧栏「全部」'],
+    ['blCount', '博客', '列表右上角篇数（{n} 换篇数）'],
+    ['blEmpty', '博客', '一篇都没有时的提示'],
+    ['blEmptySearch', '博客', '搜索/筛选没结果时的提示'],
+    ['blReadMore', '博客', '列表里的「阅读全文」'],
+    ['blBackList', '博客', '文章页底部「返回列表」'],
+    ['blPrev', '博客', '上一篇'],
+    ['blNext', '博客', '下一篇'],
+    ['blPinned', '博客', '置顶标记'],
+    ['blFilterTag', '博客', '标签页标题（{tag} 换标签名）'],
+    ['blFilterMonth', '博客', '归档页标题（{month} 换年月）'],
+    ['blSearched', '博客', '搜索结果页标题（{q} 换关键词）'],
+
     ['menuHome', '桌面·菜单', '开始菜单：返回主页'],
     ['menuCommission', '桌面·菜单', '开始菜单：委托'],
     ['menuResources', '桌面·菜单', '开始菜单：资源'],
@@ -121,13 +147,14 @@
     ['nfRetry', '电源·开机·404', '假404 重试按钮'],
     ['nfNewTab', '电源·开机·404', '假404 新标签打开']
   ];
-  var GROUPS = ['主页', '委托页', '资源页', '桌面·菜单', '留言板·彩蛋', '电源·开机·404', '其他'];
+  var GROUPS = ['主页', '委托页', '资源页', '博客', '桌面·菜单', '留言板·彩蛋', '电源·开机·404', '其他'];
   var FK = {};
   FIELDS.forEach(function (f) { FK[f[0]] = { group: f[1], label: f[2] }; });
 
   var S = {
     tab: 'text', ready: false,
     content: null, i18n: {}, status: 'open', cmCards: [], resItems: [], commentsList: [],
+    posts: [], drafts: [],
     git: null, files: { pictures: [], uploads: [] },
     repo: '', branch: '', tag: 'assets', hasToken: false
   };
@@ -207,11 +234,12 @@
   function post(p, body) {
     return api(p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   }
-  function pickFile(accept, cb) {
+  function pickFile(accept, cb, multi) {
     var inp = document.createElement('input');
     inp.type = 'file';
     if (accept) inp.accept = accept;
-    inp.onchange = function () { if (inp.files && inp.files[0]) cb(inp.files[0]); };
+    if (multi) inp.multiple = true;
+    inp.onchange = function () { if (inp.files && inp.files[0]) cb(inp.files[0], inp.files); };
     inp.click();
   }
 
@@ -229,7 +257,7 @@
   function boot() {
     hint('读取中…');
     api('/api/state').then(function (j) {
-      sync(j.content, j.comments);
+      sync(j.content, j.comments, j.blog);
       S.git = j.git;
       S.files = j.files || S.files;
       S.repo = j.repo || ''; S.branch = j.branch || ''; S.tag = j.releaseTag || 'assets'; S.hasToken = !!j.hasToken;
@@ -240,17 +268,20 @@
     }).catch(function (e) { hint('读取失败：' + e.message, true); });
   }
 
-  function sync(content, comments) {
+  function sync(content, comments, blog) {
     S.content = content;
     S.i18n = clone(content.i18n);
     S.status = content.commission.status;
     S.cmCards = normCards(content.commission.cards);
     S.resItems = content.resources.items || [];
     S.commentsList = (comments && comments.comments) || [];
+    S.posts = ((blog || {}).posts) || [];
+    S.drafts = ((blog || {}).drafts) || [];
+    BE = null;
   }
 
   // ───────── 布局 ─────────
-  var TABS = [['text', '文案'], ['cm', '委托页'], ['res', '资源页'], ['gb', '留言'], ['git', '提交']];
+  var TABS = [['text', '文案'], ['cm', '委托页'], ['res', '资源页'], ['blog', '博客'], ['gb', '留言'], ['git', '提交']];
 
   function renderTabs() {
     $('#tabs').innerHTML = TABS.map(function (t) {
@@ -264,6 +295,7 @@
     if (S.tab === 'text') v.innerHTML = viewText();
     else if (S.tab === 'cm') v.innerHTML = viewCm();
     else if (S.tab === 'res') v.innerHTML = viewRes();
+    else if (S.tab === 'blog') v.innerHTML = viewBlog();
     else if (S.tab === 'gb') v.innerHTML = viewGb();
     else v.innerHTML = viewGit();
   }
@@ -384,6 +416,196 @@
       '<div class="row2"><button data-act="r-add">＋ 新增一项</button></div></div></div>';
   }
 
+  // ───────── 博客页 ─────────
+  /* 正在编辑的文章：BE = { draft: 是不是草稿, i: 在数组里的下标（-1 = 新建）, post: {...}, tagsRaw, sel: 选中的图 }
+     正文不进 S，直接从 #blEdit 里读（contenteditable） */
+  var BE = null;
+  /* 工具栏：FMT 走 document.execCommand，BACT 是自己写的动作 */
+  var FMT = [['bold', 'B', '加粗'], ['italic', 'I', '斜体'], ['underline', 'U', '下划线'],
+    ['h2', '大标题', '二级标题'], ['h3', '小标题', '三级标题'], ['p', '正文', '变回普通段落'],
+    ['ul', '• 列表', '无序列表'], ['ol', '1. 列表', '有序列表'], ['quote', '引用', '引用块'],
+    ['link', '链接', '给选中的文字加链接'], ['hr', '——', '插入分隔线'], ['clear', '清格式', '清除选中文字的格式']];
+  var BACT = [['b-img', '插图', '选一张或多张图，压到长边 1600px 后插到光标处'],
+    ['b-mid', '图片居中', '先在正文里点一下那张图'],
+    ['b-row', '两图并排', '先点一下第一张图（下一张也得是图）'],
+    ['b-unrow', '拆开并排', '取消这两张图的并排']];
+
+  function blogArr(draft) { return draft ? S.drafts : S.posts; }
+  function newPost() {
+    var d = new Date();
+    return {
+      id: 'p-' + Date.now(), title: '', date: d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()),
+      tags: [], summary: '', html: '', pinned: false
+    };
+  }
+  function parseTags(s) {
+    var out = [], seen = {};
+    String(s || '').split(/[,，、;；\s]+/).forEach(function (k) {
+      k = k.trim().slice(0, 24);
+      if (!k || seen[k] || out.length >= 8) return;
+      seen[k] = 1; out.push(k);
+    });
+    return out;
+  }
+  function bWords(html) {
+    var d = document.createElement('div');
+    d.innerHTML = String(html || '');
+    return String(d.textContent || '').replace(/\s+/g, '').length;
+  }
+
+  function bRows(arr, draft) {
+    if (!arr.length) return '<div class="tip">还没有' + (draft ? '草稿' : '文章') + '。</div>';
+    return arr.map(function (p, i) {
+      var tags = (p.tags || []).length ? '<span class="pill">' + esc(p.tags.join('、')) + '</span>' : '';
+      return '<div class="item"><div class="hd"><b>' + esc(p.title || '（还没写标题）') + '</b>' +
+        '<span class="pill">' + esc(p.date || '') + '</span>' + tags +
+        (p.pinned ? '<span class="pill warn">置顶</span>' : '') +
+        '<span class="pill off">' + bWords(p.html) + ' 字</span>' +
+        '<button data-act="b-edit" data-i="' + i + '" data-draft="' + (draft ? 1 : 0) + '">编辑</button>' +
+        (draft ? '<button data-act="b-pub" data-i="' + i + '">发布到前台</button>'
+               : '<button data-act="b-unpub" data-i="' + i + '">转成草稿</button>') +
+        '<button class="del" data-act="b-del" data-i="' + i + '" data-draft="' + (draft ? 1 : 0) + '">删除</button></div>' +
+        (p.summary ? '<div class="lab">' + esc(p.summary) + '</div>' : '') + '</div>';
+    }).join('');
+  }
+
+  function bListHtml() {
+    return '<div class="grp"><h3>个人博客</h3><div class="bd">' +
+      '<div class="tip">已发布的文章存在 `blog/posts.js`（推上线，前台能看）；草稿存在 `blog/drafts.js`，它写进了 .gitignore —— <b>只在你这台电脑的本地后台看得到，换台电脑或重装就没了</b>。<br>' +
+      '编辑流程：点「编辑」改完 → 点正文下面那排按钮里的「保存这篇文章」→ 再点右上角「保存改动」写进文件 → 最后去「提交」页推送。</div>' +
+      '<div class="row2"><button class="pri" data-act="b-new">＋ 新建文章</button><button data-act="b-new-draft">＋ 新建草稿</button></div>' +
+      '</div></div>' +
+      '<div class="grp"><h3>已发布（' + S.posts.length + ' 篇）</h3><div class="bd">' + bRows(S.posts, false) + '</div></div>' +
+      '<div class="grp"><h3>草稿（' + S.drafts.length + ' 篇）</h3><div class="bd">' + bRows(S.drafts, true) + '</div></div>';
+  }
+
+  function bEditHtml() {
+    try { document.execCommand('defaultParagraphSeparator', false, 'p'); } catch (e) {}
+    var p = BE.post;
+    var bar = FMT.map(function (c) {
+      return '<button data-act="b-fmt" data-cmd="' + c[0] + '" title="' + c[2] + '">' + c[1] + '</button>';
+    }).join('') + BACT.map(function (c) {
+      return '<button data-act="' + c[0] + '" title="' + c[2] + '">' + c[1] + '</button>';
+    }).join('');
+    return '<div class="grp"><h3>' + (BE.draft ? '编辑草稿' : '编辑文章') + '（' + esc(p.id) + '）</h3><div class="bd">' +
+      '<div class="lab">标题</div><input type="text" data-bf="title" placeholder="文章标题" value="' + esc(p.title || '') + '">' +
+      '<div class="lab">日期（前台按日期倒序排）</div><input type="date" data-bf="date" value="' + esc(p.date || '') + '">' +
+      '<div class="lab">标签（逗号、顿号或空格隔开，最多 8 个，可以留空）</div>' +
+      '<input type="text" data-bf="tags" placeholder="生活记录、感想" value="' + esc(BE.tagsRaw || '') + '">' +
+      '<div class="lab">摘要（留空 = 前台自动截正文前 120 字）</div>' +
+      '<textarea data-bf="summary" rows="2" placeholder="列表里显示的那两行">' + esc(p.summary || '') + '</textarea>' +
+      '<label class="bl-pin"><input type="checkbox" data-bf="pinned"' + (p.pinned ? ' checked' : '') + '> 置顶（前台排最前面）</label>' +
+      '</div></div>' +
+      '<div class="grp"><h3>正文</h3><div class="bd">' +
+      '<div class="tip">选中文字再点按钮；「插图」会先把图压到长边 1600px 再传（透明 PNG 还是 PNG，GIF 原样传）。插完点一下正文里的图，才能用「图片居中 / 两图并排」。</div>' +
+      '<div class="bl-tbar">' + bar + '</div>' +
+      '<div class="bl-edit" id="blEdit" contenteditable="true">' + (p.html || '') + '</div>' +
+      '<div class="row2"><button class="pri" data-act="b-save">保存这篇文章</button><button data-act="b-cancel">返回列表（不保存）</button></div>' +
+      '</div></div>';
+  }
+
+  function viewBlog() { return BE ? bEditHtml() : bListHtml(); }
+
+  /* 把编辑器里的东西读回 BE */
+  function bCommit() {
+    if (!BE) return;
+    var box = $('#blEdit');
+    if (box) BE.post.html = box.innerHTML;
+    BE.post.tags = parseTags(BE.tagsRaw);
+    BE.post.title = String(BE.post.title || '').trim();
+    BE.post.summary = String(BE.post.summary || '').trim();
+  }
+
+  /* auto = 点右上角「保存改动」/「提交推送」时顺手存下来的（不弹提示、不改页签） */
+  function bSave() {
+    bCommit();
+    if (!BE) return true;
+    if (!BE.post.title) { hint('还没写标题，先写上标题', true); return false; }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(BE.post.date || '')) BE.post.date = newPost().date;
+    if (BE.i < 0) blogArr(BE.draft).push(BE.post);
+    else blogArr(BE.draft)[BE.i] = BE.post;
+    BE = null;
+    return true;
+  }
+
+  /* 顺手把编辑中的文章收进内存（在保存/推送前调用），收不了就明确报出来 */
+  function bAutoCommit() {
+    if (!BE) return;
+    if (bSave()) hint('编辑中的文章也一起存了（还在内存里，接着写文件）');
+  }
+
+  function bFmt(cmd) {
+    var box = $('#blEdit');
+    if (!box) return;
+    box.focus();
+    try { document.execCommand('styleWithCSS', false, false); } catch (e) {}   /* 要 <b>/<i>/<u>，不要行内 style */
+    if (cmd === 'h2' || cmd === 'h3' || cmd === 'p') document.execCommand('formatBlock', false, cmd);
+    else if (cmd === 'quote') document.execCommand('formatBlock', false, 'blockquote');
+    else if (cmd === 'ul') document.execCommand('insertUnorderedList');
+    else if (cmd === 'ol') document.execCommand('insertOrderedList');
+    else if (cmd === 'hr') document.execCommand('insertHorizontalRule');
+    else if (cmd === 'clear') document.execCommand('removeFormat');
+    else if (cmd === 'link') {
+      var u = prompt('链接地址（https:// 开头，或站内路径像 uploads/xxx.zip）：', 'https://');
+      if (u) document.execCommand('createLink', false, u);
+    } else document.execCommand(cmd);
+  }
+
+  /* 图片：选中的那张 figure（点一下正文里的图就选中了） */
+  function bFig() {
+    if (BE && BE.sel && document.body.contains(BE.sel)) return BE.sel;
+    hint('先在正文里点一下那张图，再点这个按钮', true);
+    return null;
+  }
+  function bShrink(file, cb) {
+    /* ponytail: 只做长边缩放 + JPEG 0.85，不做质量/格式面板；真嫌大再调 MAX/质量 */
+    var MAX = 1600;
+    if (!/^image\//.test(file.type) || file.type === 'image/gif' || file.type === 'image/svg+xml') { cb(file, file.name); return; }
+    var url = URL.createObjectURL(file), im = new Image();
+    var done = function (blob, name) { URL.revokeObjectURL(url); cb(blob, name); };
+    im.onerror = function () { done(file, file.name); };
+    im.onload = function () {
+      try {
+        var k = Math.min(1, MAX / Math.max(im.naturalWidth, im.naturalHeight));
+        var cv = document.createElement('canvas');
+        cv.width = Math.max(1, Math.round(im.naturalWidth * k));
+        cv.height = Math.max(1, Math.round(im.naturalHeight * k));
+        var cx = cv.getContext('2d');
+        var png = file.type === 'image/png';
+        if (!png) { cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); }
+        cx.drawImage(im, 0, 0, cv.width, cv.height);
+        var base = String(file.name || 'img').replace(/\.[^.]+$/, '').replace(/[^A-Za-z0-9._-]+/g, '-').slice(0, 30) || 'img';
+        cv.toBlob(function (b) {
+          if (!b) { done(file, file.name); return; }
+          done(b, base + (png ? '.png' : '.jpg'));
+        }, png ? 'image/png' : 'image/jpeg', 0.85);
+      } catch (e) { done(file, file.name); }
+    };
+    im.src = url;
+  }
+  function bInsertImages(files) {
+    var list = Array.prototype.slice.call(files || []), box = $('#blEdit'), n = 0;
+    (function step() {
+      if (n >= list.length) { hint('图插好了；接着点「保存这篇文章」→「保存改动」'); return; }
+      var f = list[n++];
+      bShrink(f, function (blob, name) {
+        hint('正在上传 ' + name + '（' + Math.round(blob.size / 1024) + ' KB）…');
+        fetch('/api/upload?kind=image&name=' + encodeURIComponent(name),
+          { method: 'POST', headers: { 'Content-Type': 'application/octet-stream' }, body: blob })
+          .then(parseRes)
+          .then(function (j) {
+            S.files.uploads.push(j.path.replace(/^uploads\//, ''));
+            if (box) {
+              box.focus();
+              document.execCommand('insertHTML', false, '<figure class="bl-figure"><img src="' + j.path + '" alt=""></figure>');
+            }
+            step();
+          })
+          .catch(function (e) { hint('上传失败：' + e.message, true); });
+      });
+    })();
+  }
+
   // ───────── 留言页 ─────────
   function viewGb() {
     var cs = S.commentsList;
@@ -477,14 +699,20 @@
       S.status = S.content.commission.status;
       S.cmCards = normCards(S.content.commission.cards);
       S.resItems = S.content.resources.items;
+      return post('/api/blog', { posts: S.posts, drafts: S.drafts });
+    }).then(function (m) {
+      S.posts = m.posts || S.posts;
+      S.drafts = m.drafts || S.drafts;
+      if (m.git) S.git = m.git;
     });
   }
 
   function doSave() {
     hint('保存中…');
+    bAutoCommit();
     saveBoth().then(function () {
       hint('已写进本地文件（还没提交）。去「提交」页点一下提交并推送。');
-      if (S.tab === 'gb') render();
+      render();
     }).catch(function (e) { hint('保存失败：' + e.message, true); });
   }
 
@@ -538,6 +766,7 @@
     var out = $('#gitout');
     if (out) out.textContent = '先保存，再提交推送…';
     hint('提交推送中…');
+    bAutoCommit();
     saveBoth().then(function () {
       return post('/api/git', { message: msg });
     }).then(function (j) {
@@ -684,6 +913,15 @@
     var tab = t.dataset && t.dataset.tab;
     if (tab) { S.tab = tab; render(); return; }
 
+    /* 正文里点一下图 = 选中它（「图片居中 / 两图并排」都作用在选中的这张上） */
+    if (t.tagName === 'IMG' && t.closest && t.closest('#blEdit')) {
+      var fg = t.closest('figure');
+      $$('#blEdit figure, #blEdit img').forEach(function (n) { n.classList.remove('sel'); });
+      (fg || t).classList.add('sel');
+      if (BE) BE.sel = fg;
+      return;
+    }
+
     var act = t.dataset && t.dataset.act;
     if (!act) return;
     var i = Number(t.dataset.i), j = Number(t.dataset.j);
@@ -729,12 +967,81 @@
       return;
     }
 
+    if (act === 'b-new' || act === 'b-new-draft') {
+      BE = { draft: act === 'b-new-draft', i: -1, post: newPost(), tagsRaw: '', sel: null };
+      render();
+      return;
+    }
+    if (act === 'b-edit') {
+      var arr0 = blogArr(t.dataset.draft === '1');
+      if (!arr0[i]) return;
+      BE = { draft: t.dataset.draft === '1', i: i, post: clone(arr0[i]), tagsRaw: (arr0[i].tags || []).join('、'), sel: null };
+      render();
+      return;
+    }
+    if (act === 'b-del') {
+      var arr1 = blogArr(t.dataset.draft === '1');
+      if (!arr1[i]) return;
+      if (!confirm('真的删掉「' + (arr1[i].title || '（没标题）') + '」？\n' + (t.dataset.draft === '1' ? '（草稿删了找不回来）' : ''))) return;
+      arr1.splice(i, 1);
+      render();
+      hint('已删掉（点「保存改动」才写进文件）');
+      return;
+    }
+    if (act === 'b-pub' || act === 'b-unpub') {
+      var from = act === 'b-pub' ? S.drafts : S.posts, to = act === 'b-pub' ? S.posts : S.drafts;
+      if (!from[i]) return;
+      to.push(from.splice(i, 1)[0]);
+      render();
+      hint('已' + (act === 'b-pub' ? '移进「已发布」' : '移进「草稿」') + '（点「保存改动」才写进文件）');
+      return;
+    }
+    if (act === 'b-fmt') { bFmt(t.dataset.cmd); return; }
+    if (act === 'b-img') { pickFile('image/*', function (f, fs) { bInsertImages(fs); }, true); return; }
+    if (act === 'b-mid') {
+      var fg = bFig();
+      if (fg) fg.classList.toggle('bl-mid');
+      return;
+    }
+    if (act === 'b-row') {
+      var f1 = bFig();
+      if (!f1) return;
+      var nx = f1.nextElementSibling;
+      if (!nx || nx.tagName !== 'FIGURE') { hint('下一张也得是图：先插第二张图，再点第一张图，然后点这里', true); return; }
+      var row = document.createElement('div');
+      row.className = 'bl-row';
+      f1.parentNode.insertBefore(row, f1);
+      row.appendChild(f1);
+      row.appendChild(nx);
+      return;
+    }
+    if (act === 'b-unrow') {
+      var f2 = bFig();
+      if (!f2) return;
+      var p2 = f2.parentNode;
+      if (!p2 || !p2.classList || !p2.classList.contains('bl-row')) { hint('这张图没有并排', true); return; }
+      p2.parentNode.insertBefore(f2, p2);
+      if (!p2.querySelector('figure')) p2.parentNode.removeChild(p2);
+      return;
+    }
+    if (act === 'b-save') {
+      if (bSave()) { hint('已收进内存（还没写文件）。点右上角「保存改动」写进本地文件。'); render(); }
+      return;
+    }
+    if (act === 'b-cancel') { BE = null; render(); return; }
+
     if (act === 'git-go') { gitGo(); return; }
     if (act === 'git-refresh') { refreshGit().then(function () { hint('状态已刷新'); }).catch(function (er) { hint(er.message, true); }); return; }
   }
 
   function onInput(e) {
     var t = e.target, d = t.dataset || {};
+    if (d.bf) {
+      if (!BE) return;
+      if (d.bf === 'tags') BE.tagsRaw = t.value;
+      else BE.post[d.bf] = t.value;
+      return;
+    }
     if (d.k && d.l) { (S.i18n[d.k] = S.i18n[d.k] || {})[d.l] = t.value; return; }
     if ('ri' in d && d.rf) {
       var it = S.resItems[Number(d.ri)];
@@ -756,6 +1063,7 @@
   function onChange(e) {
     if (e.target.name === 'cmst') S.status = e.target.value;
     var d = e.target.dataset || {};
+    if (d.bf === 'pinned') { if (BE) BE.post.pinned = e.target.checked; return; }
     if (d.act === 'ratio') {
       var s = findShot(Number(d.i), Number(d.j));
       if (!s) return;
@@ -773,6 +1081,11 @@
 
   // ───────── 启动 ─────────
   document.addEventListener('click', onClick);
+  /* 点工具栏别把正文里的焦点和选区弄丢（丢了 execCommand 就没作用了） */
+  document.addEventListener('mousedown', function (e) {
+    var el = e.target;
+    if (el && el.closest && el.closest('.bl-tbar')) e.preventDefault();
+  });
   document.addEventListener('input', onInput);
   document.addEventListener('change', onChange);
   document.addEventListener('keydown', onKey);

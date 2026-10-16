@@ -8,6 +8,7 @@
 <link rel="icon" href="icon.png">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/winxp.css">
+<link rel="stylesheet" href="css/blog.css">
 <link rel="stylesheet" href="css/player.css">
 </head>
 <body data-page="index">
@@ -31,6 +32,10 @@
   <button class="desk-icon" type="button" data-desk data-href="resources.html" title="Double-click to open">
     <img src="assets/winxp/windowsIcons/318(32x32).png" alt="">
     <span data-i18n="titleResources">资源配布</span>
+  </button>
+  <button class="desk-icon" type="button" data-desk data-href="blog.html" title="Double-click to open">
+    <img src="assets/winxp/windowsIcons/327(32x32).png" alt="">
+    <span data-i18n="menuBlog">个人博客</span>
   </button>
   <button class="desk-icon" type="button" data-desk data-app="guestbook" title="Double-click to open">
     <img src="assets/winxp/windowsIcons/mail.png" alt="">
@@ -126,9 +131,24 @@
         </div>
       </section>
 
+      <!-- 博客入口：贴在侧栏底部（站主 m00575 定），主栏的留言板因此拿回整块高度 -->
+      <section class="win" id="blogEntry" data-win>
+        <div class="titlebar">
+          <img class="tb-icon" src="assets/winxp/windowsIcons/ie-paper.png" alt="">
+          <span class="tb-title" data-i18n="titleBlog">个人博客</span>
+          <span class="tb-btns"><i class="tb-min" title="Minimize">—</i></span>
+        </div>
+        <div class="win-body">
+          <p class="entry-text" data-i18n="blEntryText">感想、生活记录、各种资源存档都写在博客里，点下面的按钮进去看。</p>
+          <p class="bl-entry-sub" data-i18n="blRecentTitle">最近更新</p>
+          <ul class="bl-mini bl-entry-list" id="blEntryList"></ul>
+          <p style="margin-top:10px"><a class="btn btn-go" href="blog.html" data-i18n="blEntryGo">进入博客 →</a></p>
+        </div>
+      </section>
+
     </aside>
 
-    <!-- ══════ 主栏：两个跳转入口 ══════ -->
+    <!-- ══════ 主栏：两个跳转入口 + 留言板 ══════ -->
     <div class="main-col">
 
       <section class="win" id="commissionEntry" data-win>
@@ -221,8 +241,10 @@
 <script src="js/i18n.js"></script>
 <script src="js/content.js"></script>
 <script src="js/content-render.js"></script>
+<script src="blog/posts.js"></script>
 <script src="js/config.js"></script>
 <script src="js/winxp.js"></script>
+<script src="js/blog.js"></script>
 <script src="js/apps.js"></script>
 <script src="js/player.js"></script>
 <script src="js/guestbook.js"></script>

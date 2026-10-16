@@ -73,6 +73,26 @@ main { padding:10px; max-width:1180px; }
 .pill.warn { background:#ffe6c9; color:#8a4b1f; }
 .pill.off { background:#f0d0d0; color:#8a2f2f; }
 
+/* 博客编辑器 */
+.bl-pin { display:flex; align-items:center; gap:5px; margin-top:8px; font-size:12px; }
+.bl-pin input { width:auto; }
+.bl-tbar { display:flex; flex-wrap:wrap; gap:4px; padding:5px 6px; background:#f0f0f0; border:1px solid var(--line); border-bottom:0; }
+.bl-tbar button { min-width:30px; padding:2px 7px; }
+.bl-edit { border:1px solid var(--line); background:#fff; padding:12px 14px; min-height:420px; overflow:auto; font-size:14px; line-height:1.75; }
+.bl-edit:focus { outline:2px solid #bcd4f2; }
+.bl-edit p, .bl-edit > div { margin:0 0 9px; }
+.bl-edit h2 { font-size:19px; margin:14px 0 8px; }
+.bl-edit h3 { font-size:16px; margin:12px 0 6px; }
+.bl-edit blockquote { margin:0 0 9px; padding:4px 10px; border-left:3px solid #b9b9b9; background:#fafafa; color:#333; }
+.bl-edit ul, .bl-edit ol { margin:0 0 9px; padding-left:24px; }
+.bl-edit img { max-width:100%; }
+.bl-edit figure { margin:0 0 10px; text-align:left; }
+.bl-edit figure.bl-mid { text-align:center; }
+.bl-edit figure.sel { outline:2px solid var(--hl); }
+.bl-edit .bl-row { display:flex; gap:8px; align-items:flex-start; }
+.bl-edit .bl-row figure { flex:1; min-width:0; }
+.bl-edit .bl-row img { width:100%; }
+
 /* 裁剪弹层（预览框和前台 .cm-card-shots a.crop 是同一套算法，所见即所得） */
 #crop { position:fixed; inset:0; z-index:30; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; }
 #crop[hidden] { display:none; }

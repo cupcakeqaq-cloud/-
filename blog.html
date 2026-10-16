@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n="blogPageTitle">个人博客 ★ 12あKa@被告人杯糕_</title>
+<meta name="description" content="12あKa@被告人杯糕_ 的个人博客：感想、生活记录与资源存档。">
+<link rel="icon" href="icon.png">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/winxp.css">
+<link rel="stylesheet" href="css/blog.css">
+</head>
+<body data-page="blog">
+
+<div class="star-field" id="starField" aria-hidden="true"></div>
+
+<div class="lang-drop" id="langDrop">
+  <button class="lang-toggle" id="langToggle" type="button" aria-expanded="false" aria-haspopup="true">中文 ▾</button>
+  <div class="lang-menu" id="langMenu" hidden>
+    <button class="lang-opt" type="button" data-lang="zh">中文</button>
+    <button class="lang-opt" type="button" data-lang="ja">日本語</button>
+    <button class="lang-opt" type="button" data-lang="en">English</button>
+  </div>
+</div>
+
+<!-- ══════ 固定式浏览器窗口：整页可滚动，不可拖动/关闭 ══════ -->
+<section class="win" id="blWin" data-win data-fixed>
+  <div class="titlebar">
+    <img class="tb-icon" src="assets/winxp/windowsIcons/ie.png" alt="">
+    <span class="tb-title" data-i18n="titleBlog">个人博客</span>
+    <span class="tb-btns"><i class="tb-min" title="Minimize">—</i><i class="tb-max" title="Maximize">□</i><i class="tb-close" title="Close">×</i></span>
+  </div>
+  <div class="win-body flush">
+
+    <div class="ie-home">
+      <button class="ie-back" id="ieBack" type="button" title="Back">
+        <img src="assets/winxp/windowsIcons/back.png" alt="Back">
+      </button>
+      <button class="ie-back-txt" id="ieHome" type="button" data-i18n="backHome">← 返回主页</button>
+      <div class="ie-addr">
+        <span>Address</span>
+        <input id="ieAddr" type="text" readonly>
+      </div>
+    </div>
+
+    <div class="ie-page">
+      <div class="ie-wrap">
+        <div class="ie-cols bl-cols">
+
+          <!-- ── 左栏：站点名 / 搜索 / 标签 / 归档 / 最近更新 / 关于 ── -->
+          <div class="cm-side bl-side">
+
+            <div class="cm-panel bl-lead">
+              <span class="bl-title" data-i18n="titleBlog">个人博客</span>
+              <span class="bl-tagline" data-i18n="blTagline">感想 · 生活记录 · 资源存档</span>
+              <div class="bl-search">
+                <input id="blSearch" type="text" data-i18n-placeholder="blSearchPh" placeholder="搜索文章…">
+                <button id="blSearchGo" type="button" data-i18n="blSearchGo">搜索</button>
+              </div>
+            </div>
+
+            <div class="cm-panel">
+              <h2 data-i18n="blTagsTitle">标签</h2>
+              <div class="bl-tags" id="blTags"></div>
+            </div>
+
+            <div class="cm-panel">
+              <h2 data-i18n="blMonthsTitle">按月归档</h2>
+              <div class="bl-tags" id="blMonths"></div>
+            </div>
+
+            <div class="cm-panel">
+              <h2 data-i18n="blRecentTitle">最近更新</h2>
+              <ul class="bl-recent" id="blRecent"></ul>
+            </div>
+
+            <div class="cm-panel">
+              <h2 data-i18n="blAboutTitle">关于本博</h2>
+              <p class="bl-about" data-i18n="blAbout">放我平时写的东西：感想、生活流水账、收集到的资源。想到什么写什么，不定期更新。</p>
+            </div>
+
+          </div>
+
+          <!-- ── 右栏：列表 / 文章 / 标签 / 搜索结果（由 js/blog.js 画） ── -->
+          <div class="bl-main" id="blMain"></div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════ winXP 任务栏 ══════ -->
+<footer class="taskbar">
+  <button class="task-start" id="startBtn" type="button" aria-label="Start">
+    <img src="assets/winxp/windowsIcons/start.png" alt="Start">
+  </button>
+  <div class="task-tasks" id="taskTasks"></div>
+  <div class="task-tray">
+    <img src="assets/winxp/windowsIcons/690(16x16).png" alt="">
+    <img src="assets/winxp/windowsIcons/394(16x16).png" alt="">
+    <img src="assets/winxp/windowsIcons/229(16x16).png" alt="">
+    <span class="task-clock" id="taskClock">--:--</span>
+  </div>
+</footer>
+<div class="startmenu" id="startMenu" hidden></div>
+
+<div id="winLayer"></div>
+
+<script src="js/i18n.js"></script>
+<script src="js/content.js"></script>
+<script src="js/content-render.js"></script>
+<script src="blog/posts.js"></script>
+<script src="js/config.js"></script>
+<script src="js/winxp.js"></script>
+<script src="js/blog.js"></script>
+<!-- 播放器引擎：博客页没有播放器窗口，只用来接着放主页点开的那首歌 -->
+<script src="js/player.js"></script>
+<script src="js/starfield.js"></script>
+</body>
+</html>

@@ -1065,3 +1065,148 @@ node --check js/player.js        # 通过（PATH 里的 node 与插件自带 nod
   - `.wmp` 上的 `fit()`（`min(body.clientWidth/620, body.clientHeight/340)`）保留：外框锁死后内容区比例会有几 px 偏差，`fit()` 保证内容永远不超过窗口（留一点 Aero 渐变边，肉眼无感）。
   - 证据（`--window-size=1400,1000`，`getBoundingClientRect()` 实测）：常态 626×374＝**1.6738**、拖握把 +300/+40 后 926×553.2＝**1.6738**、最大化 1366×816.1＝**1.6738** —— 三个尺寸外框比例完全一致；`diag/shots/music.png` / `music-max.png` 两张图肉眼同形（最大化不再铺满，四周留桌面）。
 
+---
+
+## 十七、第 11 批：个人博客（**本轮新增，边做边在 17.4 追加**）
+
+### 17.1 站主原话与拍板（本轮不再重问）
+
+站主原话要点（m00001）：新增一个功能「个人博客」，主要发布我个人的文章，作用就是普通的博客，用于我个人的感想／生活记录／各种资源存档，但暂时想不到怎么排版显得美观且合理；个人博客通过后端编辑，要求可插入图文。并且此后必须遵守两条规则：**① 在确认有百分百把握做完任务前，务必先让站主回答疑问，直到完全知道该怎么做为止，在此之前不要进行任何操作；② 此后每一步大改都要写到交接文件里。**
+
+两轮问答的拍板（全部由站主点选，不是实现者决定的）：
+
+| 项 | 拍板结果 |
+|---|---|
+| 排版 | **甲「千禧年博客主站」**：`blog.html` 沿用跳转页的固定式 IE 窗口 + 左 200px 侧栏（站点名／颜文字分隔线／标签／按月归档／最新 5 篇／关于）+ 右主区的列表页与文章页切换 |
+| 入口 | 主页主栏整行「个人博客」入口窗（**窗里直接列最近 3 篇标题+日期，点标题直达**）+ 桌面快捷方式 + 开始菜单项 |
+| 正文编辑 | **富文本所见即所得**（`contenteditable` + `document.execCommand`，存 HTML），零新依赖 |
+| 工具栏 | 加粗/斜体/下划线、H2/H3/正文、无序列表/有序列表/引用、插入图片、插入链接/分隔线/清除格式、图片并排/图片居中（六组全要） |
+| 文章字段 | 标题、日期、**标签（多个自由词）**、摘要（手写；留空则前台自动截正文前 120 字）、**置顶**、**草稿**；**不要分类、不要封面图** |
+| 草稿 | **真不发布**：草稿存 `blog/drafts.js` 并写进 `.gitignore`（换机器／重装会丢，站主已知并接受） |
+| 文章地址 | `blog.html#/文章id`（纯静态，零配置） |
+| 语言 | 文章正文单语（写什么显示什么）；博客页面的界面文案走站点三语 i18n |
+| 插图 | 传进 `uploads/`，后台在浏览器端自动压到长边 1600px（JPEG 质量 0.85；透明 PNG 仍存 PNG） |
+| 评论 | **不做** |
+| 附赠 | 做「主页侧栏最近文章小窗」+「博客侧栏站内搜索」；**归档页与 RSS 不做** |
+| 重复小窗 | 主页「入口窗 3 篇」与「侧栏小窗 5 篇」**两个都留** |
+
+### 17.2 数据契约（前台/后台按这个来）
+
+```js
+// blog/posts.js —— 已发布（会推上线，前台加载）
+window.BLOG_POSTS = [
+  { id: 'p-1735689600000', title: '标题', date: '2026-02-14',
+    tags: ['生活记录'], summary: '', html: '<p>正文…</p>', pinned: false }
+];
+// blog/drafts.js —— 草稿（.gitignore，只有本地后台读，前台永不加载）
+window.BLOG_DRAFTS = [ /* 同形状 */ ];
+```
+
+- `id` 决定哈希地址（`blog.html#/p-xxxx`）；排序＝`pinned` 优先，再按 `date` 倒序，同日按数组顺序。
+- `html` 允许的标签：`h2 h3 p br strong b em i u s ul ol li blockquote a img figure figcaption hr div span code pre`；属性只留 `href src alt title class`；前台渲染前过一遍白名单清洗（防手抖粘进 `<script>`）。
+- 图片块约定：单张＝`<figure class="bl-figure"><img src="uploads/..." alt=""></figure>`；两张并排＝`<div class="bl-row">` 里放两个 `figure`；`.bl-mid` = 居中。
+
+### 17.3 改动清单（按落地顺序）
+
+| # | 文件 | 动作 |
+|---|---|---|
+| 1 | `HANDOFF.md` | 新增本节（就是这里） |
+| 2 | `blog/posts.js`、`blog/drafts.js` | 新增数据层（含 `window.blogRecent(n)`、`window.blogAll()` 小工具） |
+| 3 | `.gitignore` | 加 `blog/drafts.js` |
+| 4 | `server/admin.js` | 新增 `GET`/`POST /api/blog`（读回/写入 posts+drafts）；**图片上传复用现有 `POST /api/upload?kind=image`，服务器端不改上传逻辑** |
+| 5 | `admin.html` | 加引 `blog/posts.js` + `blog/drafts.js`；博客页签用的少量样式 |
+| 6 | `js/admin.js` | `TABS` 加「博客」；新增 `viewBlog()`、编辑器与元数据表单、`act` 前缀 `b-*` 的点击/输入处理；`FIELDS` 登记新 i18n key（分组「博客」） |
+| 7 | `js/admin.css` | —— 后台样式是 `admin.html` 内联 `<style>`，所以第 7 项并入第 5 项，**不新建 css 文件** |
+| 8 | `blog.html`、`css/blog.css`、`js/blog.js` | 前台博客页（hash 路由 / 列表 / 文章 / 标签 / 搜索 / 侧栏） |
+| 9 | `index.html` | 主栏整行「个人博客」入口窗（最近 3 篇）+ 侧栏「最近文章」小窗（5 篇）+ 脚本引入 |
+| 10 | `css/style.css` | 补 `#blogEntry` 的栅格位置并顺延 `#guestbook` 的行 |
+| 11 | `js/winxp.js` | `NAV` 加「个人博客」（开始菜单项）；`index.html` 加一个桌面快捷方式 |
+| 12 | `js/i18n.js` | 博客文案三语 key（含入口窗、前台博客页、侧栏小窗） |
+
+### 17.4 实现记录 + 验证证据
+
+**新增文件**
+
+| 文件 | 规模 | 干什么 |
+|---|---|---|
+| `blog/posts.js` | 30 行 | `window.BLOG_POSTS = []` ＋ `window.blogAll()`（置顶优先 → 日期倒序）、`window.blogRecent(n)`。**工具函数在文件上半部、数据永远在最底下**，后台保存时从 `window.BLOG_POSTS` 那一行往后整段重写，所以手写的注释和工具不会被冲掉 |
+| `blog/drafts.js` | 8 行 | `window.BLOG_DRAFTS = []`；已进 `.gitignore`，前台从不加载 |
+| `blog.html` | 122 行 | 前台博客页：固定式 IE 窗口（`data-fixed`）+ `.ie-home`（后退 / `← 返回主页` / 地址栏）+ `.ie-page > .ie-wrap > .bl-cols`（左 `.bl-side`、右 `#blMain`） |
+| `css/blog.css` | 118 行 | 博客页与两个小窗的样式（全 `.bl-*`），沿用跳转页的纸面配色 |
+| `js/blog.js` | 205 行 | 前台唯一脚本：哈希路由（`#/`、`#/p-xxx`、`#/tag/词`、`#/month/2026-02`、`#/search/词`）、列表/文章/标签/月归档/搜索、侧栏（标签计数＋按月计数＋最新 5 篇）、主页两个小窗（3 篇 / 5 篇）、正文标签白名单清洗 `clean()`、摘要兜底 `plain().slice(0,120)`；`langchange` 时全部重画 |
+| `server/test-blog.js` | 42 行 | 零依赖自检：`node server/test-blog.js`（写→读回→清空→再读，顺带拦「后台保存把工具函数冲掉」这个坑） |
+
+**改动文件**
+
+| 文件 | 改了什么 |
+|---|---|
+| `server/admin.js` | 31-32 行加 `BLOG_JS`/`BLOG_DRAFT_JS`；319-376 行加 `readJsArray/writeJsArray/normPost/normPosts`（读＝用 `^window\.XXX\s*=` 正则定位后 `JSON.parse`，写＝保留前面的注释再重写整段）；535 行 `/api/state` 多回一个 `blog:{posts,drafts}`；568-580 行新增 `POST /api/blog`；662 行 `_test` 多导出四个函数。**图片上传复用现有 `/api/upload?kind=image`，服务器端上传逻辑一行没改** |
+| `js/admin.js` | 70-72 行 `FIELDS` 加三个「博客」分组文案；271-279 行 `sync()` 收下 `blog`；284 行 `TABS` 加「博客」；298 行 `render()` 分支；423-620 行编辑器（`FMT` 走 `document.execCommand`、`BACT`＝插图/居中/两图并排/拆开并排、`bShrink()` 在浏览器端压到长边 1600px）；960-1035 行 `b-*` 动作分派；1084 行 mousedown 保住正文选区（不然点工具栏就把选区丢了） |
+| `admin.html` | 只加 `.bl-*` 后台样式（77-94 行）。**故意不引 `blog/posts.js`**——后台数据从 `/api/state` 拿，引了文件反而会在保存后读到旧数据 |
+| `css/style.css` | 161-193 行：双栏布局。**现状（见 17.8）**：主栏两行（委托＋资源并排 → 留言板整行）；侧栏「自介 `flex:1` 撑满 ＋ `#blogEntry` `flex:none` 贴底」；撑满规则只管主栏 `.main-col > .win` |
+| `index.html` | 11 行引 `css/blog.css`；36-38 行桌面快捷方式「个人博客」（图标 `327(32x32).png`）；134-147 行侧栏底部的「个人博客」入口窗（`#blEntryList`，最近 5 篇 ＋ 进入按钮，**位置见 17.8**）；154 行起主栏只有委托／资源／留言板；253-256 行按顺序引 `blog/posts.js`、`js/blog.js` |
+| `js/winxp.js` | 486 行 `NAV` 加一项 `{key:'blog', nameKey:'menuBlog', icon: ICON+'327(32x32).png', href:'blog.html'}`（开始菜单里出现） |
+| `js/i18n.js` | `DICT` 加 25 个 `bl*` 文案（225-267 行），三语都写全 |
+| `.gitignore` | 加 `blog/drafts.js` |
+
+**验证证据**
+
+1. `node --check` 过：`js/blog.js`、`js/admin.js`、`js/i18n.js`、`js/winxp.js`、`blog/posts.js`、`blog/drafts.js`、`server/admin.js`。
+2. `node server/test-blog.js` → `✓ 博客数据读写自检通过`。
+3. 端到端（真起服务器、真走 HTTP，脚本 `diag/bl-e2e.js`）：登录拿会话 → `POST /api/upload` 传图 → `POST /api/blog` 写 3 篇（1 篇置顶、1 篇含 `.bl-row` 并排图＋居中图＋引用、1 篇草稿）→ `GET /api/state` 读回 `posts=3 drafts=1 置顶=1 标签=["公告","置顶"]`，并排的 `class="bl-row"` 原样保住 → 再 `--reset` 清空并删掉测试图。**交出去的仓库是干净的：`blog/posts.js`、`blog/drafts.js` 都是空数组，`uploads/` 里没有测试图。**
+4. 静态自检（脚本 `diag/bl-check.js`，20 项全过）：132 个文案 key 三语齐全；5 个 HTML 里 90 处 `data-i18n` 都有对应 key；`js/blog.js`＋`js/admin.js` 里 12 个 `t()` key 存在；`FIELDS` 里 131 个 key 全存在；HTML 引用的本地文件全部存在；`blog.html`/`index.html` 都没引草稿；`js/blog.js` 用的 8 个元素 id 在页面上都存在；排序结果 `cba`、`blogRecent(2)`＝`cb`。
+
+**没做到的验证（这条要说清楚）**：这台机器的当前沙箱**不让拉无头浏览器**——`msedge --headless` 被拒（crashpad `OpenProcess: 拒绝访问 (0x5)`），`Start-Process` 直接 `Access is denied`，加了 `danger-full-access` 重试也一样，一张截图都没写出来。所以**视觉排版没有截图验收过**，只有上面这些文件级／DOM 契约级检查。站主自己开 `http://127.0.0.1:3000/index.html`、`http://127.0.0.1:3000/blog.html`、`/admin/` 扫一眼即可。
+
+### 17.6 如果站主觉得不合适，最省事的两个改动
+
+1. **侧栏那个博客入口窗还是太高**：`js/blog.js` 的 `homeFill()` 里 `mini(all(), 5)` 改成 `3`，能省约 40px（入口窗里的最近文章从 5 篇变 3 篇）。
+2. **图标不合适**：`assets/winxp/windowsIcons/` 里任选一个 32×32 的 png，替换 `index.html` 桌面快捷方式与 `js/winxp.js:486` 两处路径即可，其它地方不用动。
+
+### 17.7 站主验收后的调整：入口与最新内容合并成一个窗
+
+站主原话（附主页截图）：「**最近更新直接把自介覆盖掉了**，调整一下，先给我提出方案再进行修改」。
+
+**病因**：`css/style.css` 的通用规则 `.main-col > .win, .side-col > .win { height: 100%; min-height: 0; }` 是给「侧栏只有一个窗、撑满侧栏」写的。新加的侧栏小窗 `#blogRecent` 也吃到了这条，于是它自撑满整个侧栏、把 `#profile` 挤成 0 高（截图里只剩一条标题栏那个就是自介窗）。当时给它加的 `flex: none` 管不住 `height`，所以没生效。**教训：往 `.main-col` / `.side-col` 里加第二个窗之前，先看这两条通用规则。**
+
+**站主定案（不用甲乙丙三案，直接合并）**：主页的「博客入口」和「最新内容」合并成一个窗 —— 主栏那一个「个人博客」窗里：一行说明 ＋ **最近 5 篇（日期＋标题）** ＋ 进入按钮；侧栏的「最近更新」小窗删掉，侧栏回到只有「自我介绍」撑满一屏。
+
+**本次改动**
+
+| 文件 | 改了什么 |
+|---|---|
+| `index.html` | 删掉侧栏那个 `#blogRecent` 小窗（原 134-143 行，含 `#blSideList`） |
+| `css/style.css` | 删掉 `.side-col > #blogRecent { flex: none; }`（原 192 行），并把双栏布局的注释改回「侧栏只有自介一个窗」 |
+| `js/blog.js` | `homeFill()` 里入口窗的 `mini(all(), 3)` → `mini(all(), 5)`，去掉 `#blSideList` 那一支；头部注释同步改成「主页入口窗里的最近文章」 |
+
+**验证**：`node --check js/blog.js`、`node server/test-blog.js` 通过；`node diag/bl-check.js` 20 项全过（其中「js/blog.js 引用的元素 id 在页面上都存在」这条会在漏删 DOM 时立刻报错）。视觉仍请站主自己刷新 `index.html` 确认（沙箱开不了无头浏览器，见 17.4 末段）。
+
+### 17.5 已知限制（先说清楚，别当 bug 修）
+
+- 草稿只在本地 `blog/drafts.js`（`.gitignore`）：换电脑、重装、`git clean` 都会丢，后台里删掉草稿不可恢复。
+- 文章地址是哈希地址（`#/p-xxx`）：搜索引擎收录一般，站外分享链接带 `#`。
+- 正文是站主自己写的 HTML，前台只做标签白名单清洗，不保证样式完全一致（前台 CSS 会统一控制正文排版）。
+- 富文本用 `document.execCommand`（已废弃但各浏览器仍支持）：只保证 Chrome／Edge（站主用的后台环境）表现正常。
+
+### 17.8 站主验收后的调整：博客入口窗挪到侧栏底部（m00575）
+
+站主原话：「**现在的问题是留言板空间被挤压了，给我一个排版优化方案并且在我确认后实践**」。我先出了四个方案（甲 入口窗挪侧栏／乙 主栏一行三格／丙 原地把入口窗压矮／丁 允许整页滚动），站主回：「**侧栏底部不行吗。。。。**」→ 按「侧栏：自介在上撑满 ＋ 博客入口窗贴底」实施（等价于甲，只差入口窗在侧栏的上下位置）。
+
+**病因（布局机制，以后往主栏加窗先看这条）**：留言板是主栏里唯一吃 `minmax(0, 1fr)` 的行 —— 主栏每多出一行 `auto` 高度，留言板就少同样多。博客入口窗（5 篇时约 200px）整行插在主栏第一行，留言板就正好少了这 200px。而 `.page` 的高度是 `calc(100vh - 30px)` 且 `overflow: hidden`（整页不滚动、窗口内部自己滚，是既有设计），所以视口一矮就压得很难看。**教训：`1fr` 的那一行是「剩下的都给它」，其它行的高矮都从它身上扣。**
+
+**本次改动**
+
+| 文件 | 改了什么 |
+|---|---|
+| `index.html` | `#blogEntry` 整段（含 `#blEntryList`）从 `.main-col` 挪进 `aside.side-col`（`#profile` 之后、`</aside>` 之前，现在在 134-147 行）；主栏注释改成「两个跳转入口 + 留言板」 |
+| `css/style.css` | 主栏回到两行：`grid-template-rows: auto minmax(0, 1fr)`，`#commissionEntry`/`#resourcesEntry` 回 `grid-row: 1`、`#guestbook` 回 `grid-row: 2`；删掉 `.main-col > #blogEntry` 那条；加 `.side-col > #blogEntry { flex: none; }`；撑满规则收窄成只管主栏 `.main-col > .win { height: 100%; min-height: 0; }`（侧栏：自介 `flex:1` 撑满剩余、博客窗按内容高度） |
+| `js/blog.js` | **一行没改**：填的还是同一个 `#blEntryList`，窄了也不会坏 |
+
+**效果**：主栏完全恢复成「委托＋资源并排 ／ 留言板整行」的原样，留言板拿回约 200px；侧栏变成「自介（撑满剩余）＋ 博客入口（贴底）」。
+
+**验证**：`node diag/bl-check.js` 20 项里 19 项过（唯一没过的仍是「`blog/posts.js` 现在有 3 篇示例」那条故意的，见 17.9）；元素 id 契约检查通过。视觉请站主刷新确认（沙箱开不了无头浏览器，见 17.4 末段）。
+
+### 17.9 临时给站主看效果的 3 篇示例文章（**还没删**）
+
+`diag/bl-seed.js`（临时脚本，`diag/` 已 gitignore）：`node diag/bl-seed.js` 往 `blog/posts.js` 写 3 篇示例（置顶 ＋ 全格式 ＋ 无摘要 ＋ 标签），`node diag/bl-seed.js --reset` 一条命令删光。**站主看完前不要在后台「提交」页推送**，否则示例会跟着上线。删掉后 `diag/bl-check.js` 的第 20 项自动变绿。
+

@@ -160,7 +160,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------- 双栏布局 ----------
    主区：第一行「委托相关事宜 + 资源配布」并排，第二行「留言板」整行
-   侧栏：自介（撑满一屏高度） */
+   侧栏：上「自介」撑满剩余高度，下「个人博客」入口窗（内容高度）—— 站主 m00575 定的位置 */
 .blog-cols {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 380px;   /* 站主 m02125 第 3 条：自介窗宽一点，名字才不被挤压 */
@@ -183,13 +183,14 @@ a { color: inherit; text-decoration: none; }
 .main-col > #resourcesEntry  { grid-column: 2; grid-row: 1; }
 .main-col > #guestbook       { grid-column: 1 / -1; grid-row: 2; min-height: 0; }
 .side-col {
-  grid-column: 2;   /* 侧栏在右（328px） */
+  grid-column: 2;   /* 侧栏在右（380px） */
   grid-row: 1;
   display: flex; flex-direction: column; gap: 12px; min-height: 0;
 }
-.side-col > #profile { flex: 1; min-height: 0; }
-/* 窗口撑满各自的格子，内容区自己出滚动条 */
-.main-col > .win, .side-col > .win { height: 100%; min-height: 0; }
+.side-col > #profile   { flex: 1; min-height: 0; }
+.side-col > #blogEntry { flex: none; }   /* 入口窗按内容高度；不能让它也 100%（两个窗都撑满会溢出） */
+/* 窗口撑满各自的格子，内容区自己出滚动条（侧栏那个博客入口窗是内容高度，不算在内） */
+.main-col > .win { height: 100%; min-height: 0; }
 /* 窗口内容 = 正文 → 用像素体（.win 本身是 XP 外壳、用 --font-ui；
    6 个 XP 应用的窗口挂在 #winLayer 里，不受这条影响，仍是 Tahoma） */
 .main-col .win-body, .side-col .win-body { font-family: var(--font-body); }

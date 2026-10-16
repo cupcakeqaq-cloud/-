@@ -480,9 +480,10 @@
   }
 
   /* ══════════ 开始菜单 ══════════ */
-  /* 导航（返回主页 / 委托相关事宜 / 资源配布）+ Survivor 友链；extern 的新标签打开 */
+  /* 导航（返回主页 / 个人博客 / 委托相关事宜 / 资源配布）+ Survivor 友链；extern 的新标签打开 */
   var NAV = [
     { key: 'index', nameKey: 'menuHome', icon: ICON + 'windows.png', href: 'index.html' },
+    { key: 'blog', nameKey: 'menuBlog', icon: ICON + '327(32x32).png', href: 'blog.html' },
     { key: 'commission', nameKey: 'menuCommission', icon: ICON + '887(32x32).png', href: 'commission.html' },
     { key: 'resources', nameKey: 'menuResources', icon: ICON + '318(32x32).png', href: 'resources.html' },
     { key: 'friend', nameKey: 'menuFriend', icon: 'assets/icon/survivor.png', href: 'https://cupcakeqaq-cloud.github.io/survivor/', extern: true }
