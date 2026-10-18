@@ -54,7 +54,7 @@ window.CONTENT = {
     }
   },
   "commission": {
-    "status": "closed",
+    "status": "open",
     "cards": [
       {
         "shots": [
