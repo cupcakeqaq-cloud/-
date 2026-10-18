@@ -169,9 +169,10 @@ window.CONTENT = {
           "picture/插画31.png",
           {
             "src": "uploads/20261018-retouch_2025062900192397-bae7e3.jpg",
+            "r": "4:3",
             "zoom": 1.1,
             "cx": 0.455,
-            "cy": 0.524
+            "cy": 0.478
           }
         ]
       },
