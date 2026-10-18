@@ -43,6 +43,9 @@
   pointer-events: auto;
   box-shadow: 3px 4px 14px rgba(0, 0, 0, .4);
 }
+/* 拖动中：把窗口提到独立图层，合成器直接把图层挪走（不重画内容/阴影）。
+   松手就摘掉，免得一堆窗口长期占着图层。 */
+.win.dragging { will-change: transform; }
 .win.minimized { display: none; }
 /* 关闭 = 藏起来（页面窗口不真删，开始菜单「整理所有窗口」能请回来） */
 .win.closed { display: none; }

@@ -343,15 +343,17 @@
   function bindWindow(rec) {
     var bar = rec.el.querySelector('.titlebar');
     if (!bar) return;
-    var dragging = false, sx = 0, sy = 0, ox = 0, oy = 0, moved = false;
+    var dragging = false, sx = 0, sy = 0, ox = 0, oy = 0, w = 0, h = 0, moved = false, tx = 0, ty = 0;
 
     bar.addEventListener('pointerdown', function (e) {
       if (e.target.closest('.tb-btns')) return;
       if (e.button !== 0) return;
       focusWin(rec);
-      dragging = true; moved = false;
+      dragging = true; moved = false; tx = ty = 0;
       var r = rec.el.getBoundingClientRect();
       sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top;
+      /* 尺寸读一次就够：拖动中再读 offsetWidth 会强制同步回流（高回报率鼠标一帧能触发好几次 → 就是卡顿） */
+      w = r.width; h = r.height;
       try { bar.setPointerCapture(e.pointerId); } catch (err) {}
       e.preventDefault();
     });
@@ -361,20 +363,30 @@
       var dx = e.clientX - sx, dy = e.clientY - sy;
       if (!moved && Math.abs(dx) + Math.abs(dy) > 3) {
         moved = true;
-        if (!rec.floating) { toFloat(rec); ox = rec.el.getBoundingClientRect().left; oy = rec.el.getBoundingClientRect().top; sx = e.clientX; sy = e.clientY; dx = dy = 0; }
+        if (!rec.floating) {
+          toFloat(rec);
+          var r = rec.el.getBoundingClientRect();
+          ox = r.left; oy = r.top; sx = e.clientX; sy = e.clientY; dx = dy = 0;
+        }
+        rec.el.classList.add('dragging');
       }
       if (!rec.floating) return;
-      var w = rec.el.offsetWidth, h = rec.el.offsetHeight;
-      var nx = Math.min(window.innerWidth - 44, Math.max(44 - w, ox + dx));
-      var ny = Math.min(window.innerHeight - 46, Math.max(0, oy + dy));
-      rec.el.style.left = Math.round(nx) + 'px';
-      rec.el.style.top = Math.round(ny) + 'px';
+      /* 拖动只写 transform：合成器整体挪图层，不用每帧重排 + 重画窗口和它的阴影。
+         落位在 end() 里换回 left/top，其余逻辑（归位/最大化/占位）一切照旧。 */
+      tx = Math.min(window.innerWidth - 44, Math.max(44 - w, ox + dx)) - ox;
+      ty = Math.min(window.innerHeight - 46, Math.max(0, oy + dy)) - oy;
+      rec.el.style.transform = 'translate3d(' + Math.round(tx) + 'px,' + Math.round(ty) + 'px,0)';
     });
 
     function end(e) {
       if (!dragging) return;
       dragging = false;
       try { bar.releasePointerCapture(e.pointerId); } catch (err) {}
+      rec.el.classList.remove('dragging');
+      if (!moved) return;
+      rec.el.style.left = Math.round(ox + tx) + 'px';
+      rec.el.style.top = Math.round(oy + ty) + 'px';
+      rec.el.style.transform = '';
     }
     bar.addEventListener('pointerup', end);
     bar.addEventListener('pointercancel', end);
