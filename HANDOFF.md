@@ -1559,3 +1559,59 @@ ode --check js/admin.js 通过；
 ode diag/bl-check.js → **52 项全过**（新增 [11] 入口窗文案分组 2 项：6 个 key 都在「主页」分组、FIELDS 里没重复登记）。
 - js/admin.js 被 Set-Content 改写过一次，**带了 UTF-8 BOM**，已用 [System.IO.File]::WriteAllText + UTF8Encoding(false) 去 BOM 并补回结尾换行（校验：首字节 47,42,32 = /* ，末字节 10）。以后改这个文件别再用 PowerShell Set-Content，用 edit 工具。
 - 后台页面是静态文件，刷新即生效（实测 3000 端口服务的 js/admin.js 已含「[资源入口窗] 第 3 行」字样），**这次不用重启后台**。
+
+---
+
+## 二十五、第 19 批：把站主改过的中文文案补齐日文/英文（**本轮**）
+
+站主（m00561）：「后端改动了部分的中文文案（主要在委托页，可能其他地方有遗漏），需要你帮我翻译成其他语言」。
+
+### 25.1 起因与判据
+
+js/content-render.js:18-28 的覆盖逻辑是**按语言逐个覆盖**：js/content.js 的 i18n[key] 里写了哪种语言就盖哪种，没写的**回落 js/i18n.js 的 DICT**。站主在后台改中文时只改了 zh 一栏，于是：
+- 有 16 个 key 只有 zh → 日/英仍显示 DICT 里**旧中文对应的旧翻译**（价格、档位全对不上）；
+- 有 11 个 key 的 ja/en 是上一版中文的翻译（cmPriceNote 的 en 直接是日文、cmApply1d/2d/3d 的 ja/en 内容完全对不上号）；
+- duckAria 只有 zh（影响彩蛋按钮的 aria-label）。
+
+比对方式（可复用）：把 js/i18n.js 的 DICT 与 js/content.js 的 i18n 都在 node 里 eval 出来，逐 key 比 zh 是否被改、ja/en 是否缺失/两者相同/日文里没假名。
+
+### 25.2 改动（js/content.js 一个文件，27 个 key 全部补齐 zh+ja/en）
+
+| key | 中文（站主写的） | 日文 | 英文 |
+|---|---|---|---|
+| eText | 资源的下载与使用说明… | 微调（原文「音源等」→「リソース」） | 重写（不再用 moved to a separate page 的旧句） |
+| oiceNote | 使用前请仔细阅读压缩包内readme… | 沿用 | 重译（补「压缩包内」） |
+| cmPriceNote | ※ 目前价目表为施工状态… | 沿用（本来就对） | **新译**（原来 en 是日文） |
+| cmStatusNote | 档期随时变动…开放状态 | 沿用 | 重译（改成问开放状态） |
+| cmApply1d | 国内一般走米画师… | **新译**（原来 ja 是邮件模板） | **新译**（原来 en 也是邮件模板） |
+| cmApply2b | ② 支付方式 | ② お支払い方法 | ② Payment |
+| cmApply2d | 支付宝/微信 + 10% 定金 + 按节点分期 | **新译**（原来 ja 讲 PayPal） | **新译**（原来 en 讲邮件） |
+| cmApply3d | 定金到账后开工，草稿→上色→完稿 | **新译**（原来 ja 是档期提示） | **新译**（原来 en 是档期提示） |
+| oiceNoteTitle/sIntroTitle/sDownloadTitle | 已同步 | 沿用 | 沿用 |
+| duckAria | 彩蛋 | おもちゃのアヒルのお楽しみ | Toy duck surprise |
+| cmCard1Title | 简单的白底胸像/半身 | シンプルな白背景のバストアップ／半身 | Simple flat-color bust / half-body |
+| cmCard2Title | 比较精细的胸像/半身 | やや細やかなバストアップ／半身 | More detailed bust / half-body |
+| cmCard3Title | 很潦草的插图 | かなりラフなイラスト | Very rough illustration |
+| cmCard4Title | 其他 | その他 | Other |
+| cmCard1/2/3Price | ¥120-~240 / ¥160~220 / ¥200~400 | **120〜240元 / 160〜220元 / 200〜400元** | **¥120–240 (CNY) / ¥160–220 (CNY) / ¥200–400 (CNY)** |
+| cmCard1Desc1 | 完成度如图，半身底价 160… | 新译（160元から） | 新译（starts at ¥160 (CNY)） |
+| cmCard2Desc1 | 完成度如图，半身底价 200… | 新译（200元から） | 新译（starts at ¥200 (CNY)） |
+| cmCard3Desc1 | 精细度低，氛围大于精度 | 新译 | 新译（mood over precision） |
+| cmCard1/2Desc2 | 小物/抱娃OK、指定动作OK、双人乘算 | 新译 | 新译 |
+| cmCard3Desc2 | 可指定场景、动作、氛围 | 新译 | 新译 |
+| cmCard4Desc1/2 | 自带价 / 盲盒 | 新译 | 新译 |
+
+**价格口径（要改就改这里）**：日/英里的金额**不自动换算**，直接写人民币：日文用「元」、英文用「¥… (CNY)」。这样价目改一次三语各改一条，不会出现「中文改了日元还是旧汇率」的幽灵价。要真换算的话看 js/i18n.js:123-125 注释里的基准（1 CNY = 21 JPY = 0.14 USD，日元取 500 整、美元取 5 整）——但那是写死的字符串，换汇率得手改。
+
+### 25.3 顺手留的检查
+
+diag/bl-check.js 新增 [12] content.js 文案三语齐全 3 项（→ 共 **55 项全过**）：
+1. js/content.js 能被后台 eadContent()（JSON.parse）解析——写坏格式后台会当成空文件重新生成，数据全没；
+2. i18n 每个 key 的 zh/ja/en 都不为空；
+3. ja/en 里没混进未翻译中文（白名单：米画师/MiHuashi/元）。
+
+### 25.4 注意事项
+
+- **前台刷新即生效**（只改了 js/content.js，不用重启后台）。
+- 但**后台页面要先刷新**再去改文案：后台把 js/content.js 读进内存，旧页面保存时会把内存里的旧 ja/en 原样写回，把本轮翻译盖掉。
+- js/i18n.js 的 DICT **没改**（它是「没改过时的默认值」）。所以这 27 个 key 现在完全由 js/content.js 决定；哪天在后台把某条清空，会掉回 DICT 里的旧默认文本。
