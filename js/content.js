@@ -76,7 +76,7 @@ window.CONTENT = {
       "en": "Simple bust / half-body on white"
     },
     "cmCard1Price": {
-      "zh": "¥120-~240",
+      "zh": "¥120~240",
       "ja": "2,500〜5,000円",
       "en": "$17–34"
     },
