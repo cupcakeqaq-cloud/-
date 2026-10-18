@@ -159,22 +159,27 @@ window.CONTENT = {
       {
         "shots": [
           "picture/插画34-RE.png",
-          "picture/插画47-2.png",
-          "picture/插画56.jpg"
+          "uploads/20261018-35-cf2c26.png",
+          "uploads/20261018-67-2bed88.jpg"
         ]
       },
       {
         "shots": [
-          "picture/插画35.png",
-          "picture/插画67.png",
-          "picture/插画59.png"
-        ]
-      },
-      {
-        "shots": [
+          "uploads/20261018-62-82f31f.png",
           "picture/插画31.png",
-          "picture/插画37.png",
-          "picture/插画62.png"
+          {
+            "src": "uploads/20261018-retouch_2025062900192397-bae7e3.jpg",
+            "zoom": 1.1,
+            "cx": 0.455,
+            "cy": 0.524
+          }
+        ]
+      },
+      {
+        "shots": [
+          "uploads/20261018-38-506427.png",
+          "uploads/20261018-28-3039b0.png",
+          "uploads/20261018-28-1-096b32.png"
         ]
       }
     ]
