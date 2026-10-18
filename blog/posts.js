@@ -78,6 +78,18 @@ window.BLOG_POSTS = [
     ],
     "summary": "因为本人想玩PostpPet但是下载到的资源完全打不开所以强行破解并且兼容了win11，总之做都做了所以在这边分享出来供大家游玩 (*´∀`)~♥",
     "html": "<figure class=\"bl-figure\">总之最终通过破解玩到了这款互联网文物ww<br>主要是做了高版本Windows系统的兼容和汉化，原版为英文版，也有进行破解。<br>直接在站内资源配布页就能下载到！包内修改器似乎还有点问题，直接无视吧。<br>详细的使用说明还请查看压缩包内的readme文件！<br>最后：文件仅供个人学习交流，希望大家不要大规模传播</figure><figure class=\"bl-figure\"><img src=\"uploads/20261018-Snipaste_2026-10-17_19-14-58-f047ff.png\" alt=\"\"></figure>",
-    "pinned": false
+    "pinned": false,
+    "i18n": {
+      "ja": {
+        "title": "PostPet21 リソース配布",
+        "summary": "PostPetを遊びたくてダウンロードしたけど全然起動できなかったので、半ば強引にクラックしてWindows 11でも動くようにしました。せっかく作ったので、ここでみんなに配布します (*´∀`)~♥",
+        "html": "<figure class=\"bl-figure\">最終的にクラックして、このインターネットの遺物を遊べるようになりましたww<br>主に新しいバージョンの Windows での動作互換と中国語化をやりました。オリジナルは英語版で、クラックも入れています。<br>サイト内の「リソース配布」ページからそのままダウンロードできます！パッケージ内の改造ツールにはまだ不具合があるみたいなので、気にしないでください。<br>詳しい使い方は同梱の readme ファイルを見てください！<br>最後に：ファイルは個人の学習・交流用です。大規模な再配布はご遠慮ください。</figure><figure class=\"bl-figure\"><img src=\"uploads/20261018-Snipaste_2026-10-17_19-14-58-f047ff.png\" alt=\"\"></figure>"
+      },
+      "en": {
+        "title": "PostPet21 Resources",
+        "summary": "I wanted to play PostPet but the files I downloaded wouldn't open at all, so I cracked it and got it running on Windows 11. Since I already did the work, I'm sharing it here for everyone to play (*´∀`)~♥",
+        "html": "<figure class=\"bl-figure\">In the end I cracked it and finally got to play this internet relic ww<br>I mainly handled compatibility with newer Windows versions and Chinese localization. The original is the English version, and it is cracked as well.<br>You can download it straight from the Resources page on this site! The editor tool bundled in the package still seems a bit buggy, just ignore it.<br>For detailed instructions, check the readme file inside the archive!<br>One last thing: these files are for personal study and sharing only, please do not redistribute them widely.</figure><figure class=\"bl-figure\"><img src=\"uploads/20261018-Snipaste_2026-10-17_19-14-58-f047ff.png\" alt=\"\"></figure>"
+      }
+    }
   }
 ];

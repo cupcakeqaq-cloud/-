@@ -144,6 +144,11 @@ window.CONTENT = {
       "zh": "（或者看着随便出个价，我看你给的价随机产出，总之就是盲盒XD）",
       "ja": "（あるいはお任せで価格を決めていただいても構いません。いただいた金額に応じてランダムに制作します、いわゆるガチャですXD）",
       "en": "(Or just name any price and I'll make something random based on it — basically a blind box XD)"
+    },
+    "bio": {
+      "zh": "18↑一般通过十八线低精力画手兼自宅警备员\n此网站为个人网站，资源分享/个人博客/委托价目都会放在这里\n祝游玩愉快☆",
+      "ja": "18歳以上／低浮上の絵描き兼自宅警備員\n当サイトは個人サイトです。リソース配布／個人ブログ／依頼料金などはこちらにまとめています。\nどうぞお楽しみください☆",
+      "en": "18+ / Low-activity artist & self-appointed stay-at-home guard\nThis is my personal website. Resource sharing, my personal blog, and commission pricing are all posted here.\nEnjoy your visit☆"
     }
   },
   "commission": {
