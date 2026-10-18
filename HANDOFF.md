@@ -1436,3 +1436,32 @@ window.BLOG_DRAFTS = [ /* 同形状 */ ];
 验证：`node --check js/winxp.js` 通过；`node diag/bl-check.js` **33 项全过**；服务端 `/js/winxp.js` 已确认无 logo。
 
 **待确认**：站主原话里「邮箱显示bug」这句没对上皮——本页没有邮箱相关内容，已按「logo 显示 bug，去掉 logo」处理。若「邮箱显示」是另外某处（留言板、资源页、后台），等站主指位置再修。
+
+---
+
+## 二十二、第 16 批：后台「文案」页签改成按语言切换（**本轮**）
+
+站主原话（m00289）：「话说博客后台没有语言切换功能哎，补一下」。确认过事实：前台四页（index/blog/commission/resources）都有 #langDrop 下拉，只有 dmin.html 没有；再问清范围 → 站主选 **只把「文案」编辑区改成按语言切换（一次编一种）**，没选「后台界面整体三语化」（那要约 457 条中文文案，本轮明确不做）。
+
+### 22.1 改动
+
+| # | 文件 / 位置 | 改动 |
+|---|---|---|
+| 1 | js/admin.js S 状态（154-161 行附近） | 新增 ar STORE_LANG = 'cupcake-admin-lang'; 和 S.uiLang（从 localStorage 读，非法值回落 'zh'） |
+| 2 | js/admin.js ieldRow(k)（约 310-322 行） | 删掉「三列并排」逻辑（ar cells = LANGS.map(...)），改成**只渲染 S.uiLang 那一种语言的一个 input/textarea**（内容 >44 字仍自动用 textarea）；data-k / data-l 不变，输入事件和「保存改动」逻辑零改动 |
+| 3 | js/admin.js 新增 langSeg() | 渲染 中文 / 日本語 / English 三个小按钮（data-act="ui-lang" data-lang="..."），当前语言加 .on |
+| 4 | js/admin.js iewText() | 顶部 tip 后面插入 langSeg() + 一句「现在一次只显示一种语言的输入框（切换语言后未保存的改动仍在内存里）」 |
+| 5 | js/admin.js onClick（约 934 行） | 新增 if (act === 'ui-lang') 分支：设 S.uiLang、写 localStorage、ender() |
+| 6 | dmin.html 样式 | .f > .fi 从 epeat(3,minmax(0,1fr)) 改成 1fr（一行一输入框）；新增 .lseg + .lseg button.on 选中态 |
+| 7 | diag/bl-check.js | 新增 [9] 后台文案语言切换 5 项 → 共 **38 项全过** |
+| 8 | HANDOFF.md | 本节 |
+
+**没动的**：js/i18n.js、前台任何页、server/admin.js、content.json 结构、后台其它页签（委托/资源/博客/留言/提交）。语言选择只影响「文案」页签的显示，不影响保存的数据形状（S.i18n[key][lang] 原样）。
+
+### 22.2 验证
+
+- 
+ode --check js/admin.js 通过。
+- 
+ode diag/bl-check.js → **38 项全过**（[9] 5 项：localStorage 读回、切换按钮存在、点击写回、fieldRow 单输入框、admin.html 单列 + .lseg 样式）。
+- 没做浏览器自动化（后台要登录 /api，本机无 headless 脚本环境）；**渲染效果请站主在 /admin/ →「文案」页签自己看一眼**：顶部应该出现「文案 · 中文｜日本語｜English」，点哪个只显示哪种语言的输入框，刷新后保持上次选择。

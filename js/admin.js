@@ -151,8 +151,10 @@
   var FK = {};
   FIELDS.forEach(function (f) { FK[f[0]] = { group: f[1], label: f[2] }; });
 
+  var STORE_LANG = 'cupcake-admin-lang';
   var S = {
     tab: 'text', ready: false,
+    uiLang: (function () { try { var s = localStorage.getItem(STORE_LANG); return LANGS.indexOf(s) >= 0 ? s : 'zh'; } catch (e) { return 'zh'; } })(),
     content: null, i18n: {}, status: 'open', cmCards: [], resItems: [], commentsList: [],
     posts: [], drafts: [],
     git: null, files: { pictures: [], uploads: [] },
@@ -309,17 +311,23 @@
 
   function fieldRow(k) {
     var m = FK[k] || { label: k };
-    var long = Math.max.apply(null, LANGS.map(function (l) { return cur(k, l).length; })) > 44;
-    var cells = LANGS.map(function (l) {
-      var v = esc(cur(k, l));
-      if (long) return '<textarea data-k="' + esc(k) + '" data-l="' + l + '" rows="3" placeholder="' + LANG_LABEL[l] + '">' + v + '</textarea>';
-      return '<input type="text" data-k="' + esc(k) + '" data-l="' + l + '" placeholder="' + LANG_LABEL[l] + '" value="' + v + '">';
-    }).join('');
+    var l = S.uiLang;
+    var v0 = cur(k, l);
+    var cell = v0.length > 44
+      ? '<textarea data-k="' + esc(k) + '" data-l="' + l + '" rows="3" placeholder="' + LANG_LABEL[l] + '">' + esc(v0) + '</textarea>'
+      : '<input type="text" data-k="' + esc(k) + '" data-l="' + l + '" placeholder="' + LANG_LABEL[l] + '" value="' + esc(v0) + '">';
     var tag = cur(k, 'zh').indexOf('{') >= 0 ? ' <span class="pill warn">{ } 占位别删</span>' : '';
     var has = S.i18n[k] ? '<span class="pill warn">已改</span>' : '';
     return '<div class="f"><div class="fl"><b>' + esc(m.label) + ' ' + has + '</b><code>' + esc(k) + '</code>' + tag +
       '<button class="mini" data-act="reset" data-k="' + esc(k) + '">恢复默认</button></div>' +
-      '<div class="fi">' + cells + '</div></div>';
+      '<div class="fi">' + cell + '</div></div>';
+  }
+
+  function langSeg() {
+    return '<div class="lseg">' + LANGS.map(function (l) {
+      return '<button type="button" data-act="ui-lang" data-lang="' + l + '"' +
+        (l === S.uiLang ? ' class="on"' : '') + '>' + LANG_LABEL[l] + '</button>';
+    }).join('') + '</div>';
   }
 
   function viewText() {
@@ -329,7 +337,8 @@
       var g = (FK[k] && FK[k].group) || '其他';
       (buckets[g] = buckets[g] || []).push(k);
     });
-    var out = '<div class="grp"><div class="tip">三语都改了才会生效；留空 = 用网站自带的默认值。改完点右上角「保存改动」。</div></div>';
+    var out = '<div class="grp"><div class="tip">三语都改了才会生效；留空 = 用网站自带的默认值。改完点右上角「保存改动」。' +
+      ' 现在一次只显示一种语言的输入框（切换语言后未保存的改动仍在内存里）。</div>' + langSeg() + '</div>';
     GROUPS.forEach(function (g) {
       var ks = buckets[g] || [];
       if (!ks.length) return;
@@ -925,6 +934,13 @@
     var act = t.dataset && t.dataset.act;
     if (!act) return;
     var i = Number(t.dataset.i), j = Number(t.dataset.j);
+
+    if (act === 'ui-lang') {
+      S.uiLang = LANGS.indexOf(t.dataset.lang) >= 0 ? t.dataset.lang : 'zh';
+      try { localStorage.setItem(STORE_LANG, S.uiLang); } catch (e) {}
+      render();
+      return;
+    }
 
     if (act === 'reset') { delete S.i18n[t.dataset.k]; render(); hint('已恢复默认：' + t.dataset.k); return; }
 

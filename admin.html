@@ -46,9 +46,12 @@ main { padding:10px; max-width:1180px; }
 .f:last-child { border-bottom:0; }
 .f > .fl { display:flex; flex-direction:column; gap:1px; padding-top:2px; }
 .f > .fl b { font-weight:600; font-size:12px; }
-.f > .fi { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
+.f > .fi { display:grid; grid-template-columns:1fr; gap:4px; }
 .f > .fi .row { display:flex; gap:4px; align-items:center; }
 .tip { color:var(--dim); font-size:11px; padding:5px 9px; background:#fafafa; border-bottom:1px solid #eee; }
+/* 「文案」页签的语言切换（一次只编辑一种语言） */
+.lseg { display:flex; gap:3px; padding:5px 9px; background:#fafafa; border-bottom:1px solid #eee; }
+.lseg button.on { background:var(--hl); border-color:var(--hl); color:#fff; font-weight:700; }
 
 /* 卡片 / 例图 */
 .card { margin:0 0 8px; border:1px solid var(--line); background:#fff; }
