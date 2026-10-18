@@ -23,9 +23,9 @@ window.CONTENT = {
       "en": "Please read the readme file inside the archive carefully before use!\nDo not resell the resources. Do not redistribute them after downloading, or claim to be the distributor/creator."
     },
     "cmPriceNote": {
-      "zh": "※ 目前价目表为施工状态，文本/图片均为占位符，无实际参考性",
-      "ja": "※ 現在、料金表は工事中です。テキスト・画像はすべてプレースホルダーであり、実際の参考にはなりません。",
-      "en": "※ The price table is still under construction — all text and images are placeholders and not for actual reference."
+      "zh": "※ 目前各种原因暂未开放PayPal。",
+      "ja": "※ 諸事情により、現在PayPalは未対応です。",
+      "en": "※ PayPal is currently unavailable for various reasons."
     },
     "cmStatusNote": {
       "zh": "档期随时变动，来问价之前建议先确认目前委托开放状态。",
