@@ -18,9 +18,9 @@ window.CONTENT = {
       "en": "Download and usage instructions for the resources are on a dedicated page.\nPlease click the button below to continue."
     },
     "voiceNote": {
-      "zh": "请勿倒卖；转载／使用请标注原作者。",
-      "ja": "転売禁止。転載・使用の際は原作者を明記してください。",
-      "en": "Do not resell. Please credit the original author when reposting or using."
+      "zh": "使用前请仔细阅读压缩包内readme文件！请勿倒卖资源、请勿下载后二配并自称配布者/资源作者。",
+      "ja": "使用前に、圧縮ファイル内のreadmeファイルをよくお読みください！ リソースの転売は禁止です。ダウンロード後に二次配布したり、配布者・制作者を名乗ったりしないでください。",
+      "en": "Please read the readme file inside the archive carefully before use!\nDo not resell the resources. Do not redistribute them after downloading, or claim to be the distributor/creator."
     },
     "cmPriceNote": {
       "zh": "※ 目前价目表为施工状态，文本/图片均为占位符，无实际参考性",
@@ -51,6 +51,24 @@ window.CONTENT = {
       "zh": "确认报价与排期后支付定金，在定金支付完成后我将开始绘制稿件。\n流程一般是草稿 → 上色 → 完稿逐步交付。各个节点的比例看具体情况，一般会在确认要求后的回复邮件里详细说明。",
       "ja": "スケジュールは随時変動するため、お見積もりについてお問い合わせの前に、現在の依頼受付状況をご確認いただくことをおすすめします。",
       "en": "My schedule changes frequently, so before asking for a quote, please check my current commission availability first."
+    },
+    "voiceNoteTitle": {
+      "zh": "使用前请仔细阅读资源readme",
+      "ja": "使用前に、リソースのreadmeをよくお読みください。",
+      "en": "Please read the resource readme carefully before use."
+    },
+    "rsIntroTitle": {
+      "zh": "自制资源下载",
+      "ja": "自作リソースのダウンロード",
+      "en": "Download my own resources"
+    },
+    "rsDownloadTitle": {
+      "zh": "转载资源分享",
+      "ja": "転載リソースの共有",
+      "en": "Shared reposted resources"
+    },
+    "duckAria": {
+      "zh": "彩蛋"
     }
   },
   "commission": {
