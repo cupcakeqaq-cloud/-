@@ -483,7 +483,7 @@
   /* 导航（返回主页 / 个人博客 / 委托相关事宜 / 资源配布）+ Survivor 友链；extern 的新标签打开 */
   var NAV = [
     { key: 'index', nameKey: 'menuHome', icon: ICON + 'windows.png', href: 'index.html' },
-    { key: 'blog', nameKey: 'menuBlog', icon: ICON + '327(32x32).png', href: 'blog.html' },
+    { key: 'blog', nameKey: 'menuBlog', icon: 'assets/icon/blog.png', href: 'blog.html' },
     { key: 'commission', nameKey: 'menuCommission', icon: ICON + '887(32x32).png', href: 'commission.html' },
     { key: 'resources', nameKey: 'menuResources', icon: ICON + '318(32x32).png', href: 'resources.html' },
     { key: 'friend', nameKey: 'menuFriend', icon: 'assets/icon/survivor.png', href: 'https://cupcakeqaq-cloud.github.io/survivor/', extern: true }
@@ -544,8 +544,8 @@
     }
 
     menu.innerHTML =
-      '<div class="sm-head"><img class="sm-avatar" src="icon.png" alt="">' +
-      '<span class="sm-name">12あKa@被告人杯糕_</span></div>' +
+      '<div class="sm-head"><img class="sm-avatar" src="assets/icon/user-default.png" alt="">' +
+      '<span class="sm-name">Administrator</span></div>' +
       '<div class="sm-body">' +
       '<div class="sm-left">' + render(left, false) + '</div>' +
       '<div class="sm-right">' + render(right, true) + '</div>' +
@@ -670,7 +670,6 @@
     removeScreen();
     screen = mk('div', 'power-screen shutdown');
     screen.innerHTML =
-      '<img src="' + ICON + 'windows.png" alt="" style="height:52px">' +
       '<div class="ps-text">' + esc(t('pwSafeToTurnOff')) + '</div>' +
       '<button type="button" class="ps-btn">' + esc(t('pwRestartNow')) + '</button>';
     screen.querySelector('.ps-btn').addEventListener('click', function () { welcome(); });
@@ -697,8 +696,8 @@
       '</div>' +
       '<div class="welcome-r">' +
         '<button type="button" class="welcome-user">' +
-          '<img src="icon.png" alt="">' +
-          '<span><span class="wu-name">12あKa@被告人杯糕_</span><br>' +
+          '<img src="assets/icon/user-default.png" alt="">' +
+          '<span><span class="wu-name">Administrator</span><br>' +
           '<span class="wu-sub">' + esc(t('wlRunning', { n: n })) + '</span></span>' +
         '</button>' +
       '</div>' +

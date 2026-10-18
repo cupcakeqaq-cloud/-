@@ -168,7 +168,9 @@
   function mini(list, n) {
     if (!list.length) return '<li class="bl-none">' + esc(t('blEmpty')) + '</li>';
     return list.slice(0, n).map(function (p) {
-      return '<li><span class="bl-rd">' + esc(dateOf(p)) + '</span><a href="' + postHref(p) + '">' + esc(p.title) + '</a></li>';
+      return '<li><span class="bl-rd">' + esc(dateOf(p)) + '</span>' +
+        (p.pinned ? '<span class="bl-pin">★</span> ' : '') +
+        '<a href="' + postHref(p) + '">' + esc(p.title) + '</a></li>';
     }).join('');
   }
   function homeFill() {
