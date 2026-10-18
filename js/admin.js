@@ -462,11 +462,25 @@
     return String(d.textContent || '').replace(/\s+/g, '').length;
   }
 
+  /* 文章的一语三版：中文存文章本身（title/summary/html），日文英文存 p.i18n.ja / p.i18n.en。
+     编辑框里**不回落**（没写就是空的，方便看出缺哪版）；前台才回落中文。 */
+  function bLanVal(p, l, f) {
+    if (l === 'zh') return String(p[f] || '');
+    return String((p.i18n && p.i18n[l] && p.i18n[l][f]) || '');
+  }
+  function bLanSet(p, l, f, v) {
+    if (l === 'zh') { p[f] = v; return; }
+    p.i18n = p.i18n || {};
+    p.i18n[l] = p.i18n[l] || {};
+    p.i18n[l][f] = v;
+  }
+
   function bRows(arr, draft) {
     if (!arr.length) return '<div class="tip">还没有' + (draft ? '草稿' : '文章') + '。</div>';
     return arr.map(function (p, i) {
       var tags = (p.tags || []).length ? '<span class="pill">' + esc(p.tags.join('、')) + '</span>' : '';
-      return '<div class="item"><div class="hd"><b>' + esc(p.title || '（还没写标题）') + '</b>' +
+      var ttl = p.title || (p.i18n && ((p.i18n.ja && p.i18n.ja.title) || (p.i18n.en && p.i18n.en.title))) || '';
+      return '<div class="item"><div class="hd"><b>' + esc(ttl || '（还没写标题）') + '</b>' +
         '<span class="pill">' + esc(p.date || '') + '</span>' + tags +
         (p.pinned ? '<span class="pill warn">置顶</span>' : '') +
         '<span class="pill off">' + bWords(p.html) + ' 字</span>' +
@@ -490,36 +504,44 @@
 
   function bEditHtml() {
     try { document.execCommand('defaultParagraphSeparator', false, 'p'); } catch (e) {}
-    var p = BE.post;
+    var p = BE.post, l = BE.lang || 'zh';
     var bar = FMT.map(function (c) {
       return '<button data-act="b-fmt" data-cmd="' + c[0] + '" title="' + c[2] + '">' + c[1] + '</button>';
     }).join('') + BACT.map(function (c) {
       return '<button data-act="' + c[0] + '" title="' + c[2] + '">' + c[1] + '</button>';
     }).join('');
+    var seg = LANGS.map(function (k) {
+      return '<button data-act="b-lang" data-lang="' + k + '"' + (k === l ? ' class="on"' : '') + '>' + LANG_LABEL[k] + '</button>';
+    }).join('');
+    var wrote = LANGS.filter(function (k) { return !!bLanVal(p, k, 'title') || !!bLanVal(p, k, 'html'); })
+      .map(function (k) { return LANG_LABEL[k]; }).join('、');
+    var ph = l === 'zh' ? '文章标题（中文版，建议一定写）' : LANG_LABEL[l] + ' 标题（可留空，空着前台显示中文版）';
     return '<div class="grp"><h3>' + (BE.draft ? '编辑草稿' : '编辑文章') + '（' + esc(p.id) + '）</h3><div class="bd">' +
-      '<div class="lab">标题</div><input type="text" data-bf="title" placeholder="文章标题" value="' + esc(p.title || '') + '">' +
+      '<div class="lseg">' + seg + '</div>' +
+      '<div class="tip">一次编一种语言：标题 / 摘要 / 正文跟着上面的语言走；日期、标签、置顶三语共用。缺某语言时前台自动显示中文版。<b>已写：' + esc(wrote || '都还没写') + '</b></div>' +
+      '<div class="lab">标题（' + LANG_LABEL[l] + '）</div><input type="text" data-bf="title"' + (l === 'zh' ? '' : ' data-bfl="' + l + '"') + ' placeholder="' + esc(ph) + '" value="' + esc(bLanVal(p, l, 'title')) + '">' +
       '<div class="lab">日期（前台按日期倒序排）</div><input type="date" data-bf="date" value="' + esc(p.date || '') + '">' +
-      '<div class="lab">标签（逗号、顿号或空格隔开，最多 8 个，可以留空）</div>' +
+      '<div class="lab">标签（逗号、顿号或空格隔开，最多 8 个，可以留空；三语共用）</div>' +
       '<input type="text" data-bf="tags" placeholder="生活记录、感想" value="' + esc(BE.tagsRaw || '') + '">' +
-      '<div class="lab">摘要（留空 = 前台自动截正文前 120 字）</div>' +
-      '<textarea data-bf="summary" rows="2" placeholder="列表里显示的那两行">' + esc(p.summary || '') + '</textarea>' +
+      '<div class="lab">摘要（' + LANG_LABEL[l] + '，留空 = 前台自动截正文前 120 字）</div>' +
+      '<textarea data-bf="summary"' + (l === 'zh' ? '' : ' data-bfl="' + l + '"') + ' rows="2" placeholder="列表里显示的那两行">' + esc(bLanVal(p, l, 'summary')) + '</textarea>' +
       '<label class="bl-pin"><input type="checkbox" data-bf="pinned"' + (p.pinned ? ' checked' : '') + '> 置顶（前台排最前面）</label>' +
       '</div></div>' +
-      '<div class="grp"><h3>正文</h3><div class="bd">' +
+      '<div class="grp"><h3>正文（' + LANG_LABEL[l] + '）</h3><div class="bd">' +
       '<div class="tip">选中文字再点按钮；「插图」会先把图压到长边 1600px 再传（透明 PNG 还是 PNG，GIF 原样传）。插完点一下正文里的图，才能用「图片居中 / 两图并排」。</div>' +
       '<div class="bl-tbar">' + bar + '</div>' +
-      '<div class="bl-edit" id="blEdit" contenteditable="true">' + (p.html || '') + '</div>' +
+      '<div class="bl-edit" id="blEdit" contenteditable="true">' + bLanVal(p, l, 'html') + '</div>' +
       '<div class="row2"><button class="pri" data-act="b-save">保存这篇文章</button><button data-act="b-cancel">返回列表（不保存）</button></div>' +
       '</div></div>';
   }
 
   function viewBlog() { return BE ? bEditHtml() : bListHtml(); }
 
-  /* 把编辑器里的东西读回 BE */
+  /* 把编辑器里的东西读回 BE（正文按当前编辑语言存） */
   function bCommit() {
     if (!BE) return;
     var box = $('#blEdit');
-    if (box) BE.post.html = box.innerHTML;
+    if (box) bLanSet(BE.post, BE.lang || 'zh', 'html', box.innerHTML);
     BE.post.tags = parseTags(BE.tagsRaw);
     BE.post.title = String(BE.post.title || '').trim();
     BE.post.summary = String(BE.post.summary || '').trim();
@@ -529,7 +551,13 @@
   function bSave() {
     bCommit();
     if (!BE) return true;
-    if (!BE.post.title) { hint('还没写标题，先写上标题', true); return false; }
+    var has = false;
+    LANGS.forEach(function (k) {
+      bLanSet(BE.post, k, 'title', String(bLanVal(BE.post, k, 'title') || '').trim());
+      bLanSet(BE.post, k, 'summary', String(bLanVal(BE.post, k, 'summary') || '').trim());
+      if (bLanVal(BE.post, k, 'title')) has = true;
+    });
+    if (!has) { hint('标题一个语言都没写。中文版是主版本，先写中文标题', true); return false; }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(BE.post.date || '')) BE.post.date = newPost().date;
     if (BE.i < 0) blogArr(BE.draft).push(BE.post);
     else blogArr(BE.draft)[BE.i] = BE.post;
@@ -984,14 +1012,24 @@
     }
 
     if (act === 'b-new' || act === 'b-new-draft') {
-      BE = { draft: act === 'b-new-draft', i: -1, post: newPost(), tagsRaw: '', sel: null };
+      BE = { draft: act === 'b-new-draft', i: -1, post: newPost(), tagsRaw: '', sel: null, lang: 'zh' };
       render();
       return;
     }
     if (act === 'b-edit') {
       var arr0 = blogArr(t.dataset.draft === '1');
       if (!arr0[i]) return;
-      BE = { draft: t.dataset.draft === '1', i: i, post: clone(arr0[i]), tagsRaw: (arr0[i].tags || []).join('、'), sel: null };
+      BE = { draft: t.dataset.draft === '1', i: i, post: clone(arr0[i]), tagsRaw: (arr0[i].tags || []).join('、'), sel: null, lang: 'zh' };
+      render();
+      return;
+    }
+    if (act === 'b-lang') {
+      if (!BE) return;
+      var lg = LANGS.indexOf(t.dataset.lang) >= 0 ? t.dataset.lang : 'zh';
+      if (lg === (BE.lang || 'zh')) return;
+      bCommit();               /* 切走之前先把当前语言的正文收进内存 */
+      BE.lang = lg;
+      BE.sel = null;
       render();
       return;
     }
@@ -1055,6 +1093,7 @@
     if (d.bf) {
       if (!BE) return;
       if (d.bf === 'tags') BE.tagsRaw = t.value;
+      else if (d.bfl) bLanSet(BE.post, d.bfl, d.bf, t.value);
       else BE.post[d.bf] = t.value;
       return;
     }

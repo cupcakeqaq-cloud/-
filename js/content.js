@@ -91,7 +91,7 @@ window.CONTENT = {
       {
         "icon": "assets/winxp/windowsIcons/846(32x32).png",
         "name": {
-          "zh": "PostPet21-2.1-中文版",
+          "zh": "PostPet21-2.1",
           "ja": "PostPet21-2.1-CN",
           "en": "PostPet21-2.1-CN"
         },
@@ -100,7 +100,7 @@ window.CONTENT = {
           "ja": "",
           "en": ""
         },
-        "href": "uploads/20261018-PostPet21-2.1-d37a23.zip"
+        "href": "uploads/20261018-PostPet21-2.1-610055.zip"
       },
       {
         "icon": "assets/winxp/windowsIcons/846(32x32).png",

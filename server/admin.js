@@ -368,13 +368,23 @@ function today() {
   return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
 }
 
-/** 一篇文章：标题必填（空的直接丢掉），id/日期格式不对就补一个 */
+/** 一篇文章：标题至少要有一种语言（都空的直接丢掉），id/日期格式不对就补一个
+    中文存顶层 title/summary/html，日文英文存 p.i18n.ja / p.i18n.en（缺的语言前台回落中文） */
 function normPost(p) {
   if (!p || typeof p !== 'object') return null;
   const title = str(p.title, 200).trim();
-  if (!title) return null;
+  const i18n = {};
+  ['ja', 'en'].forEach(function (l) {
+    const src = p.i18n && typeof p.i18n === 'object' && p.i18n[l] && typeof p.i18n[l] === 'object' ? p.i18n[l] : null;
+    if (!src) return;
+    const t = str(src.title, 200).trim();
+    const s = str(src.summary, 400).trim();
+    const h = str(src.html, 200000);
+    if (t || s || h) i18n[l] = { title: t, summary: s, html: h };
+  });
+  if (!title && !(i18n.ja && i18n.ja.title) && !(i18n.en && i18n.en.title)) return null;
   const tags = (Array.isArray(p.tags) ? p.tags : []).map(function (t) { return str(t, 24).trim(); }).filter(Boolean);
-  return {
+  const out = {
     id: /^p-[A-Za-z0-9_-]{1,40}$/.test(String(p.id || '')) ? String(p.id) : 'p-' + Date.now().toString(36) + crypto.randomBytes(2).toString('hex'),
     title: title,
     date: /^\d{4}-\d{2}-\d{2}$/.test(String(p.date || '')) ? String(p.date) : today(),
@@ -383,6 +393,8 @@ function normPost(p) {
     html: str(p.html, 200000),
     pinned: !!p.pinned,
   };
+  if (Object.keys(i18n).length) out.i18n = i18n;
+  return out;
 }
 function normPosts(list, max) {
   return (Array.isArray(list) ? list : []).map(normPost).filter(Boolean).slice(0, max);

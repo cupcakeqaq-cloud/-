@@ -23,6 +23,8 @@
     });
   }
   function all() { return window.blogAll ? window.blogAll() : []; }
+  /* 按语言取文章字段（title/summary/html）；没写的语言由 postText 回落中文 */
+  function txt(p, f, l) { return window.postText ? window.postText(p, f, l) : String(p[f] || ''); }
   function tagsOf(p) { return Array.isArray(p.tags) ? p.tags : []; }
   function dateOf(p) { return String(p.date || ''); }
   function idOf(p) { return String(p.id || ''); }
@@ -59,9 +61,10 @@
   }
   /* 摘要：写了就用写的，没写就截正文前 120 字 */
   function summary(p) {
-    if (p.summary) return p.summary;
-    var s = plain(p.html);
-    return s.length > 120 ? s.slice(0, 120) + '…' : s;
+    var s = txt(p, 'summary');
+    if (s) return s;
+    var b = plain(txt(p, 'html'));
+    return b.length > 120 ? b.slice(0, 120) + '…' : b;
   }
 
   function chips(tags) {
@@ -87,7 +90,11 @@
     var s = String(q || '').toLowerCase();
     if (!s) return [];
     return all().filter(function (p) {
-      var hay = String(p.title || '') + ' ' + summary(p) + ' ' + plain(p.html) + ' ' + tagsOf(p).join(' ');
+      /* 三种语言的标题/摘要/正文都参与搜索：用哪种语言输入都能找到 */
+      var hay = ['zh', 'ja', 'en'].map(function (l) {
+        return txt(p, 'title', l) + ' ' + txt(p, 'summary', l) + ' ' + plain(txt(p, 'html', l));
+      }).join(' ');
+      hay += ' ' + tagsOf(p).join(' ');
       return hay.toLowerCase().indexOf(s) >= 0;
     });
   }
@@ -100,7 +107,7 @@
     if (!list.length) return head + '<div class="bl-empty">' + esc(t('blEmptySearch')) + '</div>';
     return head + list.map(function (p) {
       return '<article class="bl-item">' + metaOf(p) +
-        '<h2 class="bl-ititle"><a href="' + postHref(p) + '">' + esc(p.title) + '</a></h2>' +
+        '<h2 class="bl-ititle"><a href="' + postHref(p) + '">' + esc(txt(p, 'title')) + '</a></h2>' +
         '<p class="bl-sum">' + esc(summary(p)) + '</p>' +
         '<a class="bl-more" href="' + postHref(p) + '">' + esc(t('blReadMore')) + '</a></article>';
     }).join('');
@@ -110,11 +117,11 @@
     if (!p) return listHtml(t('blAll'), []);
     var i = list.indexOf(p), prev = list[i - 1], next = list[i + 1];
     var nav = '';
-    if (prev) nav += '<a class="bl-prev" href="' + postHref(prev) + '">← ' + esc(t('blPrev')) + '：' + esc(prev.title) + '</a>';
-    if (next) nav += '<a class="bl-next" href="' + postHref(next) + '">' + esc(t('blNext')) + '：' + esc(next.title) + ' →</a>';
+    if (prev) nav += '<a class="bl-prev" href="' + postHref(prev) + '">← ' + esc(t('blPrev')) + '：' + esc(txt(prev, 'title')) + '</a>';
+    if (next) nav += '<a class="bl-next" href="' + postHref(next) + '">' + esc(t('blNext')) + '：' + esc(txt(next, 'title')) + ' →</a>';
     return '<article class="bl-post">' + metaOf(p) +
-      '<h1 class="bl-ptitle">' + esc(p.title) + '</h1>' +
-      '<div class="bl-body">' + clean(p.html) + '</div>' +
+      '<h1 class="bl-ptitle">' + esc(txt(p, 'title')) + '</h1>' +
+      '<div class="bl-body">' + clean(txt(p, 'html')) + '</div>' +
       (nav ? '<div class="bl-nav">' + nav + '</div>' : '') +
       '<a class="bl-back" href="' + PAGE + '#/">' + esc(t('blBackList')) + '</a></article>';
   }
@@ -170,7 +177,7 @@
     return list.slice(0, n).map(function (p) {
       return '<li><span class="bl-rd">' + esc(dateOf(p)) + '</span>' +
         (p.pinned ? '<span class="bl-pin">★</span> ' : '') +
-        '<a href="' + postHref(p) + '">' + esc(p.title) + '</a></li>';
+        '<a href="' + postHref(p) + '">' + esc(txt(p, 'title')) + '</a></li>';
     }).join('');
   }
   function homeFill() {
