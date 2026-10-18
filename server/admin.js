@@ -68,6 +68,20 @@ function randPw() {
   return s;
 }
 
+/** git 可执行文件：.env 里的 GIT_PATH → GitHub Desktop 自带的（版本号会变，所以按目录扫最新）→ PATH 里的 git */
+function pickGit(want) {
+  const tries = [];
+  if (want && want !== 'git') tries.push(want);
+  const base = path.join(process.env.LOCALAPPDATA || '', 'GitHubDesktop');
+  try {
+    fs.readdirSync(base).filter(function (d) { return /^app-/.test(d); }).sort().reverse().forEach(function (d) {
+      tries.push(path.join(base, d, 'resources', 'app', 'git', 'cmd', 'git.exe'));
+    });
+  } catch (e) {}
+  for (let i = 0; i < tries.length; i++) if (fs.existsSync(tries[i])) return tries[i];
+  return 'git';
+}
+
 /** 读 .env；没有就从 .env.example 生成一份（随机密码 + 随机会话密钥） */
 function loadEnv() {
   if (!fs.existsSync(ENV_FILE)) {
@@ -87,7 +101,7 @@ function loadEnv() {
     GITHUB_REPO: process.env.GITHUB_REPO || file.GITHUB_REPO || 'cupcakeqaq-cloud/CupCakeQAQ-site',
     GIT_BRANCH: process.env.GIT_BRANCH || file.GIT_BRANCH || 'main',
     RELEASE_TAG: process.env.RELEASE_TAG || file.RELEASE_TAG || 'assets',
-    GIT_PATH: process.env.GIT_PATH || file.GIT_PATH || 'git',
+    GIT_PATH: pickGit(process.env.GIT_PATH || file.GIT_PATH || ''),
     SESSION_SECRET: process.env.SESSION_SECRET || file.SESSION_SECRET || '',
   };
   if (!cfg.SESSION_SECRET) {
@@ -98,6 +112,12 @@ function loadEnv() {
 }
 
 const CFG = loadEnv();
+
+// 启动先试一次 git：spawn 不了（路径错 / 被沙箱挡住）就在后台窗口直接喊出来，别等点了提交才发现
+git(['--version']).then(function (r) {
+  if (!r.ok) console.error('★ git 用不了（' + CFG.GIT_PATH + '）：' + r.err.trim() +
+    '\n  → 要双击「启动后台.bat」用 cmd 起，别在受限制的沙箱 / AI 工具里起后台。');
+});
 
 // ───────────────────────── 鉴权 ─────────────────────────
 
@@ -410,7 +430,9 @@ function git(args) {
         });
     } catch (e) {
       // execFile 在 spawn 失败时会直接抛（比如 GIT_PATH 写错、被系统策略拦住），别让整个后台跟着挂
-      resolve({ ok: false, out: '', err: '调用 git 失败：' + (e.message || e) });
+      const why = String((e && e.message) || e);
+      resolve({ ok: false, out: '', err: '调用 git 失败：' + why +
+        (/EPERM/.test(why) ? '　（子进程被系统挡住：后台要双击「启动后台.bat」用 cmd 起，别在沙箱/受限环境里跑）' : '　（检查 .env 里的 GIT_PATH 指对了没有）') });
     }
   });
 }
@@ -659,4 +681,4 @@ function handle(req, res, url) {
   return true;
 }
 
-module.exports = { handle, ADMIN_HTML: path.join(ROOT, 'admin.html'), CFG: CFG, _test: { normContent, normComments, asciiName, parseEnv, readContent, readJsArray, writeJsArray, normPost, normPosts } };
+module.exports = { handle, ADMIN_HTML: path.join(ROOT, 'admin.html'), CFG: CFG, _test: { normContent, normComments, asciiName, parseEnv, readContent, readJsArray, writeJsArray, normPost, normPosts, pickGit } };

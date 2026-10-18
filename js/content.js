@@ -91,6 +91,20 @@ window.CONTENT = {
       {
         "icon": "assets/winxp/windowsIcons/846(32x32).png",
         "name": {
+          "zh": "PostPet21-2.1-中文版",
+          "ja": "PostPet21-2.1-CN",
+          "en": "PostPet21-2.1-CN"
+        },
+        "size": {
+          "zh": "",
+          "ja": "",
+          "en": ""
+        },
+        "href": "uploads/20261018-PostPet21-2.1-d37a23.zip"
+      },
+      {
+        "icon": "assets/winxp/windowsIcons/846(32x32).png",
+        "name": {
           "zh": "芙兰朵露 v1.0.0-beta",
           "ja": "フランドール v1.0.0-beta",
           "en": "Flandre v1.0.0-beta"
