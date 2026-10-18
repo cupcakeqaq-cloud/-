@@ -7,6 +7,9 @@
                        没改过的不要写进来（少写少出错）
                         一个 key 里写了哪种语言就覆盖哪种，没写的回落 DICT，
                         所以改了中文记得把 ja/en 一起补（第 19 批补齐过一次）
+     价格换算      1 CNY = 21 JPY = 0.14 USD（日元取 500 整、美元取 5 整）；
+                    cmCard*Price 与 cmCard*Desc* 里的外币是写死的字符串，
+                    改人民币价时三语要一起改，别只改 zh
      commission.status open | paused | closed → 受理状态面板
      commission.cards  四档例图，数组顺序 = 页面四张卡片顺序；
                         某项为空数组 = 用 commission.html 里写死的那三张
