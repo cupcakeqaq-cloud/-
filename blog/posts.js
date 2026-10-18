@@ -59,7 +59,7 @@ window.BLOG_POSTS = [
   },
   {
     "id": "p-1792312270195",
-    "title": "PostPet21破解版配布",
+    "title": "PostPet21资源分享",
     "date": "2026-10-18",
     "tags": [
       "资源配布"
