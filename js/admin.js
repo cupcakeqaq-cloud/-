@@ -194,9 +194,23 @@
     var z = Math.min(4, Math.max(1, num(s.zoom, 1)));
     return { src: String(s.src || ''), r: ratioCss(s.r) ? s.r : '', zoom: z, cx: clampPan(s.cx, z), cy: clampPan(s.cy, z) };
   }
-  /* 裁剪窗口不能跑出图外：cx ∈ [0.5/z, 1-0.5/z]（z=1 时只能取 0.5，也就是没法平移） */
+  /* 裁剪窗口中心不能跑出图外——真正的上下界要知道原图比例才能算（见 paintCrop 的 kx/ky），
+     这里只夹到 0~1，别在没看图的时候就把它压成 0.5（那会让老数据一打开就失去横向位置） */
   function clampPan(v, z) {
-    var lo = 0.5 / z, hi = 1 - 0.5 / z;
+    return Math.min(1, Math.max(0, num(v, 0.5)));
+  }
+  /* '3 / 4' → 0.75 */
+  function ratioOf(css) {
+    var p = String(css || '').split('/');
+    return p.length === 2 ? num(p[0], 0) / num(p[1], 1) : 0;
+  }
+  /* 图片放大多少才铺满框（再乘缩放）：框比图窄 → 按宽铺满（kx>1），反之按高铺满 */
+  function coverK(rF, rI) {
+    if (!rF || !rI) return { kx: 1, ky: 1 };
+    return { kx: Math.max(1, rI / rF), ky: Math.max(1, rF / rI) };
+  }
+  function panK(v, k) {
+    var lo = 0.5 / k, hi = 1 - 0.5 / k;
     return Math.min(hi, Math.max(lo, num(v, 0.5)));
   }
   function normCards(cards) {
@@ -837,14 +851,20 @@
     if (!cr) return;
     var f = $('#cropFrame'), im = $('#cropImg');
     /* 按存盘时的精度（3 位小数）画，预览才和保存后的前台一模一样 */
-    var z = c3(cr.zoom), cx = c3(clampPan(cr.cx, z)), cy = c3(clampPan(cr.cy, z));
-    im.style.width = (z * 100) + '%';
-    im.style.height = (z * 100) + '%';
-    im.style.left = ((0.5 - cx * z) * 100) + '%';
-    im.style.top = ((0.5 - cy * z) * 100) + '%';
+    var z = c3(cr.zoom), rF = ratioOf(cropRatio());
     f.style.aspectRatio = cropRatio();
     $('#cropZoom').value = String(Math.round(z * 100));
     $('#cropVal').textContent = z.toFixed(2) + '×';
+    var w = im.naturalWidth, h = im.naturalHeight;
+    if (!w || !h) return;   /* 图还没载入：等 im.onload 再画 */
+    /* 宽高不能都写 z：框会被拉成槽位比例、图被 cover 定死，缩放和拖动就成了摆设 */
+    var k = coverK(rF, w / h), kx = c3(k.kx * z), ky = c3(k.ky * z);
+    var cx = c3(panK(cr.cx, kx)), cy = c3(panK(cr.cy, ky));
+    cr.cx = cx; cr.cy = cy; cr.kx = kx; cr.ky = ky;   /* 存的是夹过的值，确定后和预览一致 */
+    im.style.width = (kx * 100) + '%';
+    im.style.height = (ky * 100) + '%';
+    im.style.left = ((0.5 - cx * kx) * 100) + '%';
+    im.style.top = ((0.5 - cy * ky) * 100) + '%';
   }
 
   function openCrop(i, j) {
@@ -919,8 +939,9 @@
     f.addEventListener('pointermove', function (e) {
       if (!down || !cr) return;
       var r = f.getBoundingClientRect();
-      cr.cx = clampPan(ox - (e.clientX - sx) / (r.width * cr.zoom), cr.zoom);
-      cr.cy = clampPan(oy - (e.clientY - sy) / (r.height * cr.zoom), cr.zoom);
+      var kx = cr.kx || cr.zoom, ky = cr.ky || cr.zoom;
+      cr.cx = panK(ox - (e.clientX - sx) / (r.width * kx), kx);
+      cr.cy = panK(oy - (e.clientY - sy) / (r.height * ky), ky);
       paintCrop();
     });
     function up(e) {

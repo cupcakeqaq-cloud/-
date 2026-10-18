@@ -25,7 +25,7 @@ window.CONTENT = {
     "cmPriceNote": {
       "zh": "※ 目前价目表为施工状态，文本/图片均为占位符，无实际参考性",
       "ja": "※ 現在、料金表は工事中です。テキスト・画像はすべてプレースホルダーであり、実際の参考にはなりません。",
-      "en": "※ 現在、料金表は工事中です。テキスト・画像はすべてプレースホルダーであり、実際の参考にはなりません。"
+      "en": "※ The price table is still under construction — all text and images are placeholders and not for actual reference."
     },
     "cmStatusNote": {
       "zh": "档期随时变动，来问价之前建议先确认目前委托开放状态。",
@@ -71,49 +71,79 @@ window.CONTENT = {
       "zh": "彩蛋"
     },
     "cmCard1Title": {
-      "zh": "简单的白底胸像/半身"
+      "zh": "简单的白底胸像/半身",
+      "ja": "シンプルな白背景の胸像／半身",
+      "en": "Simple bust / half-body on white"
     },
     "cmCard1Price": {
-      "zh": "¥120-~240"
+      "zh": "¥120-~240",
+      "ja": "2,500〜5,000円",
+      "en": "$17–34"
     },
     "cmCard2Title": {
-      "zh": "比较精细的胸像/半身"
+      "zh": "比较精细的胸像/半身",
+      "ja": "やや描き込みの多い胸像／半身",
+      "en": "More detailed bust / half-body"
     },
     "cmCard1Desc1": {
-      "zh": "完成度如图所示，半身底价在160，要画背景/场景价格另算。"
+      "zh": "完成度如图所示，半身底价在160，要画背景/场景价格另算。",
+      "ja": "完成度は画像の通りです。半身の最低価格は160元（約3,400円／約$22）で、背景・シーンの追加は別料金となります。",
+      "en": "The level of finish is as shown. The base price for a half-body is ¥160 CNY (about $22); adding a background/scene is charged separately."
     },
     "cmCard1Desc2": {
-      "zh": "需要另外添加小物/抱娃OK，指定动作OK。双人or多人按人数乘算。"
+      "zh": "需要另外添加小物/抱娃OK，指定动作OK。双人or多人按人数乘算。",
+      "ja": "小物の追加・ぬいぐるみを抱える構図もOK、ポーズ指定もOKです。2人以上の場合は人数分の料金になります。",
+      "en": "Adding small props or a plush to hold is OK, and specifying poses is OK. Two or more characters are charged per person."
     },
     "cmCard2Price": {
-      "zh": "¥160~220"
+      "zh": "¥160~220",
+      "ja": "3,500〜4,500円",
+      "en": "$22–31"
     },
     "cmCard2Desc1": {
-      "zh": "完成度如图，刻画会稍微精细一点，半身底价要200起算，带背景/场景的话价格也是另算。"
+      "zh": "完成度如图，刻画会稍微精细一点，半身底价要200起算，带背景/场景的话价格也是另算。",
+      "ja": "完成度は画像の通りで、描き込みはやや多めです。半身の最低価格は200元（約4,200円／約$28）からで、背景・シーン付きは別料金となります。",
+      "en": "The finish is as shown, with slightly more detail. A half-body starts at ¥200 CNY (about $28); with a background/scene it is charged separately."
     },
     "cmCard2Desc2": {
-      "zh": "需要另外添加小物/抱娃OK，指定动作OK。双人or多人按人数乘算。"
+      "zh": "需要另外添加小物/抱娃OK，指定动作OK。双人or多人按人数乘算。",
+      "ja": "小物の追加・ぬいぐるみを抱える構図もOK、ポーズ指定もOKです。2人以上の場合は人数分の料金になります。",
+      "en": "Adding small props or a plush to hold is OK, and specifying poses is OK. Two or more characters are charged per person."
     },
     "cmCard3Title": {
-      "zh": "很潦草的插图"
+      "zh": "很潦草的插图",
+      "ja": "かなりラフなイラスト",
+      "en": "Very rough illustration"
     },
     "cmCard3Price": {
-      "zh": "¥200~400"
+      "zh": "¥200~400",
+      "ja": "4,000〜8,500円",
+      "en": "$28–56"
     },
     "cmCard3Desc1": {
-      "zh": "精细度低，氛围效果大于精度，完美主义慎重考虑。"
+      "zh": "精细度低，氛围效果大于精度，完美主义慎重考虑。",
+      "ja": "描き込みは少なめで、精度よりも雰囲気重視です。細部にこだわりたい方はご注意ください。",
+      "en": "Low level of detail — atmosphere matters more than precision. Perfectionists, please think twice."
     },
     "cmCard3Desc2": {
-      "zh": "可指定场景、动作、想要的氛围。"
+      "zh": "可指定场景、动作、想要的氛围。",
+      "ja": "シーン・ポーズ・雰囲気のご指定が可能です。",
+      "en": "You can specify the scene, the pose, and the atmosphere you want."
     },
     "cmCard4Title": {
-      "zh": "其他"
+      "zh": "其他",
+      "ja": "その他",
+      "en": "Others"
     },
     "cmCard4Desc1": {
-      "zh": "你想约我其他业务的话可以自带价询问试试看！"
+      "zh": "你想约我其他业务的话可以自带价询问试试看！",
+      "ja": "別の内容をご依頼されたい場合は、ご希望の価格を添えてお問い合わせください！",
+      "en": "If you want to commission something else, feel free to ask with your own price in mind!"
     },
     "cmCard4Desc2": {
-      "zh": "（或者看着随便出个价，我看你给的价随机产出，总之就是盲盒XD）"
+      "zh": "（或者看着随便出个价，我看你给的价随机产出，总之就是盲盒XD）",
+      "ja": "（あるいはお任せで価格を決めていただいても構いません。いただいた金額に応じてランダムに制作します、いわゆるガチャですXD）",
+      "en": "(Or just name any price and I'll make something random based on it — basically a blind box XD)"
     }
   },
   "commission": {

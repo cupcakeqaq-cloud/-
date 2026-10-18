@@ -249,11 +249,10 @@ function readContent() {
 }
 
 /** 校验 + 收敛成固定形状（多余字段一律丢掉，防手改后写坏前台） */
-/** 裁剪窗口中心不能跑出图外：cx ∈ [0.5/z, 1-0.5/z]（z=1 时只能取 0.5，也就是没法平移） */
+/** 裁剪窗口中心：真正的上下界要知道原图比例才算（前台按 cover 倍数夹），这里只夹到 0~1；
+ *  以前写成 [0.5/z, 1-0.5/z]，会把「框比图窄」时的合法横向位置硬压成 0.5（横向拖不动） */
 function clampPan(v, zoom) {
-  const lo = 0.5 / zoom;
-  const hi = 1 - 0.5 / zoom;
-  return Math.min(hi, Math.max(lo, clampNum(v, 0, 1, 0.5)));
+  return Math.min(1, Math.max(0, clampNum(v, 0, 1, 0.5)));
 }
 
 /** 例图能选的三种槽位比例（'' = 自动，按原图判定） */

@@ -1654,3 +1654,56 @@ diag/bl-check.js 的 [12] 白名单加了「円」→ **55 项仍全过**。
 **自检调整**：`diag/bl-check.js` 的 `[12]` 改为只校验「能被后台 readContent 解析」+「每个 key 的 zh 非空」，缺 ja/en 只打印一行提示、不判失败（去掉「三语齐全」「ja/en 不许有未译中文」两条硬断言）。现在 **54 项全过**，输出末尾会列出这 16 个待补 ja/en 的 key。
 
 **待办**：等站主给出「日本 / 海外各自的申请渠道与支付方式」细则，再按语言分别起草委托流程（`cmApply1d`/`cmApply2d`/`cmApply3d` 等）。
+## 二十七、第 21 批：价目表三语（申请方式一律不动）
+
+**站主原话**：「不要改委托的申请方式，但是价目表的价格和文案都照着中文版本改」。
+
+**只改 16 个 key**（`js/content.js` 的 i18n）：`cmCard1Title`/`cmCard1Price`/`cmCard1Desc1`/`cmCard1Desc2`、`cmCard2Title`/`cmCard2Price`/`cmCard2Desc1`/`cmCard2Desc2`、`cmCard3Title`/`cmCard3Price`/`cmCard3Desc1`/`cmCard3Desc2`、`cmCard4Title`/`cmCard4Desc1`/`cmCard4Desc2`、`cmPriceNote`。zh 原样，ja/en 按中文含义重写（不是逐字直译）。
+
+价格按 `js/i18n.js:123-125` 的基准 **1 CNY = 21 JPY = 0.14 USD** 换算：
+
+| key | zh | ja | en |
+|---|---|---|---|
+| cmCard1Price | ¥120-~240 | 2,500〜5,000円 | $17–34 |
+| cmCard2Price | ¥160~220 | 3,500〜4,500円 | $22–31 |
+| cmCard3Price | ¥200~400 | 4,000〜8,500円 | $28–56 |
+
+两处「底价」正文里同时给出三币：卡1 160元（約3,400円／約$22）、卡2 200元（約4,200円／約$28）。价格是写死字符串，改人民币价要三语一起改。
+
+**明确没动的**：`cmApply1d`（申请方式①）、`cmApply2b`（② 支付方式）、`cmApply2d`（国内支付/定金）、`cmApply3d`（流程节点）——ja/en 保持站主原稿（日文 PayPal、英文邮件询价）。`cmStatusNote`/`voiceNote`/`reText`/`voiceNoteTitle`/`rsIntroTitle`/`rsDownloadTitle`/`cmApplyTitle` 等也没动。唯一仍缺 ja/en 的是 `duckAria`（彩蛋按钮的 aria 标签，不显示在页面上）。
+
+**校验**：`node --check js/content.js` OK；key 数 27；脚本实测三档价格三语正确、申请方式 ja/en 仍是站主原句；`node diag/bl-check.js` **54 项全过**（[12] 现在只提示 `duckAria`）。
+
+**坑（再次踩到）**：`edit` 工具第一次报「file changed since it was read」——后台旧标签页的自动保存或我上一轮写入改了 mtime。改用 read 后重试时，一次 edit 的 old_string 多带了 `},\n"cmStatusNote": {` 却在新串里漏写，导致结构破损；已在下一次 edit 中补回。**教训：edit 的 old_string 只圈要替换的最小片段，别把后一个 key 的开头卷进来。**
+
+**站主要做的**：把 `/admin/` 页面**刷新**（别用旧标签页），否则后台内存里那份旧文案一点保存就会把这次的价目表覆盖回去。
+## 二十八、第 22 批：例图裁剪修好了（方案 1）+ 博客日/英版被旧后台进程吞掉
+
+### 28.1 裁剪的根因
+`js/content-render.js` 和 `js/admin.js` 的 `paintCrop()` 都把图片宽高写成 `z * 100%`，也就是**元素盒子永远等于卡槽比例**；而 `css/winxp.css:1026` 的 `a.crop img` 还带着 `object-fit: cover`。结果：
+- 盒子比例 == 卡槽比例，不管 z 多大，`cover` 裁出来的画面一模一样 → 缩放看起来没反应；
+- 唯一的“变化”是把整张图平移，露出来的其实是 `#eef3fc` 底色 → 拖动像坏了；
+- `clampPan` 又把 cx/cy 夹在 `[0.5/z, 1-0.5/z]`，z=1 时死锁在 0.5，横图塞竖框时左右根本拖不动。
+
+站主原话：「上传图片之后的裁剪页面只能裁剪已经被强行裁剪的部分」——就是这个。
+
+### 28.2 改法（前后台同一套公式，所见即所得）
+`rF` = 卡槽比例，`rI` = 原图比例，铺满倍数：
+```
+kx = max(1, rI / rF) * z      ky = max(1, rF / rI) * z
+width% = kx*100   height% = ky*100   left% = (0.5 - cx*kx)*100   top% = (0.5 - cy*ky)*100
+cx ∈ [0.5/kx, 1-0.5/kx]（cy 同理）
+```
+这样盒子比例恒等于 `rI`，`cover` 不再额外裁一刀；1× 时看到的是“能铺满卡槽的最大窗口”，放大后可以把图里任意位置拖进框里，两边都不会露底色。
+- `js/content-render.js`：新增 `ratioOf()` / `coverK()`，`pan()` 改成按 k 夹；`img` 的宽高/位置改在 `paint()` 里按 `naturalWidth/Height` 算（图片没载入完先按默认比例占位，`load` 后再算）。
+- `js/admin.js`：同样新增 `ratioOf` / `coverK` / `panK`；`paintCrop()` 用 `cropRatio()` 和原图比例算 kx/ky，并把夹过的 cx/cy 写回 `cr`（确定后存的就是预览里的值）；拖动改除以 `rect.width * kx`；`clampPan` 放宽成只夹 0~1（真正的上下界要看过图才知道，不能再在打开时就压成 0.5）。
+- `server/admin.js:253` `clampPan` 同步放宽到 0~1：以前那个 `[0.5/z, 1-0.5/z]` 会把「框比图窄」时的合法横向位置存成 0.5。
+- `css/winxp.css` 没动：盒子比例正确后 `object-fit: cover` 等于原样填充。
+
+### 28.3 验证
+`diag/bl-check.js` 新增 `[13] 例图裁剪` 8 项（把 `coverK`/`panK`/`ratioOf` 从 `js/admin.js` 源码里抠出来在 node 里真跑）：横图 2:1 塞竖框时盒子仍是 2:1、1× 只看得到 37.5%、1× 仍可左右拖、纵向不许拖、放大后中心点被夹住。**62 项全过**。三个文件 `node --check` 都过。
+
+### 28.4 博客日/英版不见了
+`blog/posts.js` 里两篇文章（`p-1792306390501` / `p-1792312270195`）**都没有 `i18n` 字段**，`blog/drafts.js` 也是空的。
+最可能的原因：站主保存时跑的 `启动后台.bat` 是 `server/admin.js` 改动（16:40）**之前**启动的旧进程，旧的 `normPost` 只留固定字段，会把 `i18n` 静默丢掉。19:15 那次写入就是它。现在没有 node 进程在跑。
+处理：关黑窗口 → 重新双击 `启动后台.bat`（新 `normPost` 会保留 ja/en）→ 重新贴日/英版。前端不用重启。

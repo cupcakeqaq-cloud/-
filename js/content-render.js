@@ -51,9 +51,19 @@
     return (r === '1:1' || r === '3:4' || r === '4:3') ? r.replace(':', ' / ') : '';
   }
   function num(v, d) { var n = Number(v); return isFinite(n) ? n : d; }
-  /* content.js 允许手改，所以这里也夹一遍：裁剪窗口不能跑出图外（cx ∈ [0.5/z, 1-0.5/z]） */
-  function pan(v, z) {
-    var lo = 0.5 / z, hi = 1 - 0.5 / z;
+  /* '3 / 4' → 0.75（cropRatio 和固定比例都写成这种带空格的 CSS 值） */
+  function ratioOf(css) {
+    var p = String(css || '').split('/');
+    return p.length === 2 ? num(p[0], 0) / num(p[1], 1) : 0;
+  }
+  /* 图片要放大多少才铺满槽位框（再乘缩放）：框比图窄 → 按宽铺满（kx>1），反之按高铺满 */
+  function coverK(rF, rI) {
+    if (!rF || !rI) return { kx: 1, ky: 1 };
+    return { kx: Math.max(1, rI / rF), ky: Math.max(1, rF / rI) };
+  }
+  /* 裁剪窗口中心不能跑出图外：cx ∈ [0.5/k, 1-0.5/k]，k = 该方向的铺满倍数 × 缩放（k=1 时只能取 0.5） */
+  function pan(v, k) {
+    var lo = 0.5 / k, hi = 1 - 0.5 / k;
     return Math.min(hi, Math.max(lo, num(v, 0.5)));
   }
 
@@ -76,17 +86,24 @@
       im.loading = 'lazy';
       im.alt = '';
       if (fx || z > 1.001) {
-        /* 指定了比例或裁剪过：a 当裁剪框（overflow:hidden），img 放大 z 倍再偏移，多出来的被裁掉 */
+        /* 指定了比例或裁剪过：a 当裁剪框（overflow:hidden），img 按「原图比例 × 铺满倍数 × 缩放」放大再偏移。
+           注意宽高不能都写 z：那样会把框拉成槽位比例、图被 cover 定死，缩放和拖动就不起作用了 */
         a.className = 'crop';
-        im.style.width = (z * 100) + '%';
-        im.style.height = (z * 100) + '%';
-        im.style.left = ((0.5 - pan(o.cx, z) * z) * 100) + '%';
-        im.style.top = ((0.5 - pan(o.cy, z) * z) * 100) + '%';
-        /* 选定的比例优先；没选就得等图片载入才知道宽高，先按默认竖版占位 */
         a.style.aspectRatio = fx || '3 / 4';
-        if (!fx) im.addEventListener('load', function () {
-          if (im.naturalWidth && im.naturalHeight) a.style.aspectRatio = shotRatio(im.naturalWidth, im.naturalHeight);
-        });
+        var paint = function () {
+          var w = im.naturalWidth, h = im.naturalHeight;
+          if (!w || !h) return;
+          var rF = ratioOf(fx) || ratioOf(shotRatio(w, h));
+          a.style.aspectRatio = fx || shotRatio(w, h);
+          var k = coverK(rF, w / h), kx = k.kx * z, ky = k.ky * z;
+          var cx = pan(o.cx, kx), cy = pan(o.cy, ky);
+          im.style.width = (kx * 100) + '%';
+          im.style.height = (ky * 100) + '%';
+          im.style.left = ((0.5 - cx * kx) * 100) + '%';
+          im.style.top = ((0.5 - cy * ky) * 100) + '%';
+        };
+        if (im.complete && im.naturalWidth) paint();
+        else im.addEventListener('load', paint);
       }
       a.appendChild(im);
       box.appendChild(a);
