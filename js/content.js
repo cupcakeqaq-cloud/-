@@ -200,25 +200,25 @@ window.CONTENT = {
           "en": "PostPet21-2.1-CN"
         },
         "size": {
-          "zh": "",
-          "ja": "",
-          "en": ""
+          "zh": "约 9.98 MB · zip",
+          "ja": "約9.98MB · zip",
+          "en": "~9.98MB · zip"
         },
         "href": "uploads/20261018-PostPet21-2.1-610055.zip"
       },
       {
         "icon": "assets/winxp/windowsIcons/846(32x32).png",
         "name": {
-          "zh": "芙兰朵露 v1.0.0-beta",
-          "ja": "フランドール v1.0.0-beta",
-          "en": "Flandre v1.0.0-beta"
+          "zh": "芙兰朵露 v1.0.0",
+          "ja": "フランドール v1.0.0",
+          "en": "Flandre v1.0.0"
         },
         "size": {
-          "zh": "约 33.2 MB · zip",
-          "ja": "約 33.2 MB · zip",
-          "en": "~33.2 MB · zip"
+          "zh": "约 33.1 MB · zip",
+          "ja": "約 33.1 MB · zip",
+          "en": "~33.1 MB · zip"
         },
-        "href": "voice dl/芙兰朵露v1.0.0-beta.zip"
+        "href": "uploads/20261019-v1.0.0-6baaa2.zip"
       }
     ]
   }
