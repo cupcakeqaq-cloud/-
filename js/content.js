@@ -204,7 +204,7 @@ window.CONTENT = {
           "ja": "約 33.1 MB · zip",
           "en": "~33.1 MB · zip"
         },
-        "href": "uploads/20261019-v1.0.0-331b5b.zip"
+        "href": "uploads/20261019-v1.0.0-b88ff6.zip"
       },
       {
         "icon": "assets/winxp/windowsIcons/846(32x32).png",
