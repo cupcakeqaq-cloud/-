@@ -193,7 +193,7 @@ window.CONTENT = {
   "resources": {
     "items": [
       {
-        "icon": "assets/winxp/windowsIcons/846(32x32).png",
+        "icon": "E:\\自介网页\\assets\\winxp\\icon.png",
         "name": {
           "zh": "芙兰朵露 v1.0.0",
           "ja": "フランドール v1.0.0",
@@ -204,7 +204,7 @@ window.CONTENT = {
           "ja": "約 33.1 MB · zip",
           "en": "~33.1 MB · zip"
         },
-        "href": "uploads/20261019-v1.0.0-6baaa2.zip"
+        "href": "uploads/20261019-v1.0.0-331b5b.zip"
       },
       {
         "icon": "assets/winxp/windowsIcons/846(32x32).png",
