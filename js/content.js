@@ -193,7 +193,7 @@ window.CONTENT = {
   "resources": {
     "items": [
       {
-        "icon": "E:\\自介网页\\assets\\winxp\\icon.png",
+        "icon": "assets/winxp/icon.png",
         "name": {
           "zh": "芙兰朵露 v1.0.0",
           "ja": "フランドール v1.0.0",

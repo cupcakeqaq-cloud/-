@@ -710,6 +710,14 @@
   }
 
   // ───────── 收集 → 保存 ─────────
+  /* 图标/文件路径可能是从资源管理器直接粘进来的绝对路径（E:\自介网页\assets\…），
+     浏览器解析成 file:// 就是破图；保存时统一收成站内相对路径。 */
+  function webPath(p) {
+    p = String(p || '').trim().replace(/\\/g, '/');
+    var m = p.match(/(?:^|\/)((?:assets|uploads)\/.*)$/);
+    return m ? m[1] : p;
+  }
+
   function collect() {
     var i18n = {};
     Object.keys(S.i18n).forEach(function (k) {
@@ -732,7 +740,7 @@
       },
       resources: {
         items: S.resItems.map(function (it) {
-          return { icon: it.icon, name: it.name, size: it.size, href: it.href };
+          return { icon: webPath(it.icon), name: it.name, size: it.size, href: it.href };
         })
       }
     };
