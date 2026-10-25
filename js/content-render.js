@@ -126,6 +126,9 @@
       var ic = document.createElement('img');
       ic.src = it.icon || 'assets/winxp/windowsIcons/846(32x32).png';
       ic.alt = '';
+      /* 素材原生尺寸够大（海报/头像类）就放大显示，32px 的 XP 图标维持原尺寸不糊 */
+      var bump = function () { if (ic.naturalWidth >= 96) ic.className = 'lg'; };
+      if (ic.complete && ic.naturalWidth) bump(); else ic.addEventListener('load', bump);
       row.appendChild(ic);
 
       var info = document.createElement('div');
