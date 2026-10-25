@@ -58,14 +58,14 @@ window.CONTENT = {
       "en": "Please read the resource readme carefully before use."
     },
     "rsIntroTitle": {
-      "zh": "自制资源下载",
-      "ja": "自作リソースのダウンロード",
-      "en": "Download my own resources"
+      "zh": "资源配布页面",
+      "ja": "リソース配布ページ",
+      "en": "Resource distribution"
     },
     "rsDownloadTitle": {
-      "zh": "转载资源分享",
-      "ja": "転載リソースの共有",
-      "en": "Shared reposted resources"
+      "zh": "资源下载分享",
+      "ja": "リソースのダウンロード共有",
+      "en": "Resource downloads"
     },
     "duckAria": {
       "zh": "彩蛋"
@@ -196,15 +196,15 @@ window.CONTENT = {
         "icon": "assets/winxp/icon.png",
         "name": {
           "zh": "芙兰朵露 v1.1.0",
-          "ja": "フランドール v1.0.0",
-          "en": "Flandre v1.0.0"
+          "ja": "フランドール v1.1.0",
+          "en": "Flandre v1.1.0"
         },
         "size": {
           "zh": "持续更新，详见GitHub",
           "ja": "継続更新中。詳細はGitHubまで。",
           "en": "Continuously updated. See GitHub for details."
         },
-        "href": "uploads/20261019-v1.0.0-b88ff6.zip"
+        "href": "https://github.com/cupcakeqaq-cloud/flandre-desktop-pet"
       },
       {
         "icon": "assets/winxp/windowsIcons/846(32x32).png",
