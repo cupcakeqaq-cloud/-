@@ -195,14 +195,14 @@ window.CONTENT = {
       {
         "icon": "assets/winxp/icon.png",
         "name": {
-          "zh": "芙兰朵露 v1.0.0",
+          "zh": "芙兰朵露 v1.1.0",
           "ja": "フランドール v1.0.0",
           "en": "Flandre v1.0.0"
         },
         "size": {
-          "zh": "约 33.1 MB · zip",
-          "ja": "約 33.1 MB · zip",
-          "en": "~33.1 MB · zip"
+          "zh": "持续更新，详见GitHub",
+          "ja": "継続更新中。詳細はGitHubまで。",
+          "en": "Continuously updated. See GitHub for details."
         },
         "href": "uploads/20261019-v1.0.0-b88ff6.zip"
       },

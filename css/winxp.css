@@ -1057,7 +1057,8 @@ body.grayed #winLayer { pointer-events: none; }
 /* 资源页 */
 .rs-item {
   display: flex; align-items: center; gap: 12px;
-  padding: 13px 15px; border: 2px solid; border-color: #fff #b9b9b9 #b9b9b9 #fff;
+  /* 左边只留 2px：卡片左/上边框是白色，图标要和上方正文的文本列左对齐 */
+  padding: 13px 15px 13px 2px; border: 2px solid; border-color: #fff #b9b9b9 #b9b9b9 #fff;
   border-radius: 6px; background: #fff; margin-bottom: 10px;
 }
 .rs-item img { width: 32px; height: 32px; flex: none; }

@@ -141,13 +141,13 @@
     cmLinksTitle: { zh: '联系方式', ja: '連絡先', en: 'Contact' },
 
     /* ---------- 资源页 ---------- */
-    rsIntroTitle: { zh: '资源简介', ja: '素材について', en: 'About these resources' },
+    rsIntroTitle: { zh: '资源配布页面', ja: 'リソース配布ページ', en: 'Resource distribution' },
     rsIntro: {
       zh: '这里什么都有可能放 —— 会不定时上传本人制作的东西，看到更新就下载吧。',
       ja: 'ここに置くものは何でもありです —— 本人が作ったものを不定期にアップします。更新があったらダウンロードしていってください。',
       en: 'Anything goes here — I upload things I make now and then. Grab whatever you see when it updates.'
     },
-    rsDownloadTitle: { zh: '下载', ja: 'ダウンロード', en: 'Download' },
+    rsDownloadTitle: { zh: '资源下载分享', ja: 'リソースのダウンロード共有', en: 'Resource downloads' },
     /* 显示名跟着语言走；zip 的文件名是中文的，改不了（改了链接就 404） */
     voiceNameFlan: { zh: '芙兰朵露 v1.0.0-beta', ja: 'フランドール v1.0.0-beta', en: 'Flandre v1.0.0-beta' },
     voiceSizeFlan: { zh: '约 33.2 MB · zip', ja: '約 33.2 MB · zip', en: '~33.2 MB · zip' },

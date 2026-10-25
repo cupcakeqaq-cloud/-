@@ -146,7 +146,8 @@
       var a = document.createElement('a');
       a.className = 'rs-dl';
       a.href = enc(it.href);
-      a.setAttribute('download', '');
+      if (/^https?:/i.test(it.href)) { a.target = '_blank'; a.rel = 'noopener'; }
+      else a.setAttribute('download', '');
       a.textContent = (window.t ? window.t('voiceDownload') : '↓ 下载');
       row.appendChild(a);
 
