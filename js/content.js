@@ -57,16 +57,6 @@ window.CONTENT = {
       "ja": "使用前に、リソースのreadmeをよくお読みください。",
       "en": "Please read the resource readme carefully before use."
     },
-    "rsIntroTitle": {
-      "zh": "资源配布页面",
-      "ja": "リソース配布ページ",
-      "en": "Resource distribution"
-    },
-    "rsDownloadTitle": {
-      "zh": "资源下载分享",
-      "ja": "リソースのダウンロード共有",
-      "en": "Resource downloads"
-    },
     "duckAria": {
       "zh": "彩蛋"
     },
