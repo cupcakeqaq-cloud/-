@@ -452,7 +452,9 @@ async function gitSummary() {
   const r = await git(['status', '--porcelain']);
   if (!r.ok) return { ok: false, error: (r.err || '').trim(), changed: [] };
   const changed = r.out.split(/\r?\n/).filter(Boolean);
-  return { ok: true, changed: changed };
+  /* 还卡在本机没推上去的提交数（上次推送失败留下的），提交页要靠它提醒站主补推 */
+  const c = await git(['rev-list', '--count', 'origin/' + CFG.GIT_BRANCH + '..HEAD']);
+  return { ok: true, changed: changed, ahead: c.ok ? parseInt(c.out.trim(), 10) || 0 : 0 };
 }
 
 // ───────────────────────── GitHub（大文件 Releases） ─────────────────────────
@@ -654,24 +656,39 @@ async function route(req, res, url) {
     const log = [];
     const st = await git(['status', '--porcelain']);
     if (!st.ok) return fail(res, 500, 'git status 失败：' + st.err.trim());
-    if (!st.out.trim()) return json(res, 200, { ok: true, nothing: true, log: '没有改动，不用提交' });
+    const dirty = !!st.out.trim();
+    /* 上一次推送失败会留下「提交好了但没推上去」的本地提交。这种情况哪怕没有新改动也得再推一次，
+       不然「没有改动，不用提交」会把它们永远卡在本机，站主以为推了、线上其实没变。 */
+    const cnt = await git(['rev-list', '--count', 'origin/' + CFG.GIT_BRANCH + '..HEAD']);
+    const ahead = cnt.ok ? parseInt(cnt.out.trim(), 10) || 0 : 0;
+    if (!dirty && !ahead) return json(res, 200, { ok: true, nothing: true, log: '没有改动，不用提交' });
 
-    let r = await git(['add', '-A']);
-    log.push('$ git add -A\n' + r.out + r.err);
-    if (!r.ok) return fail(res, 500, log.join('\n'));
+    if (dirty) {
+      let r = await git(['add', '-A']);
+      log.push('$ git add -A\n' + r.out + r.err);
+      if (!r.ok) return fail(res, 500, log.join('\n'));
 
-    r = await git(['commit', '-m', msg]);
-    log.push('$ git commit -m ' + JSON.stringify(msg) + '\n' + r.out + r.err);
-    if (!r.ok) return fail(res, 500, log.join('\n'));
+      r = await git(['commit', '-m', msg]);
+      log.push('$ git commit -m ' + JSON.stringify(msg) + '\n' + r.out + r.err);
+      if (!r.ok) return fail(res, 500, log.join('\n'));
+    } else {
+      log.push('（没有新改动，直接补推 ' + ahead + ' 个还卡在本机的提交）');
+    }
 
-    r = await git(['push', 'origin', CFG.GIT_BRANCH]);
+    let r = await git(['push', 'origin', CFG.GIT_BRANCH]);
     log.push('$ git push origin ' + CFG.GIT_BRANCH + '\n' + r.out + r.err);
+    /* 站主给 git 配了 http.proxy=127.0.0.1:7890（Clash 的混合端口）；Clash 一没开这条推送就整个失败，
+       而直连 GitHub 通常是通的 —— 代理连不上就直连再推一次（认证/分叉这类错不重试，免得弹两次密码框）。 */
+    if (!r.ok && /could not connect|failed to connect|connection (was )?reset|connection refused|proxy|timed out/i.test(r.err)) {
+      r = await git(['-c', 'http.proxy=', '-c', 'https.proxy=', 'push', 'origin', CFG.GIT_BRANCH]);
+      log.push('$ git -c http.proxy= -c https.proxy= push origin ' + CFG.GIT_BRANCH + '（代理连不上，直连重试）\n' + r.out + r.err);
+    }
     if (!r.ok) {
       return json(res, 200, {
         ok: false,
         pushed: false,
         log: log.join('\n'),
-        error: '已提交到本地仓库，但推送失败（常见原因：GitHub 连接被重置，或 GitHub 网页端改过文件导致分叉）。重试一次；还不行就在 GitHub Desktop 里处理。',
+        error: '已提交到本地仓库，但推送失败（常见原因：代理软件 Clash 没开导致 git 连不上 GitHub，或 GitHub 网页端改过文件导致分叉）。代理开着再点一次「保存 + 提交并推送」；还不行就在 GitHub Desktop 里处理。',
       });
     }
     return json(res, 200, { ok: true, pushed: true, log: log.join('\n') });

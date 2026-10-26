@@ -689,9 +689,11 @@
   // ───────── 提交页 ─────────
   function viewGit() {
     var changed = (S.git && S.git.changed) || [];
+    var ahead = (S.git && S.git.ahead) || 0;
     var gitBad = S.git && S.git.ok === false
       ? '<div class="tip" style="color:#a33">git 用不了：' + esc(S.git.error || '') + '　（检查 .env 里的 GIT_PATH 指对了没有）</div>' : '';
     return '<div class="grp"><h3>提交并推送 → ' + esc(S.repo) + ' · ' + esc(S.branch) + '</h3><div class="bd">' + gitBad +
+      (ahead ? '<div class="tip" style="color:#a33;margin-bottom:6px">本地还有 ' + ahead + ' 个提交没推上 GitHub（上次推送失败了）。点下面按钮会直接补推，不用再改内容。</div>' : '') +
       '<div class="lab">本地还没提交的改动（' + changed.length + ' 个文件）</div>' +
       '<div class="tip" style="margin-bottom:6px">' + (changed.length ? changed.map(esc).join('<br>') : '没有改动') + '</div>' +
       '<div class="lab">提交说明</div><input type="text" id="gitmsg" value="后台更新内容">' +
