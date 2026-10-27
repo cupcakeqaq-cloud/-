@@ -113,7 +113,7 @@ window.BLOG_POSTS = [
       "碎碎念"
     ],
     "summary": "终于换掉丑丑的GitHub子域名了~~",
-    "html": "<h2>★本站现在域名为cupcakeqaq.top<span style=\"font-weight: normal;\">★<br></span><p><span style=\"font-weight: normal;\"><br></span></p></h2><p><span style=\"font-weight: normal;\">纠结了很久最后还是买了！嘿嘿终于有自己的域名了<br></span><span style=\"font-weight: normal;\">（是的我特地发个文章就是为了说这点屁事）</span></p><p></p>",
+    "html": "<h2>★本站现在域名为cupcakeqaq.top<span style=\"font-weight: normal;\">★<br></span><p><span style=\"font-weight: normal;\"><br></span></p></h2><p><span style=\"font-weight: normal;\">纠结了很久最后还是买了！嘿嘿终于有自己的域名了<br></span><span style=\"font-weight: normal;\">（是的我特地发个文章就是为了说这点屁事xd</span></p><p></p>",
     "pinned": false,
     "i18n": {
       "ja": {
